@@ -279,6 +279,21 @@ export const AdminDashboard: React.FC = () => {
     remainingSeconds: number;
   } | null>(null);
 
+  // Universal / Room-Wide Exit OTP state (valid for 30 seconds for any student)
+  const [globalOtp, setGlobalOtp] = useState<{
+    otp: string | null;
+    expiresAt: string | null;
+    remainingSeconds: number;
+    isActive: boolean;
+  }>({
+    otp: null,
+    expiresAt: null,
+    remainingSeconds: 0,
+    isActive: false,
+  });
+  const [generatingGlobalOtp, setGeneratingGlobalOtp] = useState(false);
+  const [copiedGlobalOtp, setCopiedGlobalOtp] = useState(false);
+
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Load Overview stats
@@ -412,6 +427,66 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  // Fetch Universal Exit OTP status
+  const fetchGlobalOtpStatus = async () => {
+    try {
+      const res = await api.get<{
+        success: boolean;
+        isActive: boolean;
+        otp: string | null;
+        remainingSeconds: number;
+        expiresAt: string;
+      }>('/admin/global-exit-otp/status');
+
+      if (res.data.success) {
+        setGlobalOtp({
+          otp: res.data.otp,
+          expiresAt: res.data.expiresAt,
+          remainingSeconds: res.data.remainingSeconds || 0,
+          isActive: res.data.isActive,
+        });
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch global OTP status:', err);
+    }
+  };
+
+  // Generate Universal Exit OTP (valid for exactly 30 seconds for any student)
+  const handleGenerateGlobalOtp = async () => {
+    setGeneratingGlobalOtp(true);
+    try {
+      const res = await api.post<{
+        success: boolean;
+        message: string;
+        otp: string;
+        expiresAt: string;
+        validitySeconds: number;
+      }>('/admin/global-exit-otp');
+
+      if (res.data.success) {
+        setGlobalOtp({
+          otp: res.data.otp,
+          expiresAt: res.data.expiresAt,
+          remainingSeconds: res.data.validitySeconds || 30,
+          isActive: true,
+        });
+        setCopiedGlobalOtp(false);
+        setNotification({
+          type: 'success',
+          message: `Universal Exit OTP ${res.data.otp} generated! Valid for 30 seconds for any candidate.`,
+        });
+        fetchAssessmentSessions();
+      }
+    } catch (err: any) {
+      setNotification({
+        type: 'error',
+        message: err?.response?.data?.message || 'Failed to generate universal exit OTP',
+      });
+    } finally {
+      setGeneratingGlobalOtp(false);
+    }
+  };
+
   // Fetch Student History
   const handleOpenStudentHistory = async (studentId: string) => {
     setLoadingHistory(true);
@@ -473,6 +548,7 @@ export const AdminDashboard: React.FC = () => {
     fetchStudents();
     fetchCourses();
     fetchAssessmentSessions();
+    fetchGlobalOtpStatus();
   }, []);
 
   // Live countdown ticker every 1 second
@@ -499,6 +575,17 @@ export const AdminDashboard: React.FC = () => {
           return s;
         })
       );
+
+      // 3. Tick room-wide universal exit OTP (30s window)
+      setGlobalOtp((prev) => {
+        if (!prev.expiresAt) return prev;
+        const diff = Math.max(0, Math.floor((new Date(prev.expiresAt).getTime() - Date.now()) / 1000));
+        return {
+          ...prev,
+          remainingSeconds: diff,
+          isActive: diff > 0,
+        };
+      });
     }, 1000);
 
     return () => clearInterval(timer);
@@ -712,6 +799,7 @@ export const AdminDashboard: React.FC = () => {
           onClick={() => {
             setActiveTab('sessions');
             fetchAssessmentSessions();
+            fetchGlobalOtpStatus();
           }}
           className={`pb-3 font-semibold transition border-b-2 flex items-center space-x-2 ${
             activeTab === 'sessions'
@@ -1087,7 +1175,142 @@ export const AdminDashboard: React.FC = () => {
       {/* Tab 4: Assessment Sessions & Exit OTP Management */}
       {activeTab === 'sessions' && (
         <div className="space-y-6">
-          {/* Active Generated OTP Hero Card (If Active) */}
+          {/* Universal Examination Exit OTP Generator Banner (Always at top of page) */}
+          <div className="rounded-3xl bg-gradient-to-br from-amber-950/40 via-surface-900 to-surface-950 border-2 border-amber-500/60 p-6 sm:p-8 shadow-2xl shadow-amber-500/10 space-y-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+              <div className="flex items-start space-x-4">
+                <div className="h-14 w-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-inner flex-shrink-0">
+                  <KeyRound className="h-7 w-7" />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2.5">
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                      Universal Examination Exit OTP
+                    </span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                      globalOtp.isActive && globalOtp.remainingSeconds > 0
+                        ? 'bg-emerald-950 text-emerald-300 border border-emerald-800 animate-pulse'
+                        : 'bg-surface-800 text-surface-400 border border-surface-700'
+                    }`}>
+                      {globalOtp.isActive && globalOtp.remainingSeconds > 0 ? 'ACTIVE FOR ALL STUDENTS (30s)' : 'INACTIVE / READY'}
+                    </span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-white">
+                    Room-Wide Assessment Exit Verification
+                  </h2>
+                  <p className="text-xs text-surface-400 max-w-2xl">
+                    Generate a master 30-second exit code for the whole lab. Any student who has submitted their assessment can enter this code to instantly verify and log out to the dashboard.
+                  </p>
+                </div>
+              </div>
+
+              {/* Generate OTP Button at the Top of the Page */}
+              <div className="flex items-center space-x-3 flex-shrink-0">
+                <button
+                  onClick={handleGenerateGlobalOtp}
+                  disabled={generatingGlobalOtp}
+                  className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-sm shadow-xl shadow-amber-500/20 transition-all flex items-center space-x-2.5 disabled:opacity-50 cursor-pointer"
+                >
+                  {generatingGlobalOtp ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      <span>Generating 30s OTP...</span>
+                    </>
+                  ) : (
+                    <>
+                      <KeyRound className="h-5 w-5" />
+                      <span>{globalOtp.isActive && globalOtp.remainingSeconds > 0 ? 'Generate New OTP (30s)' : 'Generate OTP'}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* If Global OTP is Active: Large Display Strip with Live 30s Countdown */}
+            {globalOtp.isActive && globalOtp.remainingSeconds > 0 && globalOtp.otp ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center bg-surface-950/90 border border-amber-500/50 rounded-2xl p-6 relative z-10 animate-fadeIn">
+                <div className="md:col-span-2 space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs font-semibold text-surface-400 uppercase tracking-wider">
+                      Announce / Display this 6-Digit Code to Students:
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">
+                      Usable by any candidate
+                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-4">
+                    <span className="text-4xl sm:text-6xl font-mono font-black tracking-widest text-amber-300 bg-surface-900 px-6 py-3 rounded-2xl border-2 border-amber-500/60 shadow-inner select-all">
+                      {globalOtp.otp}
+                    </span>
+                    <button
+                      onClick={() => {
+                        if (globalOtp.otp) {
+                          navigator.clipboard.writeText(globalOtp.otp);
+                          setCopiedGlobalOtp(true);
+                          setTimeout(() => setCopiedGlobalOtp(false), 2000);
+                        }
+                      }}
+                      className="px-4 py-3.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-white text-xs font-semibold border border-surface-700 transition flex items-center space-x-2 cursor-pointer"
+                    >
+                      {copiedGlobalOtp ? (
+                        <>
+                          <Check className="h-4 w-4 text-emerald-400" />
+                          <span className="text-emerald-400">Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-4 w-4" />
+                          <span>Copy OTP</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Live Countdown Wheel/Ticker */}
+                <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-surface-900/90 border border-surface-800 text-center space-y-2.5">
+                  <div className="flex items-center space-x-2 text-surface-400 text-xs font-medium">
+                    <Timer className="h-4 w-4 text-amber-400" />
+                    <span>Valid For (Countdown)</span>
+                  </div>
+                  <div className={`text-4xl font-black font-mono ${
+                    globalOtp.remainingSeconds > 10
+                      ? 'text-emerald-400'
+                      : 'text-amber-400 animate-pulse'
+                  }`}>
+                    {globalOtp.remainingSeconds}s
+                  </div>
+                  {/* Progress Bar */}
+                  <div className="w-full bg-surface-800 h-2.5 rounded-full overflow-hidden">
+                    <div
+                      className={`h-2.5 rounded-full transition-all duration-1000 ${
+                        globalOtp.remainingSeconds > 10 ? 'bg-emerald-500' : 'bg-amber-500'
+                      }`}
+                      style={{ width: `${Math.min(100, Math.max(0, (globalOtp.remainingSeconds / 30) * 100))}%` }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-surface-400">
+                    Strict 30-second server expiration
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 rounded-2xl bg-surface-950/60 border border-surface-800 flex items-center justify-between text-xs text-surface-400">
+                <div className="flex items-center space-x-2.5">
+                  <Clock className="h-4 w-4 text-amber-400" />
+                  <span>
+                    No active universal OTP. Click the <strong className="text-amber-300">Generate OTP</strong> button above to issue a 30-second room exit code.
+                  </span>
+                </div>
+                <span className="text-[11px] text-surface-500">Validity: 30 Seconds</span>
+              </div>
+            )}
+          </div>
+
+          {/* Individual Session Modal Fallback (If Active) */}
           {activeOtpModal && (
             <div className="rounded-3xl bg-gradient-to-br from-amber-950/70 via-surface-900 to-surface-950 border-2 border-amber-500/80 p-6 sm:p-8 shadow-2xl shadow-amber-500/10 space-y-6 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />

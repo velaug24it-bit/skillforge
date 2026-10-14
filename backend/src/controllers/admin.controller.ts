@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import { User, Booking, Course, AssessmentAttempt, StudentProgress, AssessmentLevel } from '../models';
+import { User, Booking, Course, AssessmentAttempt, StudentProgress, AssessmentLevel, GlobalExitOtp } from '../models';
 import { AuthRequest } from '../middlewares/auth';
 import { AppError } from '../middlewares/errorHandler';
 import { EXAM_SLOTS, checkSlotTiming, getCampusNow } from '../utils/slots';
@@ -660,5 +660,74 @@ export const getSessionOtpStatus = async (
     next(error);
   }
 };
+
+export const generateGlobalExitOtp = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const otp = generateSixDigitOtp();
+    const hash = hashOtp(otp, 'GLOBAL_EXIT');
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + OTP_VALIDITY_SECONDS * 1000); // exactly 30s server expiry
+
+    // Delete previous global OTPs to guarantee single active code
+    await GlobalExitOtp.deleteMany({});
+
+    await GlobalExitOtp.create({
+      otp,
+      otpHash: hash,
+      otpGeneratedAt: now,
+      otpExpiresAt: expiresAt,
+      generatedBy: req.user?._id,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Universal 30-second exit OTP generated. Any student can exit using this code.',
+      otp, // 6-digit numeric OTP for administrator to announce or display
+      expiresAt,
+      validitySeconds: OTP_VALIDITY_SECONDS,
+      generatedAt: now,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getGlobalExitOtpStatus = async (
+  _req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const latest = await GlobalExitOtp.findOne().sort({ createdAt: -1 });
+    if (!latest) {
+      res.status(200).json({
+        success: true,
+        isActive: false,
+        remainingSeconds: 0,
+      });
+      return;
+    }
+
+    const now = Date.now();
+    const remaining = Math.max(0, Math.floor((latest.otpExpiresAt.getTime() - now) / 1000));
+    const isActive = remaining > 0;
+
+    res.status(200).json({
+      success: true,
+      isActive,
+      otp: isActive ? latest.otp : null,
+      remainingSeconds: remaining,
+      expiresAt: latest.otpExpiresAt,
+      generatedAt: latest.otpGeneratedAt,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
 
 
