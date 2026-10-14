@@ -91,6 +91,7 @@ export const getCourseById = async (
     // Query active bookings and active attempts for this student in this course
     let studentBookings: any[] = [];
     let activeAttempts: any[] = [];
+    let allCourseAttempts: any[] = [];
 
     if (req.user) {
       studentBookings = await Booking.find({
@@ -104,6 +105,10 @@ export const getCourseById = async (
         status: 'IN_PROGRESS',
         expiresAt: { $gt: new Date() },
       });
+      allCourseAttempts = await AssessmentAttempt.find({
+        studentId: req.user._id,
+        courseId: course._id,
+      }).sort({ createdAt: 1 });
     }
 
     const levelsWithLockState = levels.map((lvl) => {
@@ -115,6 +120,23 @@ export const getCourseById = async (
       );
       const levelAttempt = activeAttempts.find(
         (a) => a.levelId.toString() === lvl._id.toString()
+      );
+
+      // Attempts calculation for this specific level
+      const levelAttemptsList = allCourseAttempts.filter((a: any) => a.levelNumber === lvl.levelNumber);
+      const attemptsCount = levelAttemptsList.length;
+
+      let attemptsToClear: number | null = null;
+      const passedAttemptIndex = levelAttemptsList.findIndex((a: any) => a.passed === true);
+      if (passedAttemptIndex !== -1) {
+        attemptsToClear = passedAttemptIndex + 1;
+      } else if (isCompleted) {
+        attemptsToClear = attemptsCount > 0 ? attemptsCount : 1;
+      }
+
+      const highestScore = levelAttemptsList.reduce(
+        (max: number, a: any) => Math.max(max, a.totalScore || 0),
+        isCompleted ? 100 : 0
       );
 
       let bookingData = null;
@@ -145,6 +167,9 @@ export const getCourseById = async (
         durationMinutes: lvl.durationMinutes,
         isUnlocked,
         isCompleted,
+        attemptsCount,
+        attemptsToClear,
+        highestScore,
         booking: bookingData,
         hasActiveAttempt: !!levelAttempt,
         activeAttemptId: levelAttempt ? levelAttempt._id : null,

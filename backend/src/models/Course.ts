@@ -22,12 +22,12 @@ const courseSchema = new Schema<ICourse>(
     name: {
       type: String,
       required: [true, 'Course name is required'],
+      unique: true,
       trim: true,
     },
     language: {
       type: String,
       required: [true, 'Programming language is required'],
-      unique: true,
       enum: ['c', 'cpp', 'java', 'python', 'javascript'],
       lowercase: true,
       trim: true,

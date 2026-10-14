@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import { User, Booking, Course, AssessmentAttempt, StudentProgress } from '../models';
+import { User, Booking, Course, AssessmentAttempt, StudentProgress, AssessmentLevel } from '../models';
 import { AuthRequest } from '../middlewares/auth';
 import { AppError } from '../middlewares/errorHandler';
 import { EXAM_SLOTS, checkSlotTiming, getCampusNow } from '../utils/slots';
@@ -243,3 +243,246 @@ export const updateBookingAttendance = async (
     next(error);
   }
 };
+
+export const createAdminCourse = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { name, language, description, icon, topics } = req.body;
+
+    if (!name || !name.trim()) {
+      return next(new AppError('Course name is required', 400));
+    }
+    if (!language || !['c', 'cpp', 'java', 'python', 'javascript'].includes(language)) {
+      return next(new AppError('Valid language (c, cpp, java, python, javascript) is required', 400));
+    }
+    if (!description || !description.trim()) {
+      return next(new AppError('Course description is required', 400));
+    }
+
+    // Check for duplicate course name
+    const existing = await Course.findOne({ name: name.trim() });
+    if (existing) {
+      return next(new AppError('A course with this name already exists', 400));
+    }
+
+    const { createFullCourseHierarchy } = await import('../utils/courseFactory');
+    const { course, levels } = await createFullCourseHierarchy({
+      name: name.trim(),
+      language,
+      description: description.trim(),
+      icon: icon || 'Code',
+      topics,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: `Course "${course.name}" and 4 assessment levels created successfully!`,
+      course: {
+        id: course._id,
+        name: course.name,
+        language: course.language,
+        description: course.description,
+        icon: course.icon,
+        totalLevels: course.totalLevels,
+        levelsCount: levels.length,
+      },
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getAdminCourses = async (
+  _req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const courses = await Course.find().sort({ createdAt: -1 });
+
+    const courseIds = courses.map((c) => c._id);
+    const [allProgress, allLevels] = await Promise.all([
+      StudentProgress.find({ courseId: { $in: courseIds } }),
+      AssessmentLevel.find({ courseId: { $in: courseIds } }),
+    ]);
+
+    const coursesData = courses.map((c) => {
+      const progress = allProgress.filter((p) => p.courseId.toString() === c._id.toString());
+      const enrolledCount = progress.length;
+      const completedCount = progress.filter((p) => p.completedLevels.length >= c.totalLevels).length;
+      const levels = allLevels.filter((lvl) => lvl.courseId.toString() === c._id.toString());
+
+      return {
+        id: c._id,
+        name: c.name,
+        language: c.language,
+        description: c.description,
+        icon: c.icon,
+        totalLevels: c.totalLevels,
+        isActive: c.isActive,
+        createdAt: c.createdAt,
+        levelsCount: levels.length,
+        enrolledCount,
+        completedCount,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      courses: coursesData,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getAdminStudentHistory = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { studentId } = req.params;
+
+    const student = await User.findById(studentId).select('-password');
+    if (!student || student.role !== 'student') {
+      return next(new AppError('Student profile not found', 404));
+    }
+
+    const [allCourses, studentProgress, attempts, bookings] = await Promise.all([
+      Course.find({ isActive: true }).sort({ createdAt: 1 }),
+      StudentProgress.find({ studentId: student._id }).populate('courseId', 'name language icon totalLevels'),
+      AssessmentAttempt.find({ studentId: student._id })
+        .populate('courseId', 'name language')
+        .populate('levelId', 'levelNumber title category')
+        .sort({ createdAt: -1 }),
+      Booking.find({ studentId: student._id })
+        .populate('courseId', 'name language')
+        .populate('levelId', 'levelNumber title')
+        .sort({ date: -1, startTime: -1 }),
+    ]);
+
+    // Calculate course-by-course and level-by-level history
+    const progressMap = new Map<string, any>();
+    studentProgress.forEach((p) => {
+      progressMap.set((p.courseId as any)?._id?.toString() || p.courseId.toString(), p);
+    });
+
+    const coursesProgress = allCourses.map((c) => {
+      const p = progressMap.get(c._id.toString());
+      const currentUnlockedLevel = p ? p.currentUnlockedLevel : 1;
+      const completedLevels: number[] = p ? p.completedLevels : [];
+
+      const courseAttempts = attempts.filter((a) => a.courseId && (a.courseId as any)._id?.toString() === c._id.toString());
+
+      // Build levels 1 to 4 breakdown
+      const levels = [1, 2, 3, 4].map((lvlNum) => {
+        const isCompleted = completedLevels.includes(lvlNum);
+        const isUnlocked = lvlNum <= currentUnlockedLevel;
+        const levelAttempts = courseAttempts.filter((a) => a.levelNumber === lvlNum);
+
+        // Find how many attempts were made before clearing
+        let attemptsToClear: number | null = null;
+        const passedIndex = levelAttempts.findIndex((a) => a.passed === true);
+        if (passedIndex !== -1) {
+          attemptsToClear = levelAttempts.length - passedIndex; // since sorted desc, calculate chronological
+        } else if (isCompleted) {
+          attemptsToClear = levelAttempts.length > 0 ? levelAttempts.length : 1;
+        }
+
+        const highestScore = levelAttempts.reduce(
+          (max, a) => Math.max(max, a.totalScore || 0),
+          isCompleted ? 100 : 0
+        );
+
+        return {
+          levelNumber: lvlNum,
+          title: `Level ${lvlNum}`,
+          status: isCompleted ? ('COMPLETED' as const) : isUnlocked ? ('UNLOCKED' as const) : ('LOCKED' as const),
+          isCompleted,
+          isUnlocked,
+          attemptsCount: levelAttempts.length,
+          attemptsToClear,
+          highestScore,
+          attempts: levelAttempts.map((a) => ({
+            id: a._id,
+            score: a.totalScore,
+            passed: a.passed,
+            status: a.status,
+            createdAt: a.createdAt,
+            completedAt: a.completedAt,
+          })),
+        };
+      });
+
+      return {
+        courseId: c._id,
+        courseName: c.name,
+        language: c.language,
+        icon: c.icon,
+        totalLevels: c.totalLevels,
+        isEnrolled: !!p,
+        currentUnlockedLevel,
+        completedLevelsCount: completedLevels.length,
+        isCompleted: completedLevels.length >= c.totalLevels,
+        progressPercentage: Math.round((completedLevels.length / c.totalLevels) * 100),
+        levels,
+      };
+    });
+
+    const passedAttemptsCount = attempts.filter((a) => a.passed).length;
+    const passRate = attempts.length > 0 ? Math.round((passedAttemptsCount / attempts.length) * 100) : 0;
+    const totalClearedLevels = studentProgress.reduce((sum, p) => sum + p.completedLevels.length, 0);
+
+    res.status(200).json({
+      success: true,
+      student: {
+        id: student._id,
+        name: student.name,
+        email: student.email,
+        createdAt: student.createdAt,
+      },
+      stats: {
+        totalCoursesEnrolled: studentProgress.length,
+        totalLevelsCleared: totalClearedLevels,
+        totalAttempts: attempts.length,
+        passedAttempts: passedAttemptsCount,
+        passRate,
+        totalBookings: bookings.length,
+      },
+      coursesProgress,
+      attemptsHistory: attempts.map((a) => ({
+        id: a._id,
+        courseName: (a.courseId as any)?.name || 'Course',
+        language: (a.courseId as any)?.language || '',
+        levelNumber: a.levelNumber,
+        levelTitle: (a.levelId as any)?.title || `Level ${a.levelNumber}`,
+        totalScore: a.totalScore,
+        passed: a.passed,
+        status: a.status,
+        createdAt: a.createdAt,
+        completedAt: a.completedAt,
+        questionsCount: a.questionSubmissions?.length || 0,
+      })),
+      bookingsHistory: bookings.map((b) => ({
+        id: b._id,
+        slotReference: b.slotReference,
+        courseName: (b.courseId as any)?.name || 'Course',
+        levelNumber: (b.levelId as any)?.levelNumber || 1,
+        date: b.date,
+        startTime: b.startTime,
+        endTime: b.endTime,
+        status: b.status,
+        attendanceStatus: b.attendanceStatus,
+        markedAt: b.markedAt,
+        createdAt: b.createdAt,
+      })),
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+

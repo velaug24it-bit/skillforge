@@ -11,7 +11,8 @@ import {
   Calendar, 
   ArrowLeft, 
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  RotateCcw
 } from 'lucide-react';
 
 interface LevelBooking {
@@ -38,6 +39,9 @@ interface LevelDetail {
   durationMinutes: number;
   isUnlocked: boolean;
   isCompleted: boolean;
+  attemptsCount?: number;
+  attemptsToClear?: number | null;
+  highestScore?: number;
   booking?: LevelBooking | null;
   hasActiveAttempt?: boolean;
   activeAttemptId?: string | null;
@@ -225,15 +229,27 @@ export const CourseDetails: React.FC = () => {
 
                     <div>
                       {isCompleted ? (
-                        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                          <span>Cleared (100/100)</span>
-                        </span>
+                        <div className="flex flex-col items-end space-y-0.5">
+                          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            <span>Cleared (100/100)</span>
+                          </span>
+                          <span className="text-[10px] text-emerald-400 font-medium">
+                            Cleared in {level.attemptsToClear || level.attemptsCount || 1} {(level.attemptsToClear || level.attemptsCount || 1) === 1 ? 'attempt' : 'attempts'}
+                          </span>
+                        </div>
                       ) : isUnlocked ? (
-                        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-brand-950 text-brand-300 border border-brand-800">
-                          <Unlock className="h-3 w-3" />
-                          <span>Unlocked</span>
-                        </span>
+                        <div className="flex flex-col items-end space-y-0.5">
+                          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-brand-950 text-brand-300 border border-brand-800">
+                            <Unlock className="h-3 w-3" />
+                            <span>Unlocked</span>
+                          </span>
+                          <span className="text-[10px] text-surface-400 font-medium">
+                            {typeof level.attemptsCount === 'number' && level.attemptsCount > 0
+                              ? `${level.attemptsCount} attempt${level.attemptsCount === 1 ? '' : 's'} made (Best: ${level.highestScore || 0}/100)`
+                              : '0 attempts made'}
+                          </span>
+                        </div>
                       ) : (
                         <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-surface-800 text-surface-400 border border-surface-700">
                           <Lock className="h-3 w-3" />
@@ -248,14 +264,22 @@ export const CourseDetails: React.FC = () => {
                   </p>
 
                   {/* Level Exam Specifications */}
-                  <div className="grid grid-cols-2 gap-2 text-[11px] py-2 border-y border-surface-800">
+                  <div className="grid grid-cols-3 gap-2 text-[11px] py-2 border-y border-surface-800">
                     <div className="flex items-center space-x-1.5 text-surface-400">
                       <Clock className="h-3.5 w-3.5 text-surface-500" />
-                      <span>Duration: {level.durationMinutes} Mins</span>
+                      <span>{level.durationMinutes} Mins</span>
                     </div>
                     <div className="flex items-center space-x-1.5 text-surface-400">
                       <Award className="h-3.5 w-3.5 text-surface-500" />
-                      <span>2 Questions (50 marks each)</span>
+                      <span>2 Qs (100 pts)</span>
+                    </div>
+                    <div className="flex items-center space-x-1.5 text-surface-400">
+                      <RotateCcw className="h-3.5 w-3.5 text-surface-500" />
+                      <span>
+                        {isCompleted
+                          ? `${level.attemptsToClear || 1} att. to clear`
+                          : `${level.attemptsCount || 0} attempts`}
+                      </span>
                     </div>
                   </div>
 
@@ -410,6 +434,33 @@ export const CourseDetails: React.FC = () => {
                         </>
                       )}
                     </div>
+                  ) : isCompleted ? (
+                    <div className="space-y-2">
+                      <div className="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-800 text-[11px] text-emerald-300 flex items-center justify-between">
+                        <span className="flex items-center space-x-1.5">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                          <strong className="text-white">Completed</strong>
+                          <span>({level.attemptsToClear || level.attemptsCount || 1} {(level.attemptsToClear || level.attemptsCount || 1) === 1 ? 'attempt' : 'attempts'})</span>
+                        </span>
+                        <span className="font-semibold text-emerald-400">100/100</span>
+                      </div>
+                      {level.levelNumber < 4 && (
+                        <button
+                          onClick={() => navigate(`/book-exam?courseId=${course.id}&level=${level.levelNumber + 1}`)}
+                          className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center justify-center space-x-2"
+                        >
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span>Book Level {level.levelNumber + 1} Slot &rarr;</span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => navigate(`/book-exam?courseId=${course.id}&level=${level.levelNumber}`)}
+                        className="w-full py-2 px-3 rounded-xl bg-surface-950 hover:bg-surface-800 text-surface-400 hover:text-white border border-surface-800 text-[11px] font-medium transition flex items-center justify-center space-x-1.5"
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                        <span>Book Slot for Retake</span>
+                      </button>
+                    </div>
                   ) : (
                     <div className="space-y-2">
                       <div className="p-2 rounded-lg bg-surface-950 border border-surface-800 text-[11px] text-surface-400 flex items-center space-x-1.5">
@@ -421,7 +472,7 @@ export const CourseDetails: React.FC = () => {
                         className="w-full py-2.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs shadow-md shadow-brand-600/30 transition flex items-center justify-center space-x-2"
                       >
                         <Calendar className="h-3.5 w-3.5" />
-                        <span>{isCompleted ? 'Book Slot for Retake' : 'Book Assessment Slot'}</span>
+                        <span>Book Assessment Slot</span>
                       </button>
                     </div>
                   )}
