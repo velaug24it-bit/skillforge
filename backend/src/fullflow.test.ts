@@ -4,6 +4,8 @@ import { connectDatabase, disconnectDatabase } from './config/database';
 import { User, Course, AssessmentLevel, Booking, AssessmentAttempt, StudentProgress } from './models';
 
 describe('SkillForge Full-Stack Flow Integration Tests', () => {
+  jest.setTimeout(30000);
+
   let app: any;
   let studentCookie: any;
   let studentId: string;

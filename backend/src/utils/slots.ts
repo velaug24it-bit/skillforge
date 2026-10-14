@@ -23,3 +23,85 @@ export const generateSlotReference = (date: string, startTime: string): string =
   const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
   return `SF-${cleanDate}-${cleanTime}-${randomSuffix}`;
 };
+
+export interface CampusTime {
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm
+}
+
+export const getCampusNow = (): CampusTime => {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(now);
+  const getPart = (type: string) => parts.find((p) => p.type === type)?.value || '00';
+  const date = `${getPart('year')}-${getPart('month')}-${getPart('day')}`;
+  const time = `${getPart('hour')}:${getPart('minute')}`;
+  return { date, time };
+};
+
+export interface SlotTimingStatus {
+  isNow: boolean;
+  isFuture: boolean;
+  isPast: boolean;
+  message: string;
+}
+
+export const checkSlotTiming = (
+  date: string,
+  startTime: string,
+  endTime: string
+): SlotTimingStatus => {
+  const campus = getCampusNow();
+
+  if (date < campus.date) {
+    return {
+      isNow: false,
+      isFuture: false,
+      isPast: true,
+      message: `Exam slot on ${date} has expired.`,
+    };
+  }
+
+  if (date > campus.date) {
+    return {
+      isNow: false,
+      isFuture: true,
+      isPast: false,
+      message: `Exam slot scheduled for ${date} at ${startTime} (Asia/Kolkata).`,
+    };
+  }
+
+  // Date is today in Asia/Kolkata
+  if (campus.time < startTime) {
+    return {
+      isNow: false,
+      isFuture: true,
+      isPast: false,
+      message: `Exam slot starts today at ${startTime} (Asia/Kolkata).`,
+    };
+  }
+
+  if (campus.time > endTime) {
+    return {
+      isNow: false,
+      isFuture: false,
+      isPast: true,
+      message: `Exam slot ended today at ${endTime} (Asia/Kolkata).`,
+    };
+  }
+
+  return {
+    isNow: true,
+    isFuture: false,
+    isPast: false,
+    message: `Exam slot is active right now (${startTime} – ${endTime} Asia/Kolkata).`,
+  };
+};

@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { Course, AssessmentLevel, StudentProgress, Booking, AssessmentAttempt } from '../models';
 import { AuthRequest } from '../middlewares/auth';
 import { AppError } from '../middlewares/errorHandler';
+import { checkSlotTiming } from '../utils/slots';
 
 export const getAllCourses = async (
   req: AuthRequest,
@@ -87,18 +88,67 @@ export const getCourseById = async (
     const currentUnlockedLevel = progress ? progress.currentUnlockedLevel : 1;
     const completedLevels = progress ? progress.completedLevels : [];
 
-    const levelsWithLockState = levels.map((lvl) => ({
-      id: lvl._id,
-      levelNumber: lvl.levelNumber,
-      title: lvl.title,
-      category: lvl.category,
-      description: lvl.description,
-      topics: lvl.topics,
-      passingScore: lvl.passingScore,
-      durationMinutes: lvl.durationMinutes,
-      isUnlocked: lvl.levelNumber <= currentUnlockedLevel,
-      isCompleted: completedLevels.includes(lvl.levelNumber),
-    }));
+    // Query active bookings and active attempts for this student in this course
+    let studentBookings: any[] = [];
+    let activeAttempts: any[] = [];
+
+    if (req.user) {
+      studentBookings = await Booking.find({
+        studentId: req.user._id,
+        courseId: course._id,
+        status: 'BOOKED',
+      });
+      activeAttempts = await AssessmentAttempt.find({
+        studentId: req.user._id,
+        courseId: course._id,
+        status: 'IN_PROGRESS',
+        expiresAt: { $gt: new Date() },
+      });
+    }
+
+    const levelsWithLockState = levels.map((lvl) => {
+      const isUnlocked = lvl.levelNumber <= currentUnlockedLevel;
+      const isCompleted = completedLevels.includes(lvl.levelNumber);
+
+      const levelBooking = studentBookings.find(
+        (b) => b.levelId.toString() === lvl._id.toString()
+      );
+      const levelAttempt = activeAttempts.find(
+        (a) => a.levelId.toString() === lvl._id.toString()
+      );
+
+      let bookingData = null;
+      if (levelBooking) {
+        const timing = checkSlotTiming(levelBooking.date, levelBooking.startTime, levelBooking.endTime);
+        bookingData = {
+          id: levelBooking._id,
+          slotReference: levelBooking.slotReference,
+          date: levelBooking.date,
+          startTime: levelBooking.startTime,
+          endTime: levelBooking.endTime,
+          isNow: timing.isNow || !!levelAttempt,
+          isFuture: timing.isFuture && !levelAttempt,
+          isPast: timing.isPast && !levelAttempt,
+          message: timing.message,
+        };
+      }
+
+      return {
+        id: lvl._id,
+        levelNumber: lvl.levelNumber,
+        title: lvl.title,
+        category: lvl.category,
+        description: lvl.description,
+        topics: lvl.topics,
+        passingScore: lvl.passingScore,
+        durationMinutes: lvl.durationMinutes,
+        isUnlocked,
+        isCompleted,
+        booking: bookingData,
+        hasActiveAttempt: !!levelAttempt,
+        activeAttemptId: levelAttempt ? levelAttempt._id : null,
+      };
+    });
 
     res.status(200).json({
       success: true,

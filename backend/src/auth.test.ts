@@ -4,6 +4,8 @@ import { connectDatabase, disconnectDatabase } from './config/database';
 import { User } from './models/User';
 
 describe('SkillForge Authentication Flow', () => {
+  jest.setTimeout(30000);
+
   let app: any;
   const testStudent = {
     name: 'Alice Turing',

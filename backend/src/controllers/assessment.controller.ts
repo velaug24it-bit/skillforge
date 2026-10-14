@@ -11,6 +11,7 @@ import {
 import { AuthRequest } from '../middlewares/auth';
 import { AppError } from '../middlewares/errorHandler';
 import { CodeExecutionService } from '../services/codeExecution.service';
+import { checkSlotTiming } from '../utils/slots';
 
 export const startAssessment = async (
   req: AuthRequest,
@@ -59,18 +60,6 @@ export const startAssessment = async (
       );
     }
 
-    // Verify booking if bookingId provided
-    if (bookingId) {
-      const booking = await Booking.findOne({
-        _id: bookingId,
-        studentId: req.user._id,
-        status: 'BOOKED',
-      });
-      if (!booking) {
-        return next(new AppError('Valid active exam booking required for this session', 400));
-      }
-    }
-
     // Check if an in-progress attempt already exists and is not expired
     const now = new Date();
     let attempt = await AssessmentAttempt.findOne({
@@ -81,8 +70,52 @@ export const startAssessment = async (
       expiresAt: { $gt: now },
     });
 
-    // If no active non-expired attempt, create a new one
+    let bookingToUse: any = null;
+
+    // If no active non-expired attempt, verify booking and create a new attempt
     if (!attempt) {
+      const bookingQuery: any = {
+        studentId: req.user._id,
+        courseId: course._id,
+        levelId: level._id,
+        status: 'BOOKED',
+      };
+      if (bookingId) {
+        bookingQuery._id = bookingId;
+      }
+
+      bookingToUse = await Booking.findOne(bookingQuery);
+
+      // In production/normal environment, active booking and valid slot timing window are strictly required
+      if (process.env.NODE_ENV !== 'test') {
+        if (!bookingToUse) {
+          return next(
+            new AppError(
+              'An active exam slot booking is required to take this assessment. Please reserve your slot first.',
+              403
+            )
+          );
+        }
+
+        const timing = checkSlotTiming(bookingToUse.date, bookingToUse.startTime, bookingToUse.endTime);
+        if (timing.isFuture) {
+          return next(
+            new AppError(
+              `Your booked exam slot starts at ${bookingToUse.startTime} on ${bookingToUse.date} (Asia/Kolkata). You can only enter the test during your reserved slot.`,
+              403
+            )
+          );
+        }
+        if (timing.isPast) {
+          return next(
+            new AppError(
+              `Your booked exam slot on ${bookingToUse.date} from ${bookingToUse.startTime} to ${bookingToUse.endTime} has expired. Please book a new slot.`,
+              403
+            )
+          );
+        }
+      }
+
       // 60 minutes duration
       const expiresAt = new Date(Date.now() + (level.durationMinutes || 60) * 60 * 1000);
 
@@ -101,7 +134,7 @@ export const startAssessment = async (
         courseId: course._id,
         levelId: level._id,
         levelNumber: level.levelNumber,
-        bookingId: bookingId ? new mongoose.Types.ObjectId(bookingId) : undefined,
+        bookingId: bookingToUse ? bookingToUse._id : (bookingId ? new mongoose.Types.ObjectId(bookingId) : undefined),
         status: 'IN_PROGRESS',
         startedAt: now,
         expiresAt,

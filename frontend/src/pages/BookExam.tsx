@@ -2,15 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { 
-  Calendar as CalendarIcon, 
+  Calendar as CalendarIcon,
   Clock, 
   CheckCircle2, 
   AlertCircle, 
   RefreshCw, 
   ShieldCheck, 
   Info,
-  ArrowRight
+  ArrowRight,
+  Play
 } from 'lucide-react';
+import { checkSlotStatus } from '../utils/slotTiming';
 
 interface CourseOption {
   id: string;
@@ -35,12 +37,19 @@ export const BookExam: React.FC = () => {
 
   const [courses, setCourses] = useState<CourseOption[]>([]);
   const [selectedCourseId, setSelectedCourseId] = useState<string>(searchParams.get('courseId') || '');
-  const [selectedLevelNumber, setSelectedLevelNumber] = useState<number>(1);
+  const [selectedLevelNumber, setSelectedLevelNumber] = useState<number>(() => {
+    const lvl = searchParams.get('level');
+    return lvl ? parseInt(lvl, 10) : 1;
+  });
   const [selectedDate, setSelectedDate] = useState<string>(() => {
-    // Default to tomorrow or today
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split('T')[0];
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    return formatter.format(now);
   });
   const [slots, setSlots] = useState<SlotOption[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<SlotOption | null>(null);
@@ -48,8 +57,17 @@ export const BookExam: React.FC = () => {
   const [loadingCourses, setLoadingCourses] = useState(true);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [bookingInProgress, setBookingInProgress] = useState(false);
+  const [launchingExam, setLaunchingExam] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successBooking, setSuccessBooking] = useState<any | null>(null);
+
+  // Sync state when query params change
+  useEffect(() => {
+    const cid = searchParams.get('courseId');
+    if (cid) setSelectedCourseId(cid);
+    const lvl = searchParams.get('level');
+    if (lvl) setSelectedLevelNumber(parseInt(lvl, 10));
+  }, [searchParams]);
 
   // Load available courses
   useEffect(() => {
@@ -120,7 +138,11 @@ export const BookExam: React.FC = () => {
       });
 
       if (response.data.success) {
-        setSuccessBooking(response.data.booking);
+        setSuccessBooking({
+          ...response.data.booking,
+          courseId: selectedCourseId,
+          levelId: targetLevel.id,
+        });
       }
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || 'Failed to book slot');
@@ -128,6 +150,26 @@ export const BookExam: React.FC = () => {
       fetchAvailability();
     } finally {
       setBookingInProgress(false);
+    }
+  };
+
+  const handleEnterExamNow = async () => {
+    if (!successBooking) return;
+    setLaunchingExam(true);
+    setError(null);
+    try {
+      const response = await api.post('/assessments/start', {
+        courseId: successBooking.courseId || selectedCourseId,
+        levelId: successBooking.levelId,
+        bookingId: successBooking.id,
+      });
+
+      if (response.data.success && response.data.attempt) {
+        navigate(`/workspace/${response.data.attempt.id}`);
+      }
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Failed to initialize assessment workspace');
+      setLaunchingExam(false);
     }
   };
 
@@ -166,60 +208,109 @@ export const BookExam: React.FC = () => {
 
       {/* Success Booking Modal / Banner */}
       {successBooking ? (
-        <div className="rounded-2xl bg-surface-900 border border-emerald-800 p-8 text-center space-y-6 shadow-2xl">
-          <div className="h-16 w-16 rounded-full bg-emerald-950 border border-emerald-700/60 flex items-center justify-center mx-auto text-emerald-400">
-            <CheckCircle2 className="h-8 w-8" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-xl font-bold text-white">Examination Slot Confirmed!</h2>
-            <p className="text-xs text-surface-300 max-w-md mx-auto">
-              Your examination reservation is locked in the system. Use your reference code to attend the examination.
-            </p>
-          </div>
+        (() => {
+          const slotTiming = checkSlotStatus(
+            successBooking.date,
+            successBooking.startTime,
+            successBooking.endTime
+          );
 
-          {/* Ticket Card */}
-          <div className="max-w-md mx-auto p-5 rounded-xl bg-surface-950 border border-surface-800 text-left space-y-3 font-mono text-xs">
-            <div className="flex justify-between pb-2 border-b border-surface-800">
-              <span className="text-surface-400">Booking Reference</span>
-              <span className="font-bold text-brand-400">{successBooking.slotReference}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-surface-400">Course</span>
-              <span className="text-white">{successBooking.courseName}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-surface-400">Level</span>
-              <span className="text-white">Level {successBooking.levelNumber}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-surface-400">Date</span>
-              <span className="text-white">{successBooking.date}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-surface-400">Time Window</span>
-              <span className="text-white">{successBooking.startTime} – {successBooking.endTime} ({successBooking.campusTimezone})</span>
-            </div>
-          </div>
+          return (
+            <div className="rounded-2xl bg-surface-900 border border-emerald-800 p-8 text-center space-y-6 shadow-2xl">
+              <div className="h-16 w-16 rounded-full bg-emerald-950 border border-emerald-700/60 flex items-center justify-center mx-auto text-emerald-400">
+                <CheckCircle2 className="h-8 w-8" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-white">Examination Slot Confirmed!</h2>
+                <p className="text-xs text-surface-300 max-w-md mx-auto">
+                  Your examination reservation is locked in the system. Use your reference code to attend the examination.
+                </p>
+              </div>
 
-          <div className="flex justify-center space-x-4">
-            <button
-              onClick={() => navigate('/my-assessments')}
-              className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs shadow-lg shadow-brand-600/30 transition flex items-center space-x-1.5"
-            >
-              <span>Go to My Assessments</span>
-              <ArrowRight className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => {
-                setSuccessBooking(null);
-                fetchAvailability();
-              }}
-              className="px-4 py-2.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-surface-300 text-xs font-semibold border border-surface-700 transition"
-            >
-              Book Another Slot
-            </button>
-          </div>
-        </div>
+              {/* Ticket Card */}
+              <div className="max-w-md mx-auto p-5 rounded-xl bg-surface-950 border border-surface-800 text-left space-y-3 font-mono text-xs">
+                <div className="flex justify-between pb-2 border-b border-surface-800">
+                  <span className="text-surface-400">Booking Reference</span>
+                  <span className="font-bold text-brand-400">{successBooking.slotReference}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-surface-400">Course</span>
+                  <span className="text-white">{successBooking.courseName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-surface-400">Level</span>
+                  <span className="text-white">Level {successBooking.levelNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-surface-400">Date</span>
+                  <span className="text-white">{successBooking.date}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-surface-400">Time Window</span>
+                  <span className="text-white">{successBooking.startTime} – {successBooking.endTime} ({successBooking.campusTimezone})</span>
+                </div>
+              </div>
+
+              {/* Timing Condition Indicator */}
+              {slotTiming.isNow ? (
+                <div className="max-w-md mx-auto p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-700/60 text-emerald-300 text-xs text-center font-medium space-y-1">
+                  <div className="flex items-center justify-center space-x-1.5 text-emerald-400 font-semibold">
+                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
+                    <span>Your exam slot is ACTIVE RIGHT NOW!</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-300/80">
+                    You can enter the assessment workspace immediately.
+                  </p>
+                </div>
+              ) : (
+                <div className="max-w-md mx-auto p-3.5 rounded-xl bg-brand-950/50 border border-brand-800 text-brand-300 text-xs text-center space-y-1">
+                  <div className="flex items-center justify-center space-x-1.5 text-brand-300 font-semibold">
+                    <Clock className="h-4 w-4 text-brand-400" />
+                    <span>Scheduled for {successBooking.date} at {successBooking.startTime} IST</span>
+                  </div>
+                  <p className="text-[11px] text-brand-300/80">
+                    The examination workspace will unlock automatically when your scheduled timing begins.
+                  </p>
+                </div>
+              )}
+
+              <div className="flex flex-wrap justify-center gap-4">
+                {slotTiming.isNow && (
+                  <button
+                    onClick={handleEnterExamNow}
+                    disabled={launchingExam}
+                    className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-lg shadow-emerald-600/30 transition flex items-center space-x-2 disabled:opacity-50"
+                  >
+                    {launchingExam ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                        <span>Launching Exam...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="h-4 w-4" />
+                        <span>Enter Exam Workspace Now</span>
+                      </>
+                    )}
+                  </button>
+                )}
+                <button
+                  onClick={() => navigate(`/courses/${selectedCourseId}`)}
+                  className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs shadow-lg shadow-brand-600/30 transition flex items-center space-x-1.5"
+                >
+                  <span>Back to Course Levels</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => navigate('/my-assessments')}
+                  className="px-4 py-2.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-surface-300 text-xs font-semibold border border-surface-700 transition"
+                >
+                  Go to My Assessments
+                </button>
+              </div>
+            </div>
+          );
+        })()
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Controls: Course, Level, Date */}

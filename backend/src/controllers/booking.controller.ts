@@ -2,7 +2,7 @@ import { Response, NextFunction } from 'express';
 import { Booking, Course, AssessmentLevel, StudentProgress } from '../models';
 import { AuthRequest } from '../middlewares/auth';
 import { AppError } from '../middlewares/errorHandler';
-import { EXAM_SLOTS, generateSlotReference } from '../utils/slots';
+import { EXAM_SLOTS, generateSlotReference, checkSlotTiming } from '../utils/slots';
 
 export const getSlotAvailability = async (
   req: AuthRequest,
@@ -162,8 +162,10 @@ export const createBooking = async (
         booking: {
           id: booking._id,
           slotReference: booking.slotReference,
+          courseId: course._id,
           courseName: course.name,
           language: course.language,
+          levelId: level._id,
           levelTitle: level.title,
           levelNumber: level.levelNumber,
           date: booking.date,
@@ -202,19 +204,28 @@ export const getMyBookings = async (
 
     res.status(200).json({
       success: true,
-      bookings: bookings.map((b) => ({
-        id: b._id,
-        slotReference: b.slotReference,
-        courseName: (b.courseId as any)?.name,
-        language: (b.courseId as any)?.language,
-        levelTitle: (b.levelId as any)?.title,
-        levelNumber: (b.levelId as any)?.levelNumber,
-        date: b.date,
-        startTime: b.startTime,
-        endTime: b.endTime,
-        status: b.status,
-        createdAt: b.createdAt,
-      })),
+      bookings: bookings.map((b) => {
+        const timing = checkSlotTiming(b.date, b.startTime, b.endTime);
+        return {
+          id: b._id,
+          slotReference: b.slotReference,
+          courseId: (b.courseId as any)?._id,
+          courseName: (b.courseId as any)?.name,
+          language: (b.courseId as any)?.language,
+          levelId: (b.levelId as any)?._id,
+          levelTitle: (b.levelId as any)?.title,
+          levelNumber: (b.levelId as any)?.levelNumber,
+          date: b.date,
+          startTime: b.startTime,
+          endTime: b.endTime,
+          status: b.status,
+          isNow: b.status === 'BOOKED' && timing.isNow,
+          isFuture: b.status === 'BOOKED' && timing.isFuture,
+          isPast: b.status === 'BOOKED' && timing.isPast,
+          timingMessage: timing.message,
+          createdAt: b.createdAt,
+        };
+      }),
     });
   } catch (error: any) {
     next(error);
