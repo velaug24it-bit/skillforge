@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Terminal, Lock, Mail, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
 
 export const Login: React.FC = () => {
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as any)?.from?.pathname || '/dashboard';
+
+  if (user) {
+    return <Navigate to={user.role === 'admin' ? '/admin' : from} replace />;
+  }
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

@@ -47,7 +47,7 @@ export const Navbar: React.FC = () => {
     ? '#'
     : user
     ? (user.role === 'admin' ? '/admin' : '/dashboard')
-    : '/';
+    : '/login';
 
   return (
     <header className="border-b border-surface-800 bg-surface-900/80 backdrop-blur-md sticky top-0 z-50">
