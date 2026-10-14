@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import request from 'supertest';
 import { createApp } from './app';
 import { disconnectDatabase } from './config/database';
