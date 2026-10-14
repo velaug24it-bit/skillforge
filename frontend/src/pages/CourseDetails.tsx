@@ -20,6 +20,7 @@ interface LevelBooking {
   date: string;
   startTime: string;
   endTime: string;
+  attendanceStatus?: 'PENDING' | 'PRESENT' | 'ABSENT';
   isNow: boolean;
   isFuture: boolean;
   isPast: boolean;
@@ -300,33 +301,74 @@ export const CourseDetails: React.FC = () => {
                   ) : level.booking ? (
                     <div className="space-y-2">
                       {level.booking.isNow ? (
-                        <>
-                          <div className="p-2 rounded-lg bg-emerald-950/50 border border-emerald-600/60 text-[11px] text-emerald-300 flex items-center justify-between">
-                            <span className="flex items-center space-x-1.5">
-                              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                              <strong className="text-white">Slot Active:</strong>
-                              <span>{level.booking.startTime} – {level.booking.endTime}</span>
-                            </span>
-                            <span className="font-mono text-[10px] text-emerald-400">{level.booking.slotReference}</span>
-                          </div>
-                          <button
-                            onClick={() => handleStartExam(level)}
-                            disabled={startingLevel === level.levelNumber}
-                            className="w-full py-2.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs shadow-md shadow-brand-600/30 transition flex items-center justify-center space-x-2 disabled:opacity-50"
-                          >
-                            {startingLevel === level.levelNumber ? (
-                              <>
-                                <RefreshCw className="h-4 w-4 animate-spin" />
-                                <span>Launching Exam Workspace...</span>
-                              </>
-                            ) : (
-                              <>
-                                <Play className="h-3.5 w-3.5" />
-                                <span>Start Level Assessment</span>
-                              </>
-                            )}
-                          </button>
-                        </>
+                        level.booking.attendanceStatus === 'PRESENT' ? (
+                          <>
+                            <div className="p-2 rounded-lg bg-emerald-950/60 border border-emerald-600/70 text-[11px] text-emerald-300 flex items-center justify-between">
+                              <span className="flex items-center space-x-1.5">
+                                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                                <strong className="text-white">Verified Present:</strong>
+                                <span>Window Open ({level.booking.startTime} – {level.booking.endTime})</span>
+                              </span>
+                              <span className="font-mono text-[10px] text-emerald-400">{level.booking.slotReference}</span>
+                            </div>
+                            <button
+                              onClick={() => handleStartExam(level)}
+                              disabled={startingLevel === level.levelNumber}
+                              className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center justify-center space-x-2 disabled:opacity-50"
+                            >
+                              {startingLevel === level.levelNumber ? (
+                                <>
+                                  <RefreshCw className="h-4 w-4 animate-spin" />
+                                  <span>Launching Exam Workspace...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Play className="h-3.5 w-3.5" />
+                                  <span>Start Level Assessment</span>
+                                </>
+                              )}
+                            </button>
+                          </>
+                        ) : level.booking.attendanceStatus === 'ABSENT' ? (
+                          <>
+                            <div className="p-2 rounded-lg bg-rose-950/50 border border-rose-800 text-[11px] text-rose-300 flex items-center space-x-2">
+                              <AlertCircle className="h-4 w-4 text-rose-400 flex-shrink-0" />
+                              <span>Marked Absent by Proctor for this slot. Exam entry is blocked.</span>
+                            </div>
+                            <button
+                              onClick={() => navigate(`/book-exam?courseId=${course.id}&level=${level.levelNumber}`)}
+                              className="w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs shadow-md shadow-rose-600/30 transition flex items-center justify-center space-x-2"
+                            >
+                              <Calendar className="h-3.5 w-3.5" />
+                              <span>Book New Exam Slot</span>
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <div className="p-2.5 rounded-lg bg-amber-950/40 border border-amber-800/80 text-[11px] text-amber-300 space-y-1">
+                              <div className="flex items-center justify-between">
+                                <span className="flex items-center space-x-1.5 font-semibold text-white">
+                                  <Clock className="h-3.5 w-3.5 text-amber-400" />
+                                  <span>Slot Active Now ({level.booking.startTime} – {level.booking.endTime})</span>
+                                </span>
+                                <span className="font-mono text-[10px] text-amber-400">{level.booking.slotReference}</span>
+                              </div>
+                              <p className="text-[10px] text-amber-300/80">
+                                Proctor Attendance Status: <strong className="text-amber-200">Pending Verification</strong>
+                              </p>
+                            </div>
+                            <button
+                              disabled
+                              className="w-full py-2.5 px-4 rounded-xl bg-surface-800/80 border border-surface-700/60 text-amber-300/70 font-semibold text-xs transition flex items-center justify-center space-x-2 cursor-not-allowed"
+                            >
+                              <Clock className="h-3.5 w-3.5 text-amber-400" />
+                              <span>Awaiting Admin to Mark Present</span>
+                            </button>
+                            <p className="text-[10px] text-center text-surface-500">
+                              The administrator must mark you Present during your slot before you can enter the test.
+                            </p>
+                          </>
+                        )
                       ) : level.booking.isFuture ? (
                         <>
                           <div className="p-2.5 rounded-lg bg-brand-950/40 border border-brand-800 text-[11px] text-brand-300 space-y-1">

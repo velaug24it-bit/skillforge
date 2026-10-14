@@ -12,7 +12,8 @@ import {
   LogOut, 
   Menu, 
   X,
-  ChevronDown 
+  ChevronDown,
+  ShieldCheck
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -27,27 +28,35 @@ export const Navbar: React.FC = () => {
     navigate('/login');
   };
 
-  const navLinks = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Explore Courses', path: '/courses', icon: BookOpen },
-    { name: 'My Assessments', path: '/my-assessments', icon: Code },
-    { name: 'Book Exam', path: '/book-exam', icon: Calendar },
-    { name: 'My Results', path: '/my-results', icon: Award },
-  ];
+  const navLinks = user?.role === 'admin'
+    ? [
+        { name: 'Admin Portal', path: '/admin', icon: ShieldCheck },
+        { name: 'Explore Courses', path: '/courses', icon: BookOpen },
+        { name: 'Book Exam Slot', path: '/book-exam', icon: Calendar },
+      ]
+    : [
+        { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+        { name: 'Explore Courses', path: '/courses', icon: BookOpen },
+        { name: 'My Assessments', path: '/my-assessments', icon: Code },
+        { name: 'Book Exam', path: '/book-exam', icon: Calendar },
+        { name: 'My Results', path: '/my-results', icon: Award },
+      ];
+
+  const homePath = user ? (user.role === 'admin' ? '/admin' : '/dashboard') : '/';
 
   return (
     <header className="border-b border-surface-800 bg-surface-900/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to={user ? "/dashboard" : "/"} className="flex items-center space-x-3 group">
+          <Link to={homePath} className="flex items-center space-x-3 group">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 to-accent-600 flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
               <Terminal className="h-5 w-5 text-white" />
             </div>
             <div>
               <span className="text-xl font-bold tracking-tight text-white">Skill<span className="text-brand-400">Forge</span></span>
               <span className="hidden sm:inline-block ml-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-brand-950 text-brand-300 border border-brand-800">
-                Assessment
+                {user?.role === 'admin' ? 'Admin' : 'Assessment'}
               </span>
             </div>
           </Link>

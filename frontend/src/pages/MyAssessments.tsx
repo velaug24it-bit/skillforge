@@ -24,6 +24,7 @@ interface BookingRecord {
   startTime: string;
   endTime: string;
   status: 'BOOKED' | 'CANCELLED' | 'COMPLETED' | 'NO_SHOW';
+  attendanceStatus?: 'PENDING' | 'PRESENT' | 'ABSENT';
   isNow?: boolean;
   isFuture?: boolean;
   isPast?: boolean;
@@ -166,10 +167,21 @@ export const MyAssessments: React.FC = () => {
                       <h3 className="text-base font-bold text-white">{b.levelTitle}</h3>
                     </div>
                     {b.isNow ? (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center space-x-1">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-                        <span>Active Now</span>
-                      </span>
+                      b.attendanceStatus === 'PRESENT' ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center space-x-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+                          <span>Active (Verified Present)</span>
+                        </span>
+                      ) : b.attendanceStatus === 'ABSENT' ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-950 text-rose-300 border border-rose-800">
+                          Marked Absent
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-950 text-amber-300 border border-amber-800 flex items-center space-x-1">
+                          <Clock className="h-3 w-3 text-amber-400" />
+                          <span>Active (Pending Admin)</span>
+                        </span>
+                      )
                     ) : b.isFuture ? (
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-brand-950 text-brand-300 border border-brand-800">
                         Scheduled
@@ -199,20 +211,39 @@ export const MyAssessments: React.FC = () => {
                 {/* Actions */}
                 <div className="pt-4 border-t border-surface-800 flex items-center space-x-3">
                   {b.isNow ? (
-                    <button
-                      onClick={() => handleStartExam(b)}
-                      disabled={startingId === b.id}
-                      className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center justify-center space-x-1.5 disabled:opacity-50"
-                    >
-                      {startingId === b.id ? (
-                        <RefreshCw className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <>
-                          <Play className="h-3.5 w-3.5" />
-                          <span>Enter Examination</span>
-                        </>
-                      )}
-                    </button>
+                    b.attendanceStatus === 'PRESENT' ? (
+                      <button
+                        onClick={() => handleStartExam(b)}
+                        disabled={startingId === b.id}
+                        className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center justify-center space-x-1.5 disabled:opacity-50"
+                      >
+                        {startingId === b.id ? (
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Play className="h-3.5 w-3.5" />
+                            <span>Enter Examination</span>
+                          </>
+                        )}
+                      </button>
+                    ) : b.attendanceStatus === 'ABSENT' ? (
+                      <button
+                        onClick={() => navigate(`/book-exam?courseId=${b.courseId}&level=${b.levelNumber}`)}
+                        className="flex-1 py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs shadow-md shadow-rose-600/30 transition flex items-center justify-center space-x-1.5"
+                      >
+                        <Calendar className="h-3.5 w-3.5" />
+                        <span>Marked Absent (Rebook)</span>
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        className="flex-1 py-2 px-3 rounded-xl bg-surface-800/80 border border-surface-700/60 text-amber-300/80 font-semibold text-xs transition flex items-center justify-center space-x-1.5 cursor-not-allowed"
+                        title="Waiting for admin to verify attendance"
+                      >
+                        <Clock className="h-3.5 w-3.5 text-amber-400" />
+                        <span>Awaiting Admin Verification</span>
+                      </button>
+                    )
                   ) : b.isFuture ? (
                     <button
                       disabled

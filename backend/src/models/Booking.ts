@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 
 export type BookingStatus = 'BOOKED' | 'CANCELLED' | 'COMPLETED' | 'NO_SHOW';
+export type AttendanceStatus = 'PENDING' | 'PRESENT' | 'ABSENT';
 
 export interface IBooking extends Document {
   studentId: mongoose.Types.ObjectId;
@@ -11,6 +12,9 @@ export interface IBooking extends Document {
   endTime: string; // "10:10"
   slotReference: string;
   status: BookingStatus;
+  attendanceStatus: AttendanceStatus;
+  markedAt?: Date;
+  markedBy?: mongoose.Types.ObjectId;
   cancelledAt?: Date;
   cancellationReason?: string;
   createdAt: Date;
@@ -61,6 +65,19 @@ const bookingSchema = new Schema<IBooking>(
       enum: ['BOOKED', 'CANCELLED', 'COMPLETED', 'NO_SHOW'],
       default: 'BOOKED',
       index: true,
+    },
+    attendanceStatus: {
+      type: String,
+      enum: ['PENDING', 'PRESENT', 'ABSENT'],
+      default: 'PENDING',
+      index: true,
+    },
+    markedAt: {
+      type: Date,
+    },
+    markedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
     },
     cancelledAt: {
       type: Date,

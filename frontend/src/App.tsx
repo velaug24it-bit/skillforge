@@ -14,6 +14,7 @@ import { BookExam } from './pages/BookExam';
 import { MyAssessments } from './pages/MyAssessments';
 import { AssessmentWorkspace } from './pages/AssessmentWorkspace';
 import { MyResults } from './pages/MyResults';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { checkHealth, HealthResponse } from './services/api';
 import { 
   Database, 
@@ -305,6 +306,14 @@ export function App() {
                 element={
                   <ProtectedRoute>
                     <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminDashboard />
                   </ProtectedRoute>
                 }
               />

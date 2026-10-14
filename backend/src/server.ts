@@ -1,11 +1,13 @@
 import { createApp } from './app';
 import { connectDatabase } from './config/database';
 import { env } from './config/env';
+import { ensureAdminUser } from './utils/initAdmin';
 
 const startServer = async () => {
   try {
     // Establish database connection
     await connectDatabase();
+    await ensureAdminUser();
 
     const app = createApp();
     const server = app.listen(env.PORT, () => {

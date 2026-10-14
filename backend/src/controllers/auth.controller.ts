@@ -66,8 +66,14 @@ export const login = async (
       return next(new AppError('Please provide both email and password', 400));
     }
 
-    // Find user by email and explicitly select password field
-    const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
+    const cleanInput = email.toLowerCase().trim();
+    // Allow login by either "admin" username or standard email
+    const query = cleanInput === 'admin' || cleanInput === 'admin@skillforge.com'
+      ? { $or: [{ email: 'admin@skillforge.com' }, { email: 'admin' }, { role: 'admin' }] }
+      : { email: cleanInput };
+
+    // Find user by identifier and explicitly select password field
+    const user = await User.findOne(query).select('+password');
     if (!user) {
       return next(new AppError('Invalid email or password', 401));
     }

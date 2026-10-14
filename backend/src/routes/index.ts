@@ -5,6 +5,7 @@ import coursesRoutes from './courses.routes';
 import dashboardRoutes from './dashboard.routes';
 import bookingRoutes from './booking.routes';
 import assessmentRoutes from './assessment.routes';
+import adminRoutes from './admin.routes';
 import { getMyResults } from '../controllers/assessment.controller';
 import { protect } from '../middlewares/auth';
 
@@ -27,6 +28,9 @@ router.use('/bookings', bookingRoutes);
 
 // Assessment Exam & Code Evaluation
 router.use('/assessments', assessmentRoutes);
+
+// Administrator Management & Attendance Roster
+router.use('/admin', adminRoutes);
 
 // Direct Results alias
 router.get('/results/my', protect, getMyResults);

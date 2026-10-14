@@ -1,5 +1,6 @@
 import { connectDatabase, disconnectDatabase } from './config/database';
 import { Course, AssessmentLevel, CodingQuestion } from './models';
+import { ensureAdminUser } from './utils/initAdmin';
 
 interface QuestionSeedData {
   levelNumber: number;
@@ -586,7 +587,8 @@ export const seedDatabase = async () => {
       }
     }
 
-    console.log('[Seed] Database seeded successfully with all 5 courses, 20 levels, and verified coding questions!');
+    await ensureAdminUser();
+    console.log('[Seed] Database seeded successfully with all 5 courses, 20 levels, admin user, and verified coding questions!');
   } catch (error: any) {
     console.error(`[Seed] Error seeding database: ${error.message}`);
   } finally {

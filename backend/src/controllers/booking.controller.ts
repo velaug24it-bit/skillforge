@@ -172,6 +172,7 @@ export const createBooking = async (
           startTime: booking.startTime,
           endTime: booking.endTime,
           status: booking.status,
+          attendanceStatus: booking.attendanceStatus || 'PENDING',
           campusTimezone: 'Asia/Kolkata',
         },
       });
@@ -219,6 +220,7 @@ export const getMyBookings = async (
           startTime: b.startTime,
           endTime: b.endTime,
           status: b.status,
+          attendanceStatus: b.attendanceStatus || 'PENDING',
           isNow: b.status === 'BOOKED' && timing.isNow,
           isFuture: b.status === 'BOOKED' && timing.isFuture,
           isPast: b.status === 'BOOKED' && timing.isPast,

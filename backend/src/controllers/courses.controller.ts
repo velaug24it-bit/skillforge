@@ -126,6 +126,7 @@ export const getCourseById = async (
           date: levelBooking.date,
           startTime: levelBooking.startTime,
           endTime: levelBooking.endTime,
+          attendanceStatus: levelBooking.attendanceStatus || 'PENDING',
           isNow: timing.isNow || !!levelAttempt,
           isFuture: timing.isFuture && !levelAttempt,
           isPast: timing.isPast && !levelAttempt,

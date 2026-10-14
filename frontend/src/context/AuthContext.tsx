@@ -11,8 +11,9 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
+  isAdmin: boolean;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   register: (name: string, email: string, password: string, confirmPassword: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -43,14 +44,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     refreshUser();
   }, []);
 
-  const login = async (email: string, password: string): Promise<void> => {
+  const login = async (email: string, password: string): Promise<User> => {
     const response = await api.post<{ success: boolean; user: User }>('/auth/login', {
       email,
       password,
     });
     if (response.data.success && response.data.user) {
       setUser(response.data.user);
+      return response.data.user;
     }
+    throw new Error('Unable to retrieve user credentials');
   };
 
   const register = async (
@@ -78,8 +81,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const isAdmin = user?.role === 'admin';
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, isAdmin, loading, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

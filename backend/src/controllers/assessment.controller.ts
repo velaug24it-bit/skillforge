@@ -114,6 +114,24 @@ export const startAssessment = async (
             )
           );
         }
+
+        // Strict Proctor Verification: Admin must mark student as Present for this slot
+        if (bookingToUse.attendanceStatus !== 'PRESENT') {
+          if (bookingToUse.attendanceStatus === 'ABSENT') {
+            return next(
+              new AppError(
+                'You were marked Absent by the proctor for this examination slot. Assessment entry is blocked.',
+                403
+              )
+            );
+          }
+          return next(
+            new AppError(
+              'Your attendance has not been verified by the administrator yet. The admin must mark you Present during your booked slot before you can enter the assessment.',
+              403
+            )
+          );
+        }
       }
 
       // 60 minutes duration
