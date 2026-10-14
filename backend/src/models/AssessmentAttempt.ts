@@ -29,10 +29,20 @@ export interface IAssessmentAttempt extends Document {
   questionSubmissions: IQuestionSubmission[];
   totalScore: number; // 0 to 100
   passed: boolean; // true only if totalScore === 100
-  status: 'IN_PROGRESS' | 'SUBMITTED' | 'EXPIRED';
+  status: 'IN_PROGRESS' | 'SUBMITTED' | 'AWAITING_EXIT_VERIFICATION' | 'EXIT_VERIFIED' | 'COMPLETED' | 'EXPIRED';
   startedAt: Date;
   completedAt?: Date;
   expiresAt: Date;
+  finalSubmittedAt?: Date;
+  otpHash?: string;
+  otpGeneratedAt?: Date;
+  otpExpiresAt?: Date;
+  otpStatus?: 'NOT_GENERATED' | 'ACTIVE' | 'EXPIRED' | 'USED' | 'INVALIDATED';
+  otpFailedAttempts?: number;
+  isExitVerified?: boolean;
+  otpVerifiedAt?: Date;
+  otpGeneratedBy?: mongoose.Types.ObjectId;
+  exitedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -104,8 +114,9 @@ const assessmentAttemptSchema = new Schema<IAssessmentAttempt>(
     },
     status: {
       type: String,
-      enum: ['IN_PROGRESS', 'SUBMITTED', 'EXPIRED'],
+      enum: ['IN_PROGRESS', 'SUBMITTED', 'AWAITING_EXIT_VERIFICATION', 'EXIT_VERIFIED', 'COMPLETED', 'EXPIRED'],
       default: 'IN_PROGRESS',
+      index: true,
     },
     startedAt: {
       type: Date,
@@ -114,9 +125,45 @@ const assessmentAttemptSchema = new Schema<IAssessmentAttempt>(
     completedAt: {
       type: Date,
     },
+    finalSubmittedAt: {
+      type: Date,
+    },
     expiresAt: {
       type: Date,
       required: true,
+    },
+    otpHash: {
+      type: String,
+      select: false, // Never return OTP hash in default queries
+    },
+    otpGeneratedAt: {
+      type: Date,
+    },
+    otpExpiresAt: {
+      type: Date,
+    },
+    otpStatus: {
+      type: String,
+      enum: ['NOT_GENERATED', 'ACTIVE', 'EXPIRED', 'USED', 'INVALIDATED'],
+      default: 'NOT_GENERATED',
+    },
+    otpFailedAttempts: {
+      type: Number,
+      default: 0,
+    },
+    isExitVerified: {
+      type: Boolean,
+      default: false,
+    },
+    otpVerifiedAt: {
+      type: Date,
+    },
+    otpGeneratedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    exitedAt: {
+      type: Date,
     },
   },
   {

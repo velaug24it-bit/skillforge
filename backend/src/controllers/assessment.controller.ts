@@ -12,6 +12,7 @@ import { AuthRequest } from '../middlewares/auth';
 import { AppError } from '../middlewares/errorHandler';
 import { CodeExecutionService } from '../services/codeExecution.service';
 import { checkSlotTiming } from '../utils/slots';
+import { verifyOtpHash, MAX_FAILED_OTP_ATTEMPTS } from '../utils/otpHelper';
 
 export const startAssessment = async (
   req: AuthRequest,
@@ -487,7 +488,7 @@ export const getMyResults = async (
 
     const attempts = await AssessmentAttempt.find({
       studentId: req.user._id,
-      status: 'SUBMITTED',
+      status: { $in: ['SUBMITTED', 'AWAITING_EXIT_VERIFICATION', 'EXIT_VERIFIED', 'COMPLETED'] },
     })
       .populate('courseId', 'name language icon')
       .populate('levelId', 'title category levelNumber')
@@ -525,3 +526,450 @@ export const getMyResults = async (
     next(error);
   }
 };
+
+export const getAssessmentAttemptById = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { attemptId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(attemptId)) {
+      return next(new AppError('Invalid attempt ID format', 400));
+    }
+
+    const attempt = await AssessmentAttempt.findById(attemptId)
+      .populate('courseId', 'name language icon')
+      .populate('levelId', 'title category levelNumber durationMinutes passingScore');
+
+    if (!attempt) {
+      return next(new AppError('Assessment attempt not found', 404));
+    }
+
+    // Verify ownership
+    if (attempt.studentId.toString() !== req.user?._id.toString() && req.user?.role !== 'admin') {
+      return next(new AppError('Unauthorized access to this assessment attempt', 403));
+    }
+
+    // Check expiry if IN_PROGRESS
+    const now = new Date();
+    if (attempt.status === 'IN_PROGRESS' && now > attempt.expiresAt) {
+      attempt.status = 'EXPIRED';
+      await attempt.save();
+    }
+
+    // Fetch and sanitize questions (omit mainTestCases, referenceSolution)
+    const questions = await CodingQuestion.find({
+      courseId: (attempt.courseId as any)._id,
+      levelNumber: attempt.levelNumber,
+    })
+      .select('-mainTestCases -referenceSolution')
+      .sort({ questionNumber: 1 });
+
+    const isSubmitted = ['SUBMITTED', 'AWAITING_EXIT_VERIFICATION', 'EXIT_VERIFIED', 'COMPLETED'].includes(attempt.status);
+
+    let result = null;
+    if (isSubmitted) {
+      let passedTestCasesCount = 0;
+      let totalTestCasesCount = 0;
+
+      const questionBreakdown = attempt.questionSubmissions.map((sub) => {
+        const passedTests = sub.testResults?.filter((t) => t.passed).length || 0;
+        const totalTests = 5;
+        passedTestCasesCount += passedTests;
+        totalTestCasesCount += totalTests;
+
+        return {
+          questionNumber: sub.questionNumber,
+          score: sub.questionScore,
+          maxScore: 50,
+          passedTests,
+          totalTests,
+          testResults: sub.testResults?.map((t) => ({
+            testCaseIndex: t.testCaseIndex,
+            passed: t.passed,
+            marksEarned: t.marksEarned,
+            statusDescription: t.statusDescription,
+          })) || [],
+        };
+      });
+
+      result = {
+        attemptId: attempt._id,
+        levelNumber: attempt.levelNumber,
+        totalScore: attempt.totalScore,
+        maxScore: 100,
+        passed: attempt.passed,
+        passedTestCasesCount,
+        failedTestCasesCount: totalTestCasesCount - passedTestCasesCount,
+        levelCompletionStatus: attempt.passed ? 'COMPLETED' : 'RETRY_REQUIRED',
+        status: attempt.status,
+        isExitVerified: !!attempt.isExitVerified,
+        questionBreakdown,
+      };
+    }
+
+    res.status(200).json({
+      success: true,
+      attempt: {
+        id: attempt._id,
+        courseId: (attempt.courseId as any)._id,
+        courseName: (attempt.courseId as any).name,
+        language: (attempt.courseId as any).language,
+        levelId: (attempt.levelId as any)._id,
+        levelNumber: attempt.levelNumber,
+        levelTitle: (attempt.levelId as any).title,
+        status: attempt.status,
+        isSubmitted,
+        isExitVerified: !!attempt.isExitVerified,
+        startedAt: attempt.startedAt,
+        expiresAt: attempt.expiresAt,
+        finalSubmittedAt: attempt.finalSubmittedAt,
+        questionSubmissions: attempt.questionSubmissions,
+      },
+      questions,
+      result,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const submitOverallAssessment = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { attemptId } = req.params;
+    const { submissions } = req.body || {};
+
+    const attempt = await AssessmentAttempt.findOne({
+      _id: attemptId,
+      studentId: req.user?._id,
+    });
+
+    if (!attempt) {
+      return next(new AppError('Assessment attempt not found', 404));
+    }
+
+    // Prevent duplicate submission from modifying authoritative score or re-clearing levels
+    if (['SUBMITTED', 'AWAITING_EXIT_VERIFICATION', 'EXIT_VERIFIED', 'COMPLETED'].includes(attempt.status)) {
+      return next(new AppError('This assessment has already been finalized and submitted.', 400));
+    }
+
+    if (new Date() > attempt.expiresAt) {
+      attempt.status = 'EXPIRED';
+      await attempt.save();
+      return next(new AppError('Assessment time has expired. Submissions are no longer accepted.', 400));
+    }
+
+    // Update in-memory draft code if provided
+    if (Array.isArray(submissions)) {
+      submissions.forEach((draft: any) => {
+        const sub = attempt.questionSubmissions.find(
+          (s) => s.questionId.toString() === String(draft.questionId)
+        );
+        if (sub && typeof draft.code === 'string') {
+          sub.code = draft.code;
+          if (draft.language) sub.language = draft.language;
+        }
+      });
+    }
+
+    let overallTotalScore = 0;
+    let totalPassedTestCases = 0;
+    const totalOfficialTestCases = 10;
+    const questionBreakdown = [];
+
+    // Evaluate both questions against their 5 official test cases
+    for (const sub of attempt.questionSubmissions) {
+      const question = await CodingQuestion.findById(sub.questionId);
+      if (!question) {
+        continue;
+      }
+
+      const testResults = [];
+      let questionScore = 0;
+
+      // Exactly 5 main evaluation test cases (10 marks each)
+      for (const tc of question.mainTestCases) {
+        const execution = await CodeExecutionService.execute(
+          sub.code,
+          sub.language || question.language,
+          tc.input,
+          question.timeLimitMs,
+          question.memoryLimitKb
+        );
+
+        const cleanActual = (execution.stdout || '').trim();
+        const cleanExpected = tc.expectedOutput.trim();
+        const passed = execution.success && cleanActual === cleanExpected;
+        const marks = passed ? (tc.marks || 10) : 0;
+
+        testResults.push({
+          testCaseIndex: testResults.length + 1,
+          passed,
+          marksEarned: marks,
+          statusDescription: passed
+            ? 'Passed'
+            : execution.statusDescription || 'Wrong Answer',
+          executionTimeMs: execution.executionTimeMs,
+        });
+
+        if (passed) {
+          questionScore += marks;
+          totalPassedTestCases += 1;
+        }
+      }
+
+      sub.testResults = testResults;
+      sub.questionScore = questionScore;
+      sub.submittedAt = new Date();
+
+      overallTotalScore += questionScore;
+
+      questionBreakdown.push({
+        questionNumber: sub.questionNumber,
+        score: questionScore,
+        maxScore: 50,
+        passedTests: testResults.filter((t) => t.passed).length,
+        totalTests: 5,
+        testResults: testResults.map((t) => ({
+          testCaseIndex: t.testCaseIndex,
+          passed: t.passed,
+          marksEarned: t.marksEarned,
+          statusDescription: t.statusDescription,
+        })),
+      });
+    }
+
+    // Strict 100/100 threshold (all 10 test cases must pass)
+    const passed = overallTotalScore === 100;
+    const now = new Date();
+
+    attempt.totalScore = overallTotalScore;
+    attempt.passed = passed;
+    attempt.status = 'AWAITING_EXIT_VERIFICATION';
+    attempt.finalSubmittedAt = now;
+    attempt.completedAt = now;
+    attempt.otpStatus = 'NOT_GENERATED';
+    attempt.isExitVerified = false;
+    await attempt.save();
+
+    // Mark booking as COMPLETED if attached
+    if (attempt.bookingId) {
+      await Booking.findByIdAndUpdate(attempt.bookingId, { status: 'COMPLETED' });
+    }
+
+    // Update StudentProgress
+    const progress = await StudentProgress.findOne({
+      studentId: req.user?._id,
+      courseId: attempt.courseId,
+    });
+
+    let nextLevelUnlocked = false;
+    let nextLevelNumber: number | null = null;
+
+    if (progress) {
+      if (passed) {
+        if (!progress.completedLevels.includes(attempt.levelNumber)) {
+          progress.completedLevels.push(attempt.levelNumber);
+          progress.completedLevels.sort((a, b) => a - b);
+        }
+
+        if (progress.currentUnlockedLevel === attempt.levelNumber && attempt.levelNumber < 4) {
+          progress.currentUnlockedLevel = attempt.levelNumber + 1;
+          nextLevelUnlocked = true;
+          nextLevelNumber = attempt.levelNumber + 1;
+        }
+      }
+
+      // Record highest score
+      const currentHighest = progress.highestScores.get(String(attempt.levelNumber)) || 0;
+      if (overallTotalScore > currentHighest) {
+        progress.highestScores.set(String(attempt.levelNumber), overallTotalScore);
+      }
+
+      await progress.save();
+    }
+
+    res.status(200).json({
+      success: true,
+      message: passed
+        ? `Assessment submitted successfully! Perfect score of 100/100 achieved! Level ${attempt.levelNumber} cleared.`
+        : `Assessment submitted. You scored ${overallTotalScore}/100. A score of 100/100 (all 10 test cases) is required to clear Level ${attempt.levelNumber}.`,
+      result: {
+        attemptId: attempt._id,
+        levelNumber: attempt.levelNumber,
+        totalScore: overallTotalScore,
+        maxScore: 100,
+        passed,
+        passedTestCasesCount: totalPassedTestCases,
+        failedTestCasesCount: totalOfficialTestCases - totalPassedTestCases,
+        levelCompletionStatus: passed ? 'COMPLETED' : 'RETRY_REQUIRED',
+        status: attempt.status,
+        nextLevelUnlocked,
+        nextLevelNumber,
+        questionBreakdown,
+      },
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const verifyExitOtp = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { attemptId } = req.params;
+    const { otp } = req.body;
+
+    if (!otp || typeof otp !== 'string' || !/^\d{6}$/.test(otp.trim())) {
+      return next(new AppError('A valid 6-digit numeric OTP is required', 400));
+    }
+
+    const cleanOtp = otp.trim();
+
+    // Query attempt including hidden otpHash field
+    const attempt = await AssessmentAttempt.findOne({
+      _id: attemptId,
+      studentId: req.user?._id,
+    }).select('+otpHash');
+
+    if (!attempt) {
+      return next(new AppError('Assessment session not found', 404));
+    }
+
+    // Must be submitted before exit verification
+    if (!['AWAITING_EXIT_VERIFICATION', 'SUBMITTED', 'EXIT_VERIFIED'].includes(attempt.status)) {
+      return next(new AppError('You must submit the overall assessment before verifying exit OTP.', 400));
+    }
+
+    // If already verified, return idempotent success
+    if (attempt.isExitVerified && attempt.status === 'EXIT_VERIFIED') {
+      res.status(200).json({
+        success: true,
+        message: 'Exit verification has already been completed. You may now exit the assessment.',
+        isExitVerified: true,
+      });
+      return;
+    }
+
+    // Rate-limiting: Check failed attempt counter
+    if ((attempt.otpFailedAttempts || 0) >= MAX_FAILED_OTP_ATTEMPTS) {
+      attempt.otpStatus = 'INVALIDATED';
+      await attempt.save();
+      return next(
+        new AppError(
+          'Maximum verification attempts exceeded. For security, this OTP was invalidated. Please request a new OTP from the administrator.',
+          429
+        )
+      );
+    }
+
+    // Check OTP status and server-enforced 30-second expiry
+    const now = new Date();
+    if (attempt.otpStatus !== 'ACTIVE' || !attempt.otpExpiresAt || !attempt.otpHash) {
+      return next(
+        new AppError(
+          'No active OTP found for this session. Please ask the administrator to generate an exit OTP.',
+          400
+        )
+      );
+    }
+
+    if (now > attempt.otpExpiresAt) {
+      attempt.otpStatus = 'EXPIRED';
+      await attempt.save();
+      return next(
+        new AppError(
+          'The OTP has expired (30-second server validity exceeded). Please request a new OTP from the administrator.',
+          400
+        )
+      );
+    }
+
+    // Timing-safe cryptographic hash comparison
+    const isMatch = verifyOtpHash(cleanOtp, attempt._id.toString(), attempt.otpHash);
+
+    if (!isMatch) {
+      attempt.otpFailedAttempts = (attempt.otpFailedAttempts || 0) + 1;
+      const remainingAttempts = MAX_FAILED_OTP_ATTEMPTS - attempt.otpFailedAttempts;
+      if (remainingAttempts <= 0) {
+        attempt.otpStatus = 'INVALIDATED';
+      }
+      await attempt.save();
+
+      return next(
+        new AppError(
+          remainingAttempts > 0
+            ? `Incorrect OTP. Please enter the 6-digit code provided by your administrator (${remainingAttempts} attempts remaining).`
+            : 'Maximum verification attempts exceeded. This OTP has been invalidated. Please ask the administrator for a new one.',
+          400
+        )
+      );
+    }
+
+    // Successful Verification: Atomic consumption of OTP
+    attempt.isExitVerified = true;
+    attempt.otpStatus = 'USED';
+    attempt.otpVerifiedAt = now;
+    attempt.status = 'EXIT_VERIFIED';
+    await attempt.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Exit OTP verified successfully! You may now exit the assessment.',
+      isExitVerified: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const exitAssessment = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { attemptId } = req.params;
+
+    const attempt = await AssessmentAttempt.findOne({
+      _id: attemptId,
+      studentId: req.user?._id,
+    });
+
+    if (!attempt) {
+      return next(new AppError('Assessment session not found', 404));
+    }
+
+    // Strict security check: Student cannot exit without successful OTP verification
+    if (!attempt.isExitVerified || attempt.status !== 'EXIT_VERIFIED') {
+      return next(
+        new AppError(
+          'Protected assessment lock active. You must complete administrator OTP verification before exiting.',
+          403
+        )
+      );
+    }
+
+    // Transition to COMPLETED
+    attempt.status = 'COMPLETED';
+    attempt.exitedAt = new Date();
+    await attempt.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Assessment session completed. Exit authorized.',
+      redirectTo: '/dashboard',
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+

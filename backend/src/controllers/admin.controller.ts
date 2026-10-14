@@ -3,6 +3,7 @@ import { User, Booking, Course, AssessmentAttempt, StudentProgress, AssessmentLe
 import { AuthRequest } from '../middlewares/auth';
 import { AppError } from '../middlewares/errorHandler';
 import { EXAM_SLOTS, checkSlotTiming, getCampusNow } from '../utils/slots';
+import { generateSixDigitOtp, hashOtp, OTP_VALIDITY_SECONDS } from '../utils/otpHelper';
 
 export const getAdminOverview = async (
   _req: AuthRequest,
@@ -485,4 +486,182 @@ export const getAdminStudentHistory = async (
     next(error);
   }
 };
+
+export const getAdminAssessmentSessions = async (
+  _req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const attempts = await AssessmentAttempt.find()
+      .populate('studentId', 'name email')
+      .populate('courseId', 'name language icon')
+      .populate('levelId', 'title category levelNumber')
+      .sort({ createdAt: -1 })
+      .limit(100);
+
+    const now = Date.now();
+
+    const sessions = attempts.map((att) => {
+      let liveOtpStatus = att.otpStatus || 'NOT_GENERATED';
+      let remainingSeconds = 0;
+
+      if (liveOtpStatus === 'ACTIVE' && att.otpExpiresAt) {
+        const diff = Math.floor((att.otpExpiresAt.getTime() - now) / 1000);
+        if (diff > 0) {
+          remainingSeconds = diff;
+        } else {
+          liveOtpStatus = 'EXPIRED';
+        }
+      }
+
+      const isCompleted = att.status === 'COMPLETED' || att.isExitVerified === true;
+      const canGenerateOtp = !isCompleted && ['AWAITING_EXIT_VERIFICATION', 'SUBMITTED', 'IN_PROGRESS'].includes(att.status);
+
+      return {
+        id: att._id,
+        attemptId: att._id,
+        student: {
+          id: (att.studentId as any)?._id,
+          name: (att.studentId as any)?.name || 'Unknown Student',
+          email: (att.studentId as any)?.email || '',
+        },
+        course: {
+          id: (att.courseId as any)?._id,
+          name: (att.courseId as any)?.name || 'Course',
+          language: (att.courseId as any)?.language || '',
+        },
+        level: {
+          id: (att.levelId as any)?._id,
+          levelNumber: att.levelNumber,
+          title: (att.levelId as any)?.title || `Level ${att.levelNumber}`,
+        },
+        status: att.status,
+        totalScore: att.totalScore,
+        passed: att.passed,
+        otpStatus: liveOtpStatus,
+        otpExpiresAt: att.otpExpiresAt,
+        remainingSeconds,
+        isExitVerified: !!att.isExitVerified,
+        canGenerateOtp,
+        startedAt: att.startedAt,
+        finalSubmittedAt: att.finalSubmittedAt,
+        completedAt: att.completedAt,
+        exitedAt: att.exitedAt,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      sessions,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const generateSessionOtp = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { attemptId } = req.params;
+
+    const attempt = await AssessmentAttempt.findById(attemptId)
+      .populate('studentId', 'name email')
+      .populate('courseId', 'name language');
+
+    if (!attempt) {
+      return next(new AppError('Assessment session not found', 404));
+    }
+
+    // Security check: cannot generate OTP if student has already exited
+    if (attempt.status === 'COMPLETED' || attempt.exitedAt) {
+      return next(
+        new AppError(
+          'Assessment session has already been completed and exited. No further OTP generation is permitted.',
+          400
+        )
+      );
+    }
+
+    // Generate cryptographically secure 6-digit numeric OTP
+    const otp = generateSixDigitOtp();
+    const hash = hashOtp(otp, attempt._id.toString());
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + OTP_VALIDITY_SECONDS * 1000); // exactly 30s server expiry
+
+    // Atomic update on attempt: invalidates any previous OTP
+    attempt.otpHash = hash;
+    attempt.otpGeneratedAt = now;
+    attempt.otpExpiresAt = expiresAt;
+    attempt.otpStatus = 'ACTIVE';
+    attempt.otpFailedAttempts = 0;
+    if (req.user) {
+      attempt.otpGeneratedBy = req.user._id;
+    }
+    await attempt.save();
+
+    // Plaintext OTP is returned ONLY in this response to authorized admin
+    res.status(200).json({
+      success: true,
+      message: 'Exit OTP generated successfully. Valid for 30 seconds.',
+      attemptId: attempt._id,
+      studentName: (attempt.studentId as any)?.name,
+      courseName: (attempt.courseId as any)?.name,
+      levelNumber: attempt.levelNumber,
+      otp, // 6-digit plaintext for temporary display to administrator
+      expiresAt,
+      validitySeconds: OTP_VALIDITY_SECONDS,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getSessionOtpStatus = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { attemptId } = req.params;
+
+    const attempt = await AssessmentAttempt.findById(attemptId);
+    if (!attempt) {
+      return next(new AppError('Assessment session not found', 404));
+    }
+
+    const now = Date.now();
+    let liveStatus = attempt.otpStatus || 'NOT_GENERATED';
+    let remainingSeconds = 0;
+
+    if (liveStatus === 'ACTIVE' && attempt.otpExpiresAt) {
+      const diff = Math.floor((attempt.otpExpiresAt.getTime() - now) / 1000);
+      if (diff > 0) {
+        remainingSeconds = diff;
+      } else {
+        liveStatus = 'EXPIRED';
+        if (attempt.otpStatus === 'ACTIVE') {
+          attempt.otpStatus = 'EXPIRED';
+          await attempt.save();
+        }
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      attemptId: attempt._id,
+      otpStatus: liveStatus,
+      remainingSeconds,
+      isExitVerified: !!attempt.isExitVerified,
+      otpGeneratedAt: attempt.otpGeneratedAt,
+      otpExpiresAt: attempt.otpExpiresAt,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
 

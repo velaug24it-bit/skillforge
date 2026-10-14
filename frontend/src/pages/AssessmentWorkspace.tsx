@@ -9,9 +9,10 @@ import {
   AlertCircle, 
   CheckCircle2, 
   XCircle, 
-  ChevronRight, 
   RefreshCw, 
-  Award
+  Lock,
+  KeyRound,
+  LogOut
 } from 'lucide-react';
 
 interface SanitizedQuestion {
@@ -48,6 +49,34 @@ interface QuestionSubmissionState {
   }>;
 }
 
+interface AssessmentResultBreakdown {
+  attemptId: string;
+  levelNumber: number;
+  totalScore: number;
+  maxScore: number;
+  passed: boolean;
+  passedTestCasesCount: number;
+  failedTestCasesCount: number;
+  levelCompletionStatus: 'COMPLETED' | 'RETRY_REQUIRED';
+  status: string;
+  nextLevelUnlocked?: boolean;
+  nextLevelNumber?: number | null;
+  isExitVerified?: boolean;
+  questionBreakdown: Array<{
+    questionNumber: number;
+    score: number;
+    maxScore: number;
+    passedTests: number;
+    totalTests: number;
+    testResults?: Array<{
+      testCaseIndex: number;
+      passed: boolean;
+      marksEarned: number;
+      statusDescription: string;
+    }>;
+  }>;
+}
+
 export const AssessmentWorkspace: React.FC = () => {
   const { attemptId } = useParams<{ attemptId: string }>();
   const navigate = useNavigate();
@@ -61,67 +90,86 @@ export const AssessmentWorkspace: React.FC = () => {
   // Map of questionId -> code & state
   const [submissions, setSubmissions] = useState<Record<string, QuestionSubmissionState>>({});
 
-  // Action states
+  // Execution states
   const [runningSample, setRunningSample] = useState(false);
-  const [submittingQuestion, setSubmittingQuestion] = useState(false);
-  const [submittingLevel, setSubmittingLevel] = useState(false);
   const [sampleOutput, setSampleOutput] = useState<any | null>(null);
-  const [levelResultModal, setLevelResultModal] = useState<any | null>(null);
+
+  // Final Overall Submission states
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [submittingOverall, setSubmittingOverall] = useState(false);
+  const [finalResult, setFinalResult] = useState<AssessmentResultBreakdown | null>(null);
+
+  // OTP Exit Verification states
+  const [otpInput, setOtpInput] = useState('');
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [otpError, setOtpError] = useState<string | null>(null);
+  const [otpSuccess, setOtpSuccess] = useState<string | null>(null);
+  const [isExitVerified, setIsExitVerified] = useState(false);
+  const [exitingSession, setExitingSession] = useState(false);
 
   // Time remaining (in seconds)
   const [secondsRemaining, setSecondsRemaining] = useState<number>(3600);
 
-  useEffect(() => {
-    // Fetch attempt details
-    const init = async () => {
-      setLoading(true);
-      try {
-        // Query courses to find attempt
-        const coursesRes = await api.get('/courses');
-        const firstCourse = coursesRes.data.courses[0];
-        
-        // Start/resume assessment attempt
-        const startRes = await api.post('/assessments/start', {
-          courseId: firstCourse.id,
-          levelId: (await api.get(`/courses/${firstCourse.id}`)).data.course.levels[0].id,
-        });
+  // Load exact assessment attempt by ID from URL
+  const fetchAttemptData = async () => {
+    if (!attemptId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.get<{
+        success: boolean;
+        attempt: any;
+        questions: SanitizedQuestion[];
+        result: AssessmentResultBreakdown | null;
+      }>(`/assessments/${attemptId}`);
 
-        if (startRes.data.success) {
-          setAttempt(startRes.data.attempt);
-          setQuestions(startRes.data.questions);
+      if (res.data.success) {
+        const att = res.data.attempt;
+        setAttempt(att);
+        setQuestions(res.data.questions);
 
-          // Calculate remaining seconds
-          const diffMs = new Date(startRes.data.attempt.expiresAt).getTime() - Date.now();
-          setSecondsRemaining(Math.max(0, Math.floor(diffMs / 1000)));
+        // Calculate remaining seconds
+        const diffMs = new Date(att.expiresAt).getTime() - Date.now();
+        setSecondsRemaining(Math.max(0, Math.floor(diffMs / 1000)));
 
-          // Initialize question code buffers
-          const initialSubs: Record<string, QuestionSubmissionState> = {};
-          startRes.data.questions.forEach((q: SanitizedQuestion) => {
-            const existingSub = startRes.data.attempt.questionSubmissions?.find(
-              (s: any) => s.questionId === q._id
-            );
-            initialSubs[q._id] = {
-              code: existingSub?.code || '// Write your solution here\n',
-              language: existingSub?.language || startRes.data.attempt.language || 'c',
-              questionScore: existingSub?.questionScore || 0,
-              testResults: existingSub?.testResults || [],
-            };
-          });
-          setSubmissions(initialSubs);
+        // If already submitted / awaiting verification
+        if (att.isSubmitted && res.data.result) {
+          setFinalResult(res.data.result);
         }
-      } catch (err: any) {
-        setError(err?.response?.data?.message || err?.message || 'Unable to open workspace');
-      } finally {
-        setLoading(false);
-      }
-    };
+        if (att.isExitVerified) {
+          setIsExitVerified(true);
+          setOtpSuccess('Exit verified! You may now exit the assessment.');
+        }
 
-    init();
+        // Initialize question code buffers
+        const initialSubs: Record<string, QuestionSubmissionState> = {};
+        res.data.questions.forEach((q: SanitizedQuestion) => {
+          const existingSub = att.questionSubmissions?.find(
+            (s: any) => s.questionId === q._id || s.questionNumber === q.questionNumber
+          );
+          initialSubs[q._id] = {
+            code: existingSub?.code || '// Write your solution here\n',
+            language: existingSub?.language || att.language || 'c',
+            questionScore: existingSub?.questionScore || 0,
+            testResults: existingSub?.testResults || [],
+          };
+        });
+        setSubmissions(initialSubs);
+      }
+    } catch (err: any) {
+      setError(err?.response?.data?.message || err?.message || 'Unable to open workspace');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAttemptData();
   }, [attemptId]);
 
   // Countdown timer effect
   useEffect(() => {
-    if (secondsRemaining <= 0) return;
+    if (secondsRemaining <= 0 || finalResult) return;
     const timer = setInterval(() => {
       setSecondsRemaining((prev) => {
         if (prev <= 1) {
@@ -132,13 +180,29 @@ export const AssessmentWorkspace: React.FC = () => {
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [secondsRemaining]);
+  }, [secondsRemaining, finalResult]);
+
+  // Protected Session: Intercept tab close, reload, or navigate away
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // If assessment is active and exit is not verified, warn user
+      if (!isExitVerified) {
+        e.preventDefault();
+        e.returnValue = 'You are currently taking a protected examination session. Leaving without administrator OTP exit verification is prohibited.';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isExitVerified]);
 
   const currentQuestion = questions[activeQuestionIndex];
   const currentSub = currentQuestion ? submissions[currentQuestion._id] : null;
+  const isSubmitted = !!finalResult;
 
   const handleCodeChange = (value: string | undefined) => {
-    if (!currentQuestion) return;
+    if (!currentQuestion || isSubmitted) return;
     setSubmissions((prev) => ({
       ...prev,
       [currentQuestion._id]: {
@@ -148,8 +212,9 @@ export const AssessmentWorkspace: React.FC = () => {
     }));
   };
 
+  // Run Sample Test against non-secret sample test case
   const handleRunSample = async () => {
-    if (!attempt || !currentQuestion || !currentSub) return;
+    if (!attempt || !currentQuestion || !currentSub || isSubmitted) return;
     setRunningSample(true);
     setSampleOutput(null);
     try {
@@ -169,49 +234,84 @@ export const AssessmentWorkspace: React.FC = () => {
     }
   };
 
-  const handleSubmitQuestion = async () => {
-    if (!attempt || !currentQuestion || !currentSub) return;
-    setSubmittingQuestion(true);
+  // Execute Overall Assessment Submission (evaluates both questions against 10 official test cases)
+  const handleConfirmSubmitOverall = async () => {
+    if (!attempt || isSubmitted) return;
+    setSubmittingOverall(true);
+    setIsSubmitModalOpen(false);
+
     try {
-      const response = await api.post(`/assessments/${attempt.id}/submit-question`, {
-        questionId: currentQuestion._id,
-        code: currentSub.code,
-        language: currentSub.language,
+      // Package current drafts for both questions
+      const payloadSubmissions = questions.map((q) => {
+        const sub = submissions[q._id];
+        return {
+          questionId: q._id,
+          code: sub ? sub.code : '',
+          language: sub ? sub.language : attempt.language,
+        };
+      });
+
+      const response = await api.post<{
+        success: boolean;
+        message: string;
+        result: AssessmentResultBreakdown;
+      }>(`/assessments/${attempt.id}/submit-overall`, {
+        submissions: payloadSubmissions,
       });
 
       if (response.data.success) {
-        setSubmissions((prev) => ({
-          ...prev,
-          [currentQuestion._id]: {
-            ...prev[currentQuestion._id],
-            questionScore: response.data.questionScore,
-            testResults: response.data.testResults,
-          },
-        }));
+        setFinalResult(response.data.result);
       }
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Error submitting question for evaluation');
+      alert(err?.response?.data?.message || 'Failed to submit overall assessment');
     } finally {
-      setSubmittingQuestion(false);
+      setSubmittingOverall(false);
     }
   };
 
-  const handleSubmitLevel = async () => {
-    if (!attempt) return;
-    if (!window.confirm('Are you ready to submit your final level assessment? Your score will be calculated.')) {
-      return;
-    }
+  // Verify Administrator OTP to exit assessment
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!attempt || !otpInput.trim()) return;
 
-    setSubmittingLevel(true);
+    setVerifyingOtp(true);
+    setOtpError(null);
+    setOtpSuccess(null);
+
     try {
-      const response = await api.post(`/assessments/${attempt.id}/submit-level`);
-      if (response.data.success) {
-        setLevelResultModal(response.data.result);
+      const res = await api.post<{ success: boolean; message: string; isExitVerified: boolean }>(
+        `/assessments/${attempt.id}/verify-exit-otp`,
+        { otp: otpInput.trim() }
+      );
+
+      if (res.data.success) {
+        setIsExitVerified(true);
+        setOtpSuccess(res.data.message || 'OTP verified successfully! You may now exit the assessment.');
       }
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to finalize level assessment');
+      setOtpError(err?.response?.data?.message || 'Invalid or expired OTP. Please check with your administrator.');
     } finally {
-      setSubmittingLevel(false);
+      setVerifyingOtp(false);
+    }
+  };
+
+  // Exit Assessment after OTP verification
+  const handleExitAssessment = async () => {
+    if (!attempt || !isExitVerified) return;
+    setExitingSession(true);
+
+    try {
+      const res = await api.post<{ success: boolean; redirectTo: string }>(
+        `/assessments/${attempt.id}/exit`
+      );
+
+      if (res.data.success) {
+        navigate('/dashboard');
+      }
+    } catch (err: any) {
+      alert(err?.response?.data?.message || 'Error exiting assessment session');
+    } finally {
+      setExitingSession(false);
     }
   };
 
@@ -258,7 +358,7 @@ export const AssessmentWorkspace: React.FC = () => {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col bg-surface-950 text-surface-100 overflow-hidden">
+    <div className="h-[calc(100vh-4rem)] flex flex-col bg-surface-950 text-surface-100 overflow-hidden relative">
       {/* Top Assessment Header */}
       <div className="h-14 border-b border-surface-800 bg-surface-900 px-4 sm:px-6 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center space-x-3">
@@ -300,8 +400,9 @@ export const AssessmentWorkspace: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Timer & Submit All */}
+        {/* Right Section: Timer & Overall Submit Button */}
         <div className="flex items-center space-x-4">
+          {/* Timer */}
           <div className="flex items-center space-x-2 text-xs font-mono bg-surface-950 px-3 py-1.5 rounded-lg border border-surface-800">
             <Clock className={`h-4 w-4 ${secondsRemaining < 300 ? 'text-rose-400 animate-pulse' : 'text-amber-400'}`} />
             <span className={secondsRemaining < 300 ? 'text-rose-400 font-bold' : 'text-white'}>
@@ -309,20 +410,31 @@ export const AssessmentWorkspace: React.FC = () => {
             </span>
           </div>
 
-          <button
-            onClick={handleSubmitLevel}
-            disabled={submittingLevel}
-            className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center space-x-1.5 disabled:opacity-50"
-          >
-            {submittingLevel ? (
-              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <>
-                <Send className="h-3.5 w-3.5" />
-                <span>Submit Level</span>
-              </>
-            )}
-          </button>
+          {/* Submission status or Submit Overall Button */}
+          {isSubmitted ? (
+            <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-emerald-950/60 text-emerald-300 border border-emerald-800 text-xs font-semibold">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              <span>Assessment Finalized</span>
+            </div>
+          ) : (
+            <button
+              onClick={() => setIsSubmitModalOpen(true)}
+              disabled={submittingOverall}
+              className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center space-x-1.5 disabled:opacity-50"
+            >
+              {submittingOverall ? (
+                <>
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                  <span>Evaluating 10 Test Cases...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="h-3.5 w-3.5" />
+                  <span>Submit Overall Assessment</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
 
@@ -368,17 +480,13 @@ export const AssessmentWorkspace: React.FC = () => {
           <div className="space-y-2 pt-2 border-t border-surface-800">
             <h3 className="text-xs font-bold text-surface-400 uppercase tracking-wider">Sample Test Case</h3>
             <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-              <div className="space-y-1">
-                <span className="text-[11px] text-surface-400">Sample Input:</span>
-                <pre className="p-2.5 rounded-lg bg-surface-950 border border-surface-800 text-white overflow-x-auto">
-                  {currentQuestion.sampleTestCase.input}
-                </pre>
+              <div className="p-2.5 rounded-lg bg-surface-950 border border-surface-800 space-y-1">
+                <span className="text-[10px] text-surface-500 font-sans uppercase">Input:</span>
+                <pre className="text-surface-200 whitespace-pre-wrap">{currentQuestion.sampleTestCase.input}</pre>
               </div>
-              <div className="space-y-1">
-                <span className="text-[11px] text-surface-400">Expected Output:</span>
-                <pre className="p-2.5 rounded-lg bg-surface-950 border border-surface-800 text-emerald-400 overflow-x-auto">
-                  {currentQuestion.sampleTestCase.expectedOutput}
-                </pre>
+              <div className="p-2.5 rounded-lg bg-surface-950 border border-surface-800 space-y-1">
+                <span className="text-[10px] text-surface-500 font-sans uppercase">Expected Output:</span>
+                <pre className="text-surface-200 whitespace-pre-wrap">{currentQuestion.sampleTestCase.expectedOutput}</pre>
               </div>
             </div>
             {currentQuestion.sampleTestCase.explanation && (
@@ -389,14 +497,35 @@ export const AssessmentWorkspace: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Monaco Code Editor & Test Runner (7 cols) */}
-        <div className="lg:col-span-7 flex flex-col h-full bg-surface-950">
-          {/* Editor Header Bar */}
-          <div className="h-10 border-b border-surface-800 bg-surface-900/80 px-4 flex items-center justify-between text-xs text-surface-400 flex-shrink-0">
-            <span className="font-mono text-brand-400 font-semibold uppercase">
-              {currentSub?.language} Editor
-            </span>
-            <span>Marks: {currentSub?.questionScore || 0} / 50</span>
+        {/* Right Column: Monaco Code Editor & Testing Sandbox (7 cols) */}
+        <div className="lg:col-span-7 flex flex-col bg-surface-950 overflow-hidden">
+          {/* Action Toolbar */}
+          <div className="h-10 border-b border-surface-800 bg-surface-900/40 px-4 flex items-center justify-between text-xs">
+            <div className="flex items-center space-x-2 text-surface-400 font-mono text-[11px]">
+              <span>Track:</span>
+              <span className="font-bold text-white uppercase">{currentSub?.language}</span>
+              {isSubmitted && (
+                <span className="ml-2 px-2 py-0.5 rounded bg-surface-800 text-amber-300 text-[10px] font-semibold flex items-center space-x-1">
+                  <Lock className="h-3 w-3" />
+                  <span>Read-Only Mode</span>
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={handleRunSample}
+                disabled={runningSample || isSubmitted}
+                className="px-3 py-1 rounded bg-surface-800 hover:bg-surface-700 text-white font-medium text-xs transition flex items-center space-x-1.5 disabled:opacity-50"
+              >
+                {runningSample ? (
+                  <RefreshCw className="h-3 w-3 animate-spin" />
+                ) : (
+                  <Play className="h-3 w-3 text-emerald-400" />
+                )}
+                <span>Run Sample Test</span>
+              </button>
+            </div>
           </div>
 
           {/* Monaco Editor Container */}
@@ -408,169 +537,255 @@ export const AssessmentWorkspace: React.FC = () => {
               value={currentSub?.code || ''}
               onChange={handleCodeChange}
               options={{
-                fontSize: 13,
-                fontFamily: 'JetBrains Mono, monospace',
+                readOnly: isSubmitted || submittingOverall,
                 minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                wordWrap: 'on',
+                fontSize: 13,
                 lineNumbers: 'on',
-                tabSize: 4,
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                padding: { top: 12 },
               }}
             />
           </div>
 
-          {/* Bottom Execution & Evaluation Panel */}
-          <div className="border-t border-surface-800 bg-surface-900 p-4 space-y-3 flex-shrink-0 max-h-64 overflow-y-auto">
-            {/* Action Buttons */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <button
-                  type="button"
-                  onClick={handleRunSample}
-                  disabled={runningSample || submittingQuestion}
-                  className="py-1.5 px-3 rounded-lg bg-surface-800 hover:bg-surface-700 text-surface-200 border border-surface-700 text-xs font-semibold transition flex items-center space-x-1.5 disabled:opacity-50"
-                >
-                  {runningSample ? (
-                    <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Play className="h-3.5 w-3.5 text-brand-400" />
-                  )}
-                  <span>Run Sample Test</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleSubmitQuestion}
-                  disabled={runningSample || submittingQuestion}
-                  className="py-1.5 px-4 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow-md shadow-brand-600/30 transition flex items-center space-x-1.5 disabled:opacity-50"
-                >
-                  {submittingQuestion ? (
-                    <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Award className="h-3.5 w-3.5" />
-                  )}
-                  <span>Submit Question (5 Test Cases)</span>
-                </button>
-              </div>
-
-              {activeQuestionIndex < questions.length - 1 && (
-                <button
-                  type="button"
-                  onClick={() => setActiveQuestionIndex(activeQuestionIndex + 1)}
-                  className="text-xs text-brand-400 hover:text-brand-300 font-medium flex items-center space-x-1"
-                >
-                  <span>Next Question</span>
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
+          {/* Console / Output Drawer */}
+          <div className="h-44 border-t border-surface-800 bg-surface-900/90 flex flex-col overflow-hidden text-xs">
+            <div className="h-7 border-b border-surface-800 px-4 flex items-center justify-between text-surface-400 font-semibold text-[11px]">
+              <span>Sample Test Output & Execution</span>
+              {sampleOutput && (
+                <span className={sampleOutput.passed ? 'text-emerald-400' : 'text-rose-400'}>
+                  {sampleOutput.passed ? 'Sample Test Passed' : 'Sample Test Failed'}
+                </span>
               )}
             </div>
 
-            {/* Sample Execution Feedback */}
-            {sampleOutput && (
-              <div className={`p-3 rounded-xl border text-xs font-mono space-y-1.5 ${
-                sampleOutput.passed
-                  ? 'bg-emerald-950/40 border-emerald-800/80 text-emerald-200'
-                  : 'bg-rose-950/40 border-rose-800/80 text-rose-200'
-              }`}>
-                <div className="flex items-center justify-between font-sans font-semibold">
-                  <span>Sample Validation: {sampleOutput.passed ? 'PASSED ✓' : 'FAILED ✗'}</span>
-                  <span className="text-[11px] opacity-80">{sampleOutput.statusDescription}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/10 text-[11px]">
-                  <div>Expected: <span className="text-white">{sampleOutput.expectedOutput}</span></div>
-                  <div>Actual Output: <span className="text-white">{sampleOutput.actualOutput || '(none)'}</span></div>
-                </div>
-                {sampleOutput.stderr && (
-                  <div className="text-rose-300 text-[10px] pt-1">Error: {sampleOutput.stderr}</div>
-                )}
-              </div>
-            )}
-
-            {/* Official 5 Main Test Cases Evaluation Results */}
-            {currentSub?.testResults && currentSub.testResults.length > 0 && (
-              <div className="p-3 rounded-xl bg-surface-950 border border-surface-800 space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-white">Official Evaluation Results</span>
-                  <span className="font-bold text-brand-400 font-mono">
-                    Score: {currentSub.questionScore} / 50 marks
-                  </span>
-                </div>
-                <div className="grid grid-cols-5 gap-2">
-                  {currentSub.testResults.map((tc) => (
-                    <div
-                      key={tc.testCaseIndex}
-                      className={`p-2 rounded-lg border text-center text-[10px] space-y-0.5 ${
-                        tc.passed
-                          ? 'bg-emerald-950/30 border-emerald-800/60 text-emerald-300'
-                          : 'bg-rose-950/30 border-rose-800/60 text-rose-300'
-                      }`}
-                    >
-                      <div className="font-bold">Case {tc.testCaseIndex}</div>
-                      <div>{tc.passed ? '+10 pts' : '0 pts'}</div>
-                      <div className="text-[9px] opacity-80 truncate">{tc.statusDescription}</div>
+            <div className="flex-1 p-3 overflow-y-auto font-mono text-[11px] space-y-2">
+              {sampleOutput ? (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2 rounded bg-surface-950 border border-surface-800">
+                      <p className="text-surface-500 font-sans text-[10px]">Your Output:</p>
+                      <pre className="text-white whitespace-pre-wrap">{sampleOutput.actualOutput || '(no stdout)'}</pre>
                     </div>
-                  ))}
+                    <div className="p-2 rounded bg-surface-950 border border-surface-800">
+                      <p className="text-surface-500 font-sans text-[10px]">Expected Output:</p>
+                      <pre className="text-emerald-400 whitespace-pre-wrap">{sampleOutput.expectedOutput}</pre>
+                    </div>
+                  </div>
+                  {sampleOutput.stderr && (
+                    <div className="p-2 rounded bg-rose-950/40 border border-rose-800 text-rose-300">
+                      <pre className="whitespace-pre-wrap">{sampleOutput.stderr}</pre>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              ) : (
+                <p className="text-surface-500 italic">Click "Run Sample Test" to verify your code against sample I/O.</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Level Completion Result Modal */}
-      {levelResultModal && (
+      {/* Confirmation Modal Before Final Overall Submission */}
+      {isSubmitModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-md w-full rounded-2xl bg-surface-900 border border-surface-800 p-6 sm:p-8 space-y-6 shadow-2xl text-center">
-            <div className={`h-16 w-16 rounded-full flex items-center justify-center mx-auto ${
-              levelResultModal.passed
-                ? 'bg-emerald-950 border border-emerald-700 text-emerald-400'
-                : 'bg-rose-950 border border-rose-700 text-rose-400'
-            }`}>
-              {levelResultModal.passed ? <CheckCircle2 className="h-8 w-8" /> : <XCircle className="h-8 w-8" />}
+          <div className="max-w-md w-full rounded-2xl bg-surface-900 border border-surface-700 p-6 sm:p-8 space-y-5 shadow-2xl">
+            <div className="flex items-center space-x-3">
+              <div className="h-10 w-10 rounded-xl bg-amber-950 border border-amber-800 flex items-center justify-center text-amber-400">
+                <AlertCircle className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">Submit Entire Assessment?</h3>
+                <p className="text-xs text-surface-400">Confirmation Required</p>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-white">
-                {levelResultModal.passed ? 'Level Cleared!' : 'Level Not Cleared'}
+            <p className="text-xs text-surface-300 leading-relaxed">
+              Are you sure you want to submit the entire assessment? Your answers will be evaluated and your final score will be calculated.
+            </p>
+
+            <div className="p-3 rounded-xl bg-surface-950 border border-surface-800 text-[11px] text-surface-300 space-y-1">
+              <div className="flex items-center justify-between text-surface-400">
+                <span>Total Questions:</span>
+                <span className="font-semibold text-white">2 Programming Problems</span>
+              </div>
+              <div className="flex items-center justify-between text-surface-400">
+                <span>Evaluation Cases:</span>
+                <span className="font-semibold text-white">10 Official Test Cases (5 each)</span>
+              </div>
+              <div className="flex items-center justify-between text-surface-400">
+                <span>Passing Threshold:</span>
+                <span className="font-semibold text-emerald-400">100 / 100 Required</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end space-x-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsSubmitModalOpen(false)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-surface-400 hover:text-white transition"
+              >
+                Return to Coding
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSubmitOverall}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center space-x-1.5"
+              >
+                <Send className="h-3.5 w-3.5" />
+                <span>Confirm & Submit Assessment</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Results & Student OTP Exit Verification Panel */}
+      {finalResult && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="max-w-xl w-full rounded-3xl bg-surface-900 border border-surface-700 p-6 sm:p-8 space-y-6 shadow-2xl my-8">
+            {/* Header / Outcome Icon */}
+            <div className="text-center space-y-2">
+              <div className={`h-16 w-16 rounded-2xl flex items-center justify-center mx-auto shadow-lg ${
+                finalResult.passed
+                  ? 'bg-emerald-950 border border-emerald-700 text-emerald-400 shadow-emerald-950/50'
+                  : 'bg-rose-950 border border-rose-700 text-rose-400 shadow-rose-950/50'
+              }`}>
+                {finalResult.passed ? <CheckCircle2 className="h-9 w-9" /> : <XCircle className="h-9 w-9" />}
+              </div>
+
+              <h2 className="text-2xl font-extrabold text-white">
+                {finalResult.passed ? 'Level Cleared!' : 'Level Not Cleared'}
               </h2>
               <p className="text-xs text-surface-400">
-                {levelResultModal.passed
-                  ? `Congratulations! You scored ${levelResultModal.totalScore}/100 and unlocked Level ${levelResultModal.nextLevelNumber}!`
-                  : `You scored ${levelResultModal.totalScore}/100. A perfect score of 100/100 is required to unlock the next level.`}
+                {finalResult.passed
+                  ? `Congratulations! You scored ${finalResult.totalScore}/100 and successfully cleared Level ${finalResult.levelNumber}!`
+                  : `You scored ${finalResult.totalScore}/100. A perfect score of 100/100 (all 10 test cases) is required to unlock the next level.`}
               </p>
             </div>
 
-            {/* Score Breakdown Box */}
-            <div className="p-4 rounded-xl bg-surface-950 border border-surface-800 space-y-2 text-xs">
-              <div className="flex justify-between py-1 border-b border-surface-800">
-                <span className="text-surface-400">Total Official Score</span>
-                <span className="font-bold text-white font-mono">{levelResultModal.totalScore} / 100</span>
+            {/* Official Score Card */}
+            <div className="rounded-2xl bg-surface-950 border border-surface-800 p-4 space-y-3 text-xs">
+              <div className="flex items-center justify-between pb-2 border-b border-surface-800">
+                <span className="text-surface-400">Total Official Score:</span>
+                <span className="font-extrabold text-base text-white font-mono">
+                  {finalResult.totalScore} / 100
+                </span>
               </div>
-              <div className="flex justify-between py-1 border-b border-surface-800">
-                <span className="text-surface-400">Passing Threshold</span>
-                <span className="font-semibold text-emerald-400">100 / 100</span>
+
+              <div className="flex items-center justify-between pb-2 border-b border-surface-800">
+                <span className="text-surface-400">Official Test Cases:</span>
+                <span className="font-mono text-white">
+                  <span className="text-emerald-400 font-bold">{finalResult.passedTestCasesCount} Passed</span>
+                  <span className="text-surface-600"> / </span>
+                  <span className="text-rose-400 font-bold">{finalResult.failedTestCasesCount} Failed</span>
+                </span>
               </div>
-              {levelResultModal.questionBreakdown?.map((qb: any) => (
-                <div key={qb.questionNumber} className="flex justify-between py-1">
-                  <span className="text-surface-400">Question {qb.questionNumber}</span>
-                  <span className="font-mono text-white">{qb.score} / 50 pts ({qb.passedTests}/5 cases)</span>
+
+              {/* Questions Breakdown */}
+              {finalResult.questionBreakdown?.map((qb) => (
+                <div key={qb.questionNumber} className="flex items-center justify-between text-surface-300">
+                  <span>Question {qb.questionNumber} Score:</span>
+                  <span className="font-mono font-semibold text-white">
+                    {qb.score} / 50 pts ({qb.passedTests}/5 cases passed)
+                  </span>
                 </div>
               ))}
             </div>
 
-            <div className="flex justify-center space-x-3">
+            {/* OTP Verification Section */}
+            <div className="rounded-2xl bg-brand-950/30 border border-brand-800/80 p-5 space-y-4">
+              <div className="flex items-center space-x-2.5">
+                <KeyRound className="h-5 w-5 text-brand-400 flex-shrink-0" />
+                <div>
+                  <h3 className="text-sm font-bold text-white">Verify OTP to Exit Assessment</h3>
+                  <p className="text-xs text-surface-400">
+                    Enter the OTP generated by the administrator to exit this assessment.
+                  </p>
+                </div>
+              </div>
+
+              {/* Status Message */}
+              {otpSuccess && (
+                <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-700 text-emerald-300 text-xs flex items-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+                  <span>{otpSuccess}</span>
+                </div>
+              )}
+
+              {otpError && (
+                <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-700 text-rose-300 text-xs flex items-center space-x-2">
+                  <AlertCircle className="h-4 w-4 text-rose-400 flex-shrink-0" />
+                  <span>{otpError}</span>
+                </div>
+              )}
+
+              {/* OTP Form */}
+              {!isExitVerified && (
+                <form onSubmit={handleVerifyOtp} className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={otpInput}
+                      onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
+                      placeholder="Enter 6-digit OTP"
+                      className="flex-1 px-4 py-2.5 bg-surface-950 border border-surface-700 rounded-xl text-center text-lg font-mono font-bold tracking-widest text-white placeholder-surface-600 focus:outline-none focus:border-brand-500"
+                    />
+                    <button
+                      type="submit"
+                      disabled={verifyingOtp || otpInput.length !== 6}
+                      className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs shadow-md shadow-brand-600/30 transition flex items-center space-x-1.5 disabled:opacity-50"
+                    >
+                      {verifyingOtp ? (
+                        <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <span>Verify OTP</span>
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-surface-400 flex items-center space-x-1">
+                    <Clock className="h-3 w-3 text-amber-400" />
+                    <span>OTP is valid for 30 seconds from generation by the proctor.</span>
+                  </p>
+                </form>
+              )}
+            </div>
+
+            {/* Exit Action Button (Disabled until verified) */}
+            <div className="pt-2 flex flex-col items-center space-y-2">
               <button
-                onClick={() => navigate('/my-results')}
-                className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow-md transition"
+                onClick={handleExitAssessment}
+                disabled={!isExitVerified || exitingSession}
+                className={`w-full py-3 px-6 rounded-2xl font-bold text-xs transition flex items-center justify-center space-x-2 ${
+                  isExitVerified
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/40 cursor-pointer'
+                    : 'bg-surface-800 border border-surface-700 text-surface-500 cursor-not-allowed opacity-60'
+                }`}
               >
-                View Assessment Results
+                {exitingSession ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>Closing Assessment Session...</span>
+                  </>
+                ) : isExitVerified ? (
+                  <>
+                    <LogOut className="h-4 w-4" />
+                    <span>Exit Assessment to Dashboard</span>
+                  </>
+                ) : (
+                  <>
+                    <Lock className="h-4 w-4 text-surface-500" />
+                    <span>Exit Assessment (OTP Verification Required)</span>
+                  </>
+                )}
               </button>
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="px-4 py-2 rounded-xl bg-surface-800 hover:bg-surface-700 text-surface-300 text-xs font-semibold border border-surface-700 transition"
-              >
-                Back to Dashboard
-              </button>
+
+              {!isExitVerified && (
+                <p className="text-[10px] text-surface-500 text-center">
+                  In accordance with examination proctoring rules, exit is authorized only upon administrator OTP verification.
+                </p>
+              )}
             </div>
           </div>
         </div>

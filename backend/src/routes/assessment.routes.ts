@@ -5,6 +5,10 @@ import {
   runSampleTest,
   submitQuestion,
   submitLevel,
+  submitOverallAssessment,
+  getAssessmentAttemptById,
+  verifyExitOtp,
+  exitAssessment,
   getMyResults,
 } from '../controllers/assessment.controller';
 import { protect } from '../middlewares/auth';
@@ -24,12 +28,29 @@ const codeExecutionLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Rate limiter for OTP verification attempts
+const otpVerificationLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: env.isTest ? 1000 : 15,
+  message: {
+    success: false,
+    message: 'Too many OTP verification attempts. Please wait 1 minute.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 router.use(protect);
 
 router.post('/start', startAssessment);
+router.get('/my-results', getMyResults);
+
+router.get('/:attemptId', getAssessmentAttemptById);
 router.post('/:attemptId/run-sample', codeExecutionLimiter, runSampleTest);
 router.post('/:attemptId/submit-question', codeExecutionLimiter, submitQuestion);
+router.post('/:attemptId/submit-overall', codeExecutionLimiter, submitOverallAssessment);
 router.post('/:attemptId/submit-level', submitLevel);
-router.get('/my-results', getMyResults);
+router.post('/:attemptId/verify-exit-otp', otpVerificationLimiter, verifyExitOtp);
+router.post('/:attemptId/exit', exitAssessment);
 
 export default router;

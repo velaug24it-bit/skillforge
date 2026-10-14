@@ -17,8 +17,43 @@ import {
   X,
   Award,
   Layers,
-  Check
+  Check,
+  KeyRound,
+  Copy,
+  Timer
 } from 'lucide-react';
+
+interface AssessmentSessionRecord {
+  id: string;
+  attemptId: string;
+  student: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  course: {
+    id: string;
+    name: string;
+    language: string;
+  };
+  level: {
+    id: string;
+    levelNumber: number;
+    title: string;
+  };
+  status: 'IN_PROGRESS' | 'SUBMITTED' | 'AWAITING_EXIT_VERIFICATION' | 'EXIT_VERIFIED' | 'COMPLETED' | 'EXPIRED';
+  totalScore: number;
+  passed: boolean;
+  otpStatus: 'NOT_GENERATED' | 'ACTIVE' | 'EXPIRED' | 'USED' | 'INVALIDATED';
+  otpExpiresAt?: string;
+  remainingSeconds: number;
+  isExitVerified: boolean;
+  canGenerateOtp: boolean;
+  startedAt: string;
+  finalSubmittedAt?: string;
+  completedAt?: string;
+  exitedAt?: string;
+}
 
 interface SlotBooking {
   id: string;
@@ -187,7 +222,7 @@ interface AdminStats {
 }
 
 export const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'slots' | 'students' | 'courses'>('slots');
+  const [activeTab, setActiveTab] = useState<'slots' | 'students' | 'courses' | 'sessions'>('slots');
   const [stats, setStats] = useState<AdminStats | null>(null);
   
   // Slot Roster state
@@ -226,6 +261,23 @@ export const AdminDashboard: React.FC = () => {
     description: '',
     icon: 'Terminal',
   });
+
+  // Assessment Sessions & OTP Management state
+  const [sessions, setSessions] = useState<AssessmentSessionRecord[]>([]);
+  const [loadingSessions, setLoadingSessions] = useState(false);
+  const [sessionSearch, setSessionSearch] = useState('');
+  const [sessionStatusFilter, setSessionStatusFilter] = useState<'ALL' | 'AWAITING' | 'ACTIVE' | 'COMPLETED'>('ALL');
+  const [generatingOtpAttemptId, setGeneratingOtpAttemptId] = useState<string | null>(null);
+  const [copiedOtp, setCopiedOtp] = useState(false);
+  const [activeOtpModal, setActiveOtpModal] = useState<{
+    attemptId: string;
+    studentName: string;
+    courseName: string;
+    levelNumber: number;
+    otp: string;
+    expiresAt: string;
+    remainingSeconds: number;
+  } | null>(null);
 
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -297,6 +349,69 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  // Load Assessment Sessions for OTP Management
+  const fetchAssessmentSessions = async () => {
+    setLoadingSessions(true);
+    try {
+      const res = await api.get<{ success: boolean; sessions: AssessmentSessionRecord[] }>('/admin/assessment-sessions');
+      if (res.data.success) {
+        setSessions(res.data.sessions);
+      }
+    } catch (err: any) {
+      setNotification({
+        type: 'error',
+        message: err?.response?.data?.message || 'Failed to fetch assessment sessions',
+      });
+    } finally {
+      setLoadingSessions(false);
+    }
+  };
+
+  // Generate 6-digit Exit OTP with 30s countdown
+  const handleGenerateOtp = async (attemptId: string) => {
+    setGeneratingOtpAttemptId(attemptId);
+    try {
+      const res = await api.post<{
+        success: boolean;
+        message: string;
+        attemptId: string;
+        studentName: string;
+        courseName: string;
+        levelNumber: number;
+        otp: string;
+        expiresAt: string;
+        validitySeconds: number;
+      }>(`/admin/assessment-sessions/${attemptId}/generate-otp`);
+
+      if (res.data.success) {
+        setActiveOtpModal({
+          attemptId: res.data.attemptId,
+          studentName: res.data.studentName || 'Student',
+          courseName: res.data.courseName || 'Course',
+          levelNumber: res.data.levelNumber || 1,
+          otp: res.data.otp,
+          expiresAt: res.data.expiresAt,
+          remainingSeconds: res.data.validitySeconds || 30,
+        });
+        setCopiedOtp(false);
+
+        setNotification({
+          type: 'success',
+          message: `Exit OTP ${res.data.otp} generated for ${res.data.studentName}. Active for 30s.`,
+        });
+
+        fetchAssessmentSessions();
+      }
+    } catch (err: any) {
+      setNotification({
+        type: 'error',
+        message: err?.response?.data?.message || 'Failed to generate exit OTP',
+      });
+    } finally {
+      setGeneratingOtpAttemptId(null);
+    }
+  };
+
   // Fetch Student History
   const handleOpenStudentHistory = async (studentId: string) => {
     setLoadingHistory(true);
@@ -357,6 +472,36 @@ export const AdminDashboard: React.FC = () => {
     fetchSlots(selectedDate);
     fetchStudents();
     fetchCourses();
+    fetchAssessmentSessions();
+  }, []);
+
+  // Live countdown ticker every 1 second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      // 1. Tick active OTP modal if open
+      setActiveOtpModal((prev) => {
+        if (!prev) return null;
+        const diff = Math.max(0, Math.floor((new Date(prev.expiresAt).getTime() - Date.now()) / 1000));
+        return { ...prev, remainingSeconds: diff };
+      });
+
+      // 2. Tick active sessions in table
+      setSessions((prev) =>
+        prev.map((s) => {
+          if (s.otpStatus === 'ACTIVE' && s.otpExpiresAt) {
+            const diff = Math.max(0, Math.floor((new Date(s.otpExpiresAt).getTime() - Date.now()) / 1000));
+            return {
+              ...s,
+              remainingSeconds: diff,
+              otpStatus: diff === 0 ? 'EXPIRED' : 'ACTIVE',
+            };
+          }
+          return s;
+        })
+      );
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   const handleDateChange = (newDate: string) => {
@@ -439,6 +584,7 @@ export const AdminDashboard: React.FC = () => {
               fetchSlots(selectedDate);
               fetchStudents();
               fetchCourses();
+              fetchAssessmentSessions();
             }}
             className="px-3.5 py-2 rounded-xl bg-surface-900 hover:bg-surface-800 border border-surface-700/80 text-surface-300 hover:text-white text-xs font-semibold transition flex items-center space-x-1.5 shadow-sm"
           >
@@ -560,6 +706,26 @@ export const AdminDashboard: React.FC = () => {
         >
           <BookOpen className="h-4 w-4" />
           <span>Course Management</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setActiveTab('sessions');
+            fetchAssessmentSessions();
+          }}
+          className={`pb-3 font-semibold transition border-b-2 flex items-center space-x-2 ${
+            activeTab === 'sessions'
+              ? 'border-brand-500 text-brand-400'
+              : 'border-transparent text-surface-400 hover:text-white'
+          }`}
+        >
+          <KeyRound className="h-4 w-4" />
+          <span>Assessment OTP Management</span>
+          {sessions.filter((s) => s.status === 'AWAITING_EXIT_VERIFICATION').length > 0 && (
+            <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-black animate-pulse">
+              {sessions.filter((s) => s.status === 'AWAITING_EXIT_VERIFICATION').length} Awaiting
+            </span>
+          )}
         </button>
       </div>
 
@@ -913,6 +1079,317 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tab 4: Assessment Sessions & Exit OTP Management */}
+      {activeTab === 'sessions' && (
+        <div className="space-y-6">
+          {/* Active Generated OTP Hero Card (If Active) */}
+          {activeOtpModal && (
+            <div className="rounded-3xl bg-gradient-to-br from-amber-950/70 via-surface-900 to-surface-950 border-2 border-amber-500/80 p-6 sm:p-8 shadow-2xl shadow-amber-500/10 space-y-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                <div className="flex items-center space-x-3">
+                  <div className="h-12 w-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-inner">
+                    <KeyRound className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-amber-400">Exit Verification Code</span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        activeOtpModal.remainingSeconds > 0 
+                          ? 'bg-emerald-950 text-emerald-300 border border-emerald-800 animate-pulse'
+                          : 'bg-rose-950 text-rose-300 border border-rose-800'
+                      }`}>
+                        {activeOtpModal.remainingSeconds > 0 ? 'VALID & ACTIVE' : 'EXPIRED'}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-white">
+                      {activeOtpModal.studentName} — {activeOtpModal.courseName} (Level {activeOtpModal.levelNumber})
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  {activeOtpModal.remainingSeconds === 0 ? (
+                    <button
+                      onClick={() => handleGenerateOtp(activeOtpModal.attemptId)}
+                      disabled={generatingOtpAttemptId === activeOtpModal.attemptId}
+                      className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs shadow-md transition flex items-center space-x-1.5"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      <span>Regenerate OTP</span>
+                    </button>
+                  ) : null}
+                  <button
+                    onClick={() => setActiveOtpModal(null)}
+                    className="p-2 rounded-xl text-surface-400 hover:text-white hover:bg-surface-800 transition"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* OTP Display and 30s Countdown Strip */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center bg-surface-950/80 border border-amber-900/40 rounded-2xl p-6 relative z-10">
+                <div className="md:col-span-2 space-y-2">
+                  <p className="text-xs text-surface-400 font-medium">
+                    Provide this 6-digit exit verification code directly to candidate. Single-use and strictly bound to this session:
+                  </p>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-4xl sm:text-5xl font-mono font-black tracking-widest text-amber-300 bg-surface-900 px-6 py-2.5 rounded-2xl border border-amber-500/50 shadow-inner select-all">
+                      {activeOtpModal.otp}
+                    </span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(activeOtpModal.otp);
+                        setCopiedOtp(true);
+                        setTimeout(() => setCopiedOtp(false), 2000);
+                      }}
+                      className="px-4 py-3 rounded-xl bg-surface-800 hover:bg-surface-700 text-white text-xs font-semibold border border-surface-700 transition flex items-center space-x-1.5"
+                    >
+                      {copiedOtp ? (
+                        <>
+                          <Check className="h-4 w-4 text-emerald-400" />
+                          <span className="text-emerald-400">Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-4 w-4" />
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Live Countdown Wheel/Ticker */}
+                <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-900/90 border border-surface-800 text-center space-y-2">
+                  <div className="flex items-center space-x-2 text-surface-400 text-xs font-medium">
+                    <Timer className="h-4 w-4 text-amber-400" />
+                    <span>Live Expiry Countdown</span>
+                  </div>
+                  <div className={`text-3xl font-black font-mono ${
+                    activeOtpModal.remainingSeconds > 10
+                      ? 'text-emerald-400'
+                      : activeOtpModal.remainingSeconds > 0
+                      ? 'text-amber-400 animate-pulse'
+                      : 'text-rose-400'
+                  }`}>
+                    {activeOtpModal.remainingSeconds > 0 ? `${activeOtpModal.remainingSeconds}s` : 'EXPIRED'}
+                  </div>
+                  {/* Progress Bar */}
+                  <div className="w-full bg-surface-800 h-2 rounded-full overflow-hidden">
+                    <div
+                      className={`h-2 rounded-full transition-all duration-1000 ${
+                        activeOtpModal.remainingSeconds > 10 ? 'bg-emerald-500' : 'bg-amber-500'
+                      }`}
+                      style={{ width: `${(activeOtpModal.remainingSeconds / 30) * 100}%` }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-surface-500">
+                    {activeOtpModal.remainingSeconds > 0 ? 'Server-enforced 30-second window' : 'Click Regenerate for a new code'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sessions Filter and Search Controls */}
+          <div className="bg-surface-900 border border-surface-800 rounded-2xl p-5 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center space-x-3 flex-1">
+              <Search className="h-4 w-4 text-surface-400" />
+              <input
+                type="text"
+                value={sessionSearch}
+                onChange={(e) => setSessionSearch(e.target.value)}
+                placeholder="Search candidates by name, email, or attempt ID..."
+                className="w-full bg-transparent text-sm text-white placeholder-surface-500 focus:outline-none"
+              />
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <span className="text-xs text-surface-400">Filter:</span>
+              <select
+                value={sessionStatusFilter}
+                onChange={(e) => setSessionStatusFilter(e.target.value as any)}
+                className="px-3.5 py-2 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs font-semibold focus:outline-none focus:border-brand-500"
+              >
+                <option value="ALL">All Assessment Sessions</option>
+                <option value="AWAITING">Awaiting Exit Verification</option>
+                <option value="ACTIVE">In Progress / Submitted</option>
+                <option value="COMPLETED">Completed / Exited</option>
+              </select>
+
+              <button
+                onClick={fetchAssessmentSessions}
+                className="p-2 rounded-xl bg-surface-800 hover:bg-surface-700 text-surface-300 hover:text-white border border-surface-700 transition"
+                title="Refresh Assessment Sessions"
+              >
+                <RefreshCw className={`h-4 w-4 ${loadingSessions ? 'animate-spin text-brand-400' : ''}`} />
+              </button>
+            </div>
+          </div>
+
+          {/* Sessions Table */}
+          {loadingSessions ? (
+            <div className="py-20 text-center text-surface-400 text-xs space-y-2">
+              <RefreshCw className="h-6 w-6 animate-spin mx-auto text-brand-400" />
+              <p>Loading candidate assessment sessions & exit verification states...</p>
+            </div>
+          ) : (
+            <div className="bg-surface-900 border border-surface-800 rounded-2xl overflow-hidden shadow-xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-surface-950/70 border-b border-surface-800 text-surface-400 uppercase tracking-wider text-[10px]">
+                    <tr>
+                      <th className="px-6 py-3.5 font-semibold">Candidate</th>
+                      <th className="px-6 py-3.5 font-semibold">Course & Level</th>
+                      <th className="px-6 py-3.5 font-semibold">Score / 100</th>
+                      <th className="px-6 py-3.5 font-semibold">Assessment Status</th>
+                      <th className="px-6 py-3.5 font-semibold">Exit OTP State</th>
+                      <th className="px-6 py-3.5 font-semibold text-right">Proctor Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-surface-800">
+                    {sessions
+                      .filter((s) => {
+                        // Search
+                        const q = sessionSearch.toLowerCase();
+                        const matchesSearch =
+                          s.student.name.toLowerCase().includes(q) ||
+                          s.student.email.toLowerCase().includes(q) ||
+                          s.id.toLowerCase().includes(q);
+                        if (!matchesSearch) return false;
+
+                        // Filter
+                        if (sessionStatusFilter === 'AWAITING') return s.status === 'AWAITING_EXIT_VERIFICATION';
+                        if (sessionStatusFilter === 'ACTIVE') return ['IN_PROGRESS', 'SUBMITTED'].includes(s.status);
+                        if (sessionStatusFilter === 'COMPLETED') return ['COMPLETED', 'EXIT_VERIFIED'].includes(s.status);
+                        return true;
+                      })
+                      .map((s) => {
+                        const isAwaiting = s.status === 'AWAITING_EXIT_VERIFICATION';
+                        const isCompleted = s.status === 'COMPLETED' || s.isExitVerified;
+
+                        return (
+                          <tr key={s.id} className={`hover:bg-surface-800/40 transition ${isAwaiting ? 'bg-amber-950/10' : ''}`}>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center space-x-3">
+                                <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-brand-600 to-accent-600 flex items-center justify-center font-bold text-white text-xs uppercase">
+                                  {s.student.name.charAt(0)}
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-white">{s.student.name}</p>
+                                  <p className="text-surface-400 text-[11px]">{s.student.email}</p>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td className="px-6 py-4">
+                              <p className="font-semibold text-white">{s.course.name}</p>
+                              <p className="text-surface-400 text-[11px]">Level {s.level.levelNumber} • {s.level.title}</p>
+                            </td>
+
+                            <td className="px-6 py-4">
+                              <div className="flex items-center space-x-2">
+                                <span className="font-bold text-white text-sm">{s.totalScore} / 100</span>
+                                {s.passed ? (
+                                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                                    PASSED
+                                  </span>
+                                ) : s.status !== 'IN_PROGRESS' ? (
+                                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-rose-950 text-rose-300 border border-rose-800">
+                                    FAILED
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-surface-500">—</span>
+                                )}
+                              </div>
+                            </td>
+
+                            <td className="px-6 py-4">
+                              {s.status === 'AWAITING_EXIT_VERIFICATION' ? (
+                                <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800 animate-pulse">
+                                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                                  <span>Awaiting Exit Verification</span>
+                                </span>
+                              ) : s.status === 'COMPLETED' ? (
+                                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                                  <Check className="h-3 w-3" />
+                                  <span>Completed & Exited</span>
+                                </span>
+                              ) : s.status === 'EXIT_VERIFIED' ? (
+                                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                                  <Check className="h-3 w-3" />
+                                  <span>Exit Verified</span>
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800">
+                                  <span>In Progress</span>
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="px-6 py-4">
+                              {s.otpStatus === 'ACTIVE' && s.remainingSeconds > 0 ? (
+                                <div className="space-y-0.5">
+                                  <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800 animate-pulse">
+                                    <Timer className="h-3 w-3" />
+                                    <span>Active ({s.remainingSeconds}s)</span>
+                                  </span>
+                                  <p className="text-[10px] text-surface-500 font-mono">Expires shortly</p>
+                                </div>
+                              ) : s.otpStatus === 'USED' ? (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                                  OTP Verified
+                                </span>
+                              ) : s.otpStatus === 'EXPIRED' ? (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-800">
+                                  OTP Expired
+                                </span>
+                              ) : (
+                                <span className="text-[11px] text-surface-500 font-medium">Not Generated</span>
+                              )}
+                            </td>
+
+                            <td className="px-6 py-4 text-right">
+                              {isCompleted ? (
+                                <span className="text-surface-500 text-[11px] font-medium">Session Closed</span>
+                              ) : (
+                                <button
+                                  onClick={() => handleGenerateOtp(s.id)}
+                                  disabled={generatingOtpAttemptId === s.id}
+                                  className={`px-3 py-1.5 rounded-xl font-bold text-[11px] transition inline-flex items-center space-x-1.5 shadow-sm ${
+                                    isAwaiting
+                                      ? 'bg-amber-500 hover:bg-amber-400 text-black shadow-amber-500/20'
+                                      : 'bg-surface-800 hover:bg-surface-700 text-surface-200 border border-surface-700'
+                                  } disabled:opacity-50`}
+                                >
+                                  {generatingOtpAttemptId === s.id ? (
+                                    <>
+                                      <RefreshCw className="h-3 w-3 animate-spin" />
+                                      <span>Generating...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <KeyRound className="h-3 w-3" />
+                                      <span>Generate Exit OTP</span>
+                                    </>
+                                  )}
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

@@ -42,47 +42,75 @@ export const Navbar: React.FC = () => {
         { name: 'My Results', path: '/my-results', icon: Award },
       ];
 
-  const homePath = user ? (user.role === 'admin' ? '/admin' : '/dashboard') : '/';
+  const isAssessmentWorkspace = location.pathname.startsWith('/workspace');
+  const homePath = isAssessmentWorkspace
+    ? '#'
+    : user
+    ? (user.role === 'admin' ? '/admin' : '/dashboard')
+    : '/';
 
   return (
     <header className="border-b border-surface-800 bg-surface-900/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to={homePath} className="flex items-center space-x-3 group">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 to-accent-600 flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
-              <Terminal className="h-5 w-5 text-white" />
+          {isAssessmentWorkspace ? (
+            <div className="flex items-center space-x-3 select-none cursor-default">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 to-accent-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                <Terminal className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <span className="text-xl font-bold tracking-tight text-white">Skill<span className="text-brand-400">Forge</span></span>
+                <span className="ml-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-rose-950 text-rose-300 border border-rose-800">
+                  Protected Session
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="text-xl font-bold tracking-tight text-white">Skill<span className="text-brand-400">Forge</span></span>
-              <span className="hidden sm:inline-block ml-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-brand-950 text-brand-300 border border-brand-800">
-                {user?.role === 'admin' ? 'Admin' : 'Assessment'}
-              </span>
-            </div>
-          </Link>
+          ) : (
+            <Link to={homePath} className="flex items-center space-x-3 group">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 to-accent-600 flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
+                <Terminal className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <span className="text-xl font-bold tracking-tight text-white">Skill<span className="text-brand-400">Forge</span></span>
+                <span className="hidden sm:inline-block ml-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-brand-950 text-brand-300 border border-brand-800">
+                  {user?.role === 'admin' ? 'Admin' : 'Assessment'}
+                </span>
+              </div>
+            </Link>
+          )}
 
           {/* Desktop Navigation Links */}
           {user && (
-            <nav className="hidden md:flex items-center space-x-1">
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                const isActive = location.pathname === link.path;
-                return (
-                  <Link
-                    key={link.path}
-                    to={link.path}
-                    className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium transition ${
-                      isActive
-                        ? 'bg-brand-600/20 text-brand-300 border border-brand-700/50 shadow-sm'
-                        : 'text-surface-300 hover:text-white hover:bg-surface-800/60'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{link.name}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+            isAssessmentWorkspace ? (
+              <div className="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-surface-950/80 border border-surface-800 text-surface-300 text-xs">
+                <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
+                <span className="font-semibold text-rose-400">Secure Examination Environment</span>
+                <span className="text-surface-500">•</span>
+                <span className="text-surface-400 text-[11px]">External navigation locked until overall submit & exit OTP verification</span>
+              </div>
+            ) : (
+              <nav className="hidden md:flex items-center space-x-1">
+                {navLinks.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = location.pathname === link.path;
+                  return (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium transition ${
+                        isActive
+                          ? 'bg-brand-600/20 text-brand-300 border border-brand-700/50 shadow-sm'
+                          : 'text-surface-300 hover:text-white hover:bg-surface-800/60'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{link.name}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            )
           )}
 
           {/* Right Action / User Profile */}
@@ -113,24 +141,33 @@ export const Navbar: React.FC = () => {
                       <p className="font-medium text-white">{user.name}</p>
                       <p className="text-surface-400 truncate text-[11px]">{user.email}</p>
                     </div>
-                    <Link
-                      to="/profile"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center space-x-2 px-4 py-2 text-surface-300 hover:text-white hover:bg-surface-800 transition"
-                    >
-                      <UserIcon className="h-3.5 w-3.5 text-brand-400" />
-                      <span>My Profile</span>
-                    </Link>
-                    <button
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        handleLogout();
-                      }}
-                      className="w-full flex items-center space-x-2 px-4 py-2 text-rose-400 hover:text-rose-300 hover:bg-rose-950/20 transition"
-                    >
-                      <LogOut className="h-3.5 w-3.5" />
-                      <span>Sign Out</span>
-                    </button>
+                    {isAssessmentWorkspace ? (
+                      <div className="px-4 py-3 text-[11px] text-amber-300 bg-amber-950/20 border-t border-amber-900/30">
+                        <p className="font-semibold">Session Locked</p>
+                        <p className="text-surface-400 mt-1">To exit this assessment, submit overall and verify the admin exit OTP.</p>
+                      </div>
+                    ) : (
+                      <>
+                        <Link
+                          to="/profile"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center space-x-2 px-4 py-2 text-surface-300 hover:text-white hover:bg-surface-800 transition"
+                        >
+                          <UserIcon className="h-3.5 w-3.5 text-brand-400" />
+                          <span>My Profile</span>
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            handleLogout();
+                          }}
+                          className="w-full flex items-center space-x-2 px-4 py-2 text-rose-400 hover:text-rose-300 hover:bg-rose-950/20 transition"
+                        >
+                          <LogOut className="h-3.5 w-3.5" />
+                          <span>Sign Out</span>
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -153,19 +190,21 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex md:hidden items-center space-x-2">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg bg-surface-800 text-surface-300 hover:text-white border border-surface-700"
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          </div>
+          {!isAssessmentWorkspace && (
+            <div className="flex md:hidden items-center space-x-2">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 rounded-lg bg-surface-800 text-surface-300 hover:text-white border border-surface-700"
+              >
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Mobile Drawer */}
-      {mobileMenuOpen && (
+      {mobileMenuOpen && !isAssessmentWorkspace && (
         <div className="md:hidden border-b border-surface-800 bg-surface-900/95 px-4 pt-2 pb-4 space-y-1">
           {user ? (
             <>
