@@ -516,7 +516,7 @@ export const getAdminAssessmentSessions = async (
       }
 
       const isCompleted = att.status === 'COMPLETED' || att.isExitVerified === true;
-      const canGenerateOtp = !isCompleted && ['AWAITING_EXIT_VERIFICATION', 'SUBMITTED', 'IN_PROGRESS'].includes(att.status);
+      const canGenerateOtp = true;
 
       return {
         id: att._id,
@@ -576,14 +576,11 @@ export const generateSessionOtp = async (
       return next(new AppError('Assessment session not found', 404));
     }
 
-    // Security check: cannot generate OTP if student has already exited
+    // If session was completed or exited, allow proctor to re-issue an exit OTP
     if (attempt.status === 'COMPLETED' || attempt.exitedAt) {
-      return next(
-        new AppError(
-          'Assessment session has already been completed and exited. No further OTP generation is permitted.',
-          400
-        )
-      );
+      attempt.status = 'AWAITING_EXIT_VERIFICATION';
+      attempt.isExitVerified = false;
+      attempt.exitedAt = undefined;
     }
 
     // Generate cryptographically secure 6-digit numeric OTP

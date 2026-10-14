@@ -844,17 +844,19 @@ export const verifyExitOtp = async (
       return next(new AppError('Assessment session not found', 404));
     }
 
-    // Must be submitted before exit verification
-    if (!['AWAITING_EXIT_VERIFICATION', 'SUBMITTED', 'EXIT_VERIFIED'].includes(attempt.status)) {
-      return next(new AppError('You must submit the overall assessment before verifying exit OTP.', 400));
+    // Must be in an active session or awaiting exit
+    if (!['AWAITING_EXIT_VERIFICATION', 'SUBMITTED', 'EXIT_VERIFIED', 'IN_PROGRESS', 'COMPLETED'].includes(attempt.status)) {
+      return next(new AppError('You must be in an assessment session before verifying exit OTP.', 400));
     }
 
-    // If already verified, return idempotent success
-    if (attempt.isExitVerified && attempt.status === 'EXIT_VERIFIED') {
+    // If already verified and completed, return idempotent success
+    if (attempt.isExitVerified && attempt.otpStatus === 'USED') {
       res.status(200).json({
         success: true,
-        message: 'Exit verification has already been completed. You may now exit the assessment.',
+        message: 'Exit verification has already been completed. Exiting assessment.',
         isExitVerified: true,
+        status: 'COMPLETED',
+        redirectTo: '/dashboard',
       });
       return;
     }
@@ -887,7 +889,7 @@ export const verifyExitOtp = async (
       await attempt.save();
       return next(
         new AppError(
-          'The OTP has expired (30-second server validity exceeded). Please request a new OTP from the administrator.',
+          'The OTP has expired (30-second server validity exceeded). Please wait for the administrator to generate a new OTP.',
           400
         )
       );
@@ -907,24 +909,27 @@ export const verifyExitOtp = async (
       return next(
         new AppError(
           remainingAttempts > 0
-            ? `Incorrect OTP. Please enter the 6-digit code provided by your administrator (${remainingAttempts} attempts remaining).`
-            : 'Maximum verification attempts exceeded. This OTP has been invalidated. Please ask the administrator for a new one.',
+            ? `Incorrect OTP. Please enter the valid 6-digit OTP told by your administrator (${remainingAttempts} attempts remaining).`
+            : 'Maximum verification attempts exceeded. This OTP has been invalidated. Please wait for the administrator to generate a new OTP.',
           400
         )
       );
     }
 
-    // Successful Verification: Atomic consumption of OTP
+    // Successful Verification: Atomic consumption of OTP and immediate exit completion
     attempt.isExitVerified = true;
     attempt.otpStatus = 'USED';
     attempt.otpVerifiedAt = now;
-    attempt.status = 'EXIT_VERIFIED';
+    attempt.status = 'COMPLETED';
+    attempt.exitedAt = now;
     await attempt.save();
 
     res.status(200).json({
       success: true,
-      message: 'Exit OTP verified successfully! You may now exit the assessment.',
+      message: 'Exit OTP verified successfully! Exiting assessment session...',
       isExitVerified: true,
+      status: 'COMPLETED',
+      redirectTo: '/dashboard',
     });
   } catch (error: any) {
     next(error);
@@ -949,7 +954,7 @@ export const exitAssessment = async (
     }
 
     // Strict security check: Student cannot exit without successful OTP verification
-    if (!attempt.isExitVerified || attempt.status !== 'EXIT_VERIFIED') {
+    if (!attempt.isExitVerified) {
       return next(
         new AppError(
           'Protected assessment lock active. You must complete administrator OTP verification before exiting.',

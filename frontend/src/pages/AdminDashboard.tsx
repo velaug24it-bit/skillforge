@@ -1358,31 +1358,37 @@ export const AdminDashboard: React.FC = () => {
                             </td>
 
                             <td className="px-6 py-4 text-right">
-                              {isCompleted ? (
-                                <span className="text-surface-500 text-[11px] font-medium">Session Closed</span>
-                              ) : (
-                                <button
-                                  onClick={() => handleGenerateOtp(s.id)}
-                                  disabled={generatingOtpAttemptId === s.id}
-                                  className={`px-3 py-1.5 rounded-xl font-bold text-[11px] transition inline-flex items-center space-x-1.5 shadow-sm ${
-                                    isAwaiting
-                                      ? 'bg-amber-500 hover:bg-amber-400 text-black shadow-amber-500/20'
-                                      : 'bg-surface-800 hover:bg-surface-700 text-surface-200 border border-surface-700'
-                                  } disabled:opacity-50`}
-                                >
-                                  {generatingOtpAttemptId === s.id ? (
-                                    <>
-                                      <RefreshCw className="h-3 w-3 animate-spin" />
-                                      <span>Generating...</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <KeyRound className="h-3 w-3" />
-                                      <span>Generate Exit OTP</span>
-                                    </>
-                                  )}
-                                </button>
-                              )}
+                              <button
+                                onClick={() => handleGenerateOtp(s.id)}
+                                disabled={generatingOtpAttemptId === s.id}
+                                className={`px-3 py-1.5 rounded-xl font-bold text-[11px] transition inline-flex items-center space-x-1.5 shadow-sm ${
+                                  s.otpStatus === 'ACTIVE' && s.remainingSeconds > 0
+                                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
+                                    : isAwaiting
+                                    ? 'bg-amber-500 hover:bg-amber-400 text-black shadow-amber-500/20 animate-pulse'
+                                    : 'bg-brand-600 hover:bg-brand-500 text-white shadow-brand-600/20'
+                                } disabled:opacity-50`}
+                              >
+                                {generatingOtpAttemptId === s.id ? (
+                                  <>
+                                    <RefreshCw className="h-3 w-3 animate-spin" />
+                                    <span>Generating...</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <KeyRound className="h-3 w-3" />
+                                    <span>
+                                      {s.otpStatus === 'ACTIVE' && s.remainingSeconds > 0
+                                        ? `Active (${s.remainingSeconds}s) — Re-issue`
+                                        : isCompleted
+                                        ? 'Generate Exit OTP'
+                                        : isAwaiting
+                                        ? 'Generate Exit OTP'
+                                        : 'Generate Exit OTP'}
+                                    </span>
+                                  </>
+                                )}
+                              </button>
                             </td>
                           </tr>
                         );

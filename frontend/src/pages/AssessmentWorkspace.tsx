@@ -279,17 +279,22 @@ export const AssessmentWorkspace: React.FC = () => {
     setOtpSuccess(null);
 
     try {
-      const res = await api.post<{ success: boolean; message: string; isExitVerified: boolean }>(
+      const res = await api.post<{ success: boolean; message: string; isExitVerified: boolean; redirectTo?: string }>(
         `/assessments/${attempt.id}/verify-exit-otp`,
         { otp: otpInput.trim() }
       );
 
       if (res.data.success) {
         setIsExitVerified(true);
-        setOtpSuccess(res.data.message || 'OTP verified successfully! You may now exit the assessment.');
+        setOtpSuccess(res.data.message || 'OTP verified successfully! Exiting assessment session...');
+        // Immediate automatic logout/exit after valid OTP is confirmed by server
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1200);
       }
     } catch (err: any) {
-      setOtpError(err?.response?.data?.message || 'Invalid or expired OTP. Please check with your administrator.');
+      setOtpError(err?.response?.data?.message || 'The OTP has expired (30-second window exceeded) or is invalid. Please wait for the administrator to generate a new OTP.');
+      setOtpInput('');
     } finally {
       setVerifyingOtp(false);
     }
