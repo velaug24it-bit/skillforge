@@ -173,6 +173,15 @@ export const BookExam: React.FC = () => {
     }
   };
 
+  if (loadingCourses) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center space-y-3 text-surface-400">
+        <RefreshCw className="h-8 w-8 text-brand-500 animate-spin" />
+        <p className="text-sm">Loading examination scheduling portal...</p>
+      </div>
+    );
+  }
+
   const selectedCourse = courses.find((c) => c.id === selectedCourseId);
   const maxUnlockedLevel = selectedCourse ? selectedCourse.currentUnlockedLevel : 1;
 
