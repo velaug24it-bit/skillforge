@@ -1,4 +1,4 @@
-/// <reference types="jest" />
+import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import request from 'supertest';
 import { createApp } from './app';
 import { disconnectDatabase } from './config/database';
