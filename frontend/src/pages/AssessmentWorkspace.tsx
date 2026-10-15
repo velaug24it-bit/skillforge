@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { 
   Play, 
   Send, 
@@ -90,6 +91,7 @@ interface AssessmentResultBreakdown {
 export const AssessmentWorkspace: React.FC = () => {
   const { attemptId } = useParams<{ attemptId: string }>();
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -109,7 +111,9 @@ export const AssessmentWorkspace: React.FC = () => {
   // Final Overall Submission states
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [submittingOverall, setSubmittingOverall] = useState(false);
+  const [isAutoSubmitting, setIsAutoSubmitting] = useState(false);
   const [finalResult, setFinalResult] = useState<AssessmentResultBreakdown | null>(null);
+  const isSubmitted = !!finalResult;
 
   // OTP Exit Verification states
   const [otpInput, setOtpInput] = useState('');
@@ -121,6 +125,14 @@ export const AssessmentWorkspace: React.FC = () => {
 
   // Time remaining (in seconds)
   const [secondsRemaining, setSecondsRemaining] = useState<number>(3600);
+
+  // Refs for tracking submissions and ensuring auto-submit only triggers once
+  const submissionsRef = useRef<Record<string, QuestionSubmissionState>>({});
+  const hasAutoSubmittedRef = useRef(false);
+
+  useEffect(() => {
+    submissionsRef.current = submissions;
+  }, [submissions]);
 
   // Load exact assessment attempt by ID from URL
   const fetchAttemptData = async () => {
@@ -142,12 +154,20 @@ export const AssessmentWorkspace: React.FC = () => {
 
         // Calculate remaining seconds
         const diffMs = new Date(att.expiresAt).getTime() - Date.now();
-        setSecondsRemaining(Math.max(0, Math.floor(diffMs / 1000)));
+        const remSec = Math.max(0, Math.floor(diffMs / 1000));
+        setSecondsRemaining(remSec);
 
         // If already submitted / awaiting verification
         if (att.isSubmitted && res.data.result) {
           setFinalResult(res.data.result);
+        } else if (remSec === 0 && !hasAutoSubmittedRef.current) {
+          // Time already finished when loading the page! Automatically trigger submission
+          hasAutoSubmittedRef.current = true;
+          setTimeout(() => {
+            handleConfirmSubmitOverall(true);
+          }, 300);
         }
+
         if (att.isExitVerified) {
           setIsExitVerified(true);
           setOtpSuccess('Exit verified! You may now exit the assessment.');
@@ -181,7 +201,16 @@ export const AssessmentWorkspace: React.FC = () => {
 
   // Countdown timer effect
   useEffect(() => {
-    if (secondsRemaining <= 0 || finalResult) return;
+    if (finalResult) return;
+
+    if (secondsRemaining <= 0) {
+      if (!hasAutoSubmittedRef.current && attempt && questions.length > 0 && !isSubmitted && !submittingOverall) {
+        hasAutoSubmittedRef.current = true;
+        handleConfirmSubmitOverall(true);
+      }
+      return;
+    }
+
     const timer = setInterval(() => {
       setSecondsRemaining((prev) => {
         if (prev <= 1) {
@@ -192,7 +221,7 @@ export const AssessmentWorkspace: React.FC = () => {
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [secondsRemaining, finalResult]);
+  }, [secondsRemaining, finalResult, attempt, questions, isSubmitted, submittingOverall]);
 
   // Protected Session: Intercept tab close, reload, or navigate away
   useEffect(() => {
@@ -211,7 +240,6 @@ export const AssessmentWorkspace: React.FC = () => {
 
   const currentQuestion = questions[activeQuestionIndex];
   const currentSub = currentQuestion ? submissions[currentQuestion._id] : null;
-  const isSubmitted = !!finalResult;
 
   const handleCodeChange = (value: string | undefined) => {
     if (!currentQuestion || isSubmitted) return;
@@ -294,15 +322,19 @@ export const AssessmentWorkspace: React.FC = () => {
   };
 
   // Execute Overall Assessment Submission (evaluates both questions against 10 official test cases)
-  const handleConfirmSubmitOverall = async () => {
-    if (!attempt || isSubmitted) return;
+  const handleConfirmSubmitOverall = async (isAuto = false) => {
+    if (!attempt || isSubmitted || submittingOverall) return;
     setSubmittingOverall(true);
+    if (isAuto) {
+      setIsAutoSubmitting(true);
+    }
     setIsSubmitModalOpen(false);
 
     try {
-      // Package current drafts for both questions
+      // Package current drafts for both questions from the ref (most up to date)
+      const currentSubs = submissionsRef.current;
       const payloadSubmissions = questions.map((q) => {
-        const sub = submissions[q._id];
+        const sub = currentSubs[q._id];
         return {
           questionId: q._id,
           code: sub ? sub.code : '',
@@ -318,13 +350,25 @@ export const AssessmentWorkspace: React.FC = () => {
         submissions: payloadSubmissions,
       });
 
-      if (response.data.success) {
+      if (response.data.success && response.data.result) {
         setFinalResult(response.data.result);
       }
     } catch (err: any) {
+      console.error('Failed to submit overall assessment:', err);
+      // Fallback: Check if attempt is already finalized on server and retrieve result
+      try {
+        const checkRes = await api.get<{ success: boolean; result: AssessmentResultBreakdown | null }>(
+          `/assessments/${attempt.id}`
+        );
+        if (checkRes.data.result) {
+          setFinalResult(checkRes.data.result);
+          return;
+        }
+      } catch (_) {}
       alert(err?.response?.data?.message || 'Failed to submit overall assessment');
     } finally {
       setSubmittingOverall(false);
+      setIsAutoSubmitting(false);
     }
   };
 
@@ -345,11 +389,14 @@ export const AssessmentWorkspace: React.FC = () => {
 
       if (res.data.success) {
         setIsExitVerified(true);
-        setOtpSuccess(res.data.message || 'OTP verified successfully! Exiting assessment session...');
-        // Immediate automatic logout/exit after valid OTP is confirmed by server
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 1200);
+        setOtpSuccess(res.data.message || 'Exit OTP verified successfully! Exiting assessment and logging out...');
+        // Automatic logout and redirect to login screen after valid OTP is confirmed by server
+        setTimeout(async () => {
+          try {
+            await logout();
+          } catch (_) {}
+          navigate('/login');
+        }, 1500);
       }
     } catch (err: any) {
       setOtpError(err?.response?.data?.message || 'The OTP has expired (30-second window exceeded) or is invalid. Please wait for the administrator to generate a new OTP.');
@@ -365,13 +412,14 @@ export const AssessmentWorkspace: React.FC = () => {
     setExitingSession(true);
 
     try {
-      const res = await api.post<{ success: boolean; redirectTo: string }>(
+      await api.post<{ success: boolean; redirectTo: string }>(
         `/assessments/${attempt.id}/exit`
       );
 
-      if (res.data.success) {
-        navigate('/dashboard');
-      }
+      try {
+        await logout();
+      } catch (_) {}
+      navigate('/login');
     } catch (err: any) {
       alert(err?.response?.data?.message || 'Error exiting assessment session');
     } finally {
@@ -867,13 +915,32 @@ export const AssessmentWorkspace: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={handleConfirmSubmitOverall}
+                onClick={() => handleConfirmSubmitOverall(false)}
                 className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center space-x-1.5"
               >
                 <Send className="h-3.5 w-3.5" />
                 <span>Confirm & Submit Assessment</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Auto-Submitting Countdown Expiry Overlay */}
+      {isAutoSubmitting && (
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 space-y-4 text-center">
+          <div className="h-16 w-16 rounded-2xl bg-amber-950/80 border border-amber-600/80 flex items-center justify-center text-amber-400 shadow-xl shadow-amber-950/50">
+            <Clock className="h-9 w-9 animate-pulse" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-2xl font-extrabold text-white">Time Expired!</h2>
+            <p className="text-xs sm:text-sm text-surface-300 max-w-md">
+              Assessment time has ended. Your solutions are being automatically submitted and evaluated against all official test cases.
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 text-xs text-amber-400 font-mono pt-2">
+            <RefreshCw className="h-4 w-4 animate-spin" />
+            <span>Evaluating solutions and preparing exit OTP screen...</span>
           </div>
         </div>
       )}
@@ -936,9 +1003,9 @@ export const AssessmentWorkspace: React.FC = () => {
               <div className="flex items-center space-x-2.5">
                 <KeyRound className="h-5 w-5 text-brand-400 flex-shrink-0" />
                 <div>
-                  <h3 className="text-sm font-bold text-white">Verify OTP to Exit Assessment</h3>
+                  <h3 className="text-sm font-bold text-white">Verify OTP to Exit & Log Out</h3>
                   <p className="text-xs text-surface-400">
-                    Enter the OTP generated by the administrator to exit this assessment.
+                    Enter the 6-digit OTP told by your administrator to verify exit and log out of the assessment.
                   </p>
                 </div>
               </div>
@@ -1004,24 +1071,24 @@ export const AssessmentWorkspace: React.FC = () => {
                 {exitingSession ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin" />
-                    <span>Closing Assessment Session...</span>
+                    <span>Logging Out of Assessment Session...</span>
                   </>
                 ) : isExitVerified ? (
                   <>
                     <LogOut className="h-4 w-4" />
-                    <span>Exit Assessment to Dashboard</span>
+                    <span>Exit & Log Out to Login Screen</span>
                   </>
                 ) : (
                   <>
                     <Lock className="h-4 w-4 text-surface-500" />
-                    <span>Exit Assessment (OTP Verification Required)</span>
+                    <span>Exit & Log Out (OTP Verification Required)</span>
                   </>
                 )}
               </button>
 
               {!isExitVerified && (
                 <p className="text-[10px] text-surface-500 text-center">
-                  In accordance with examination proctoring rules, exit is authorized only upon administrator OTP verification.
+                  In accordance with examination proctoring rules, exit and logout is authorized only upon administrator OTP verification.
                 </p>
               )}
             </div>

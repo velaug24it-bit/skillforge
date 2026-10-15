@@ -572,7 +572,7 @@ export const getAssessmentAttemptById = async (
       .select('-referenceSolution')
       .sort({ questionNumber: 1 });
 
-    const isSubmitted = ['SUBMITTED', 'AWAITING_EXIT_VERIFICATION', 'EXIT_VERIFIED', 'COMPLETED'].includes(attempt.status);
+    const isSubmitted = ['SUBMITTED', 'AWAITING_EXIT_VERIFICATION', 'EXIT_VERIFIED', 'COMPLETED', 'EXPIRED'].includes(attempt.status);
 
     let result = null;
     if (isSubmitted) {
@@ -659,16 +659,53 @@ export const submitOverallAssessment = async (
       return next(new AppError('Assessment attempt not found', 404));
     }
 
-    // Prevent duplicate submission from modifying authoritative score or re-clearing levels
+    // Idempotent handling: If already finalized, return current authoritative breakdown so candidate sees OTP screen
     if (['SUBMITTED', 'AWAITING_EXIT_VERIFICATION', 'EXIT_VERIFIED', 'COMPLETED'].includes(attempt.status)) {
-      return next(new AppError('This assessment has already been finalized and submitted.', 400));
+      let passedTestCasesCount = 0;
+      let totalTestCasesCount = 0;
+
+      const questionBreakdown = attempt.questionSubmissions.map((sub) => {
+        const passedTests = sub.testResults?.filter((t) => t.passed).length || 0;
+        const totalTests = 5;
+        passedTestCasesCount += passedTests;
+        totalTestCasesCount += totalTests;
+
+        return {
+          questionNumber: sub.questionNumber,
+          score: sub.questionScore,
+          maxScore: 50,
+          passedTests,
+          totalTests,
+          testResults: sub.testResults?.map((t) => ({
+            testCaseIndex: t.testCaseIndex,
+            passed: t.passed,
+            marksEarned: t.marksEarned,
+            statusDescription: t.statusDescription,
+          })) || [],
+        };
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Assessment is already finalized. Ready for administrator exit OTP verification.',
+        result: {
+          attemptId: attempt._id,
+          levelNumber: attempt.levelNumber,
+          totalScore: attempt.totalScore,
+          maxScore: 100,
+          passed: attempt.passed,
+          passedTestCasesCount,
+          failedTestCasesCount: totalTestCasesCount - passedTestCasesCount,
+          levelCompletionStatus: attempt.passed ? 'COMPLETED' : 'RETRY_REQUIRED',
+          status: attempt.status,
+          isExitVerified: !!attempt.isExitVerified,
+          questionBreakdown,
+        },
+      });
+      return;
     }
 
-    if (new Date() > attempt.expiresAt) {
-      attempt.status = 'EXPIRED';
-      await attempt.save();
-      return next(new AppError('Assessment time has expired. Submissions are no longer accepted.', 400));
-    }
+    // Auto-submission on time expiry is accepted and evaluated against official test cases
 
     // Update in-memory draft code if provided
     if (Array.isArray(submissions)) {
@@ -854,8 +891,8 @@ export const verifyExitOtp = async (
       return next(new AppError('Assessment session not found', 404));
     }
 
-    // Must be in an active session or awaiting exit
-    if (!['AWAITING_EXIT_VERIFICATION', 'SUBMITTED', 'EXIT_VERIFIED', 'IN_PROGRESS', 'COMPLETED'].includes(attempt.status)) {
+    // Must be in an active session, awaiting exit, or expired
+    if (!['AWAITING_EXIT_VERIFICATION', 'SUBMITTED', 'EXIT_VERIFIED', 'IN_PROGRESS', 'COMPLETED', 'EXPIRED'].includes(attempt.status)) {
       return next(new AppError('You must be in an assessment session before verifying exit OTP.', 400));
     }
 
