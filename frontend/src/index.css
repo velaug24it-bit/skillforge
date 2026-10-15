@@ -4,7 +4,24 @@
 
 @layer base {
   body {
-    @apply bg-surface-950 text-surface-100 font-sans;
+    @apply bg-surface-950 text-surface-100 font-sans transition-colors duration-200;
+  }
+
+  html.light body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  html.light ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+
+  html.light ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+  }
+
+  html.light ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
   }
 }
 

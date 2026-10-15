@@ -14,8 +14,11 @@ import {
   Lock,
   KeyRound,
   LogOut,
-  ShieldAlert
+  ShieldAlert,
+  Sun,
+  Moon
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 interface SanitizedQuestion {
   _id: string;
@@ -93,6 +96,7 @@ export const AssessmentWorkspace: React.FC = () => {
   const { attemptId } = useParams<{ attemptId: string }>();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { toggleTheme, isLight } = useTheme();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -532,21 +536,21 @@ export const AssessmentWorkspace: React.FC = () => {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col bg-surface-950 text-surface-100 overflow-hidden relative">
+    <div className={`h-[calc(100vh-4rem)] flex flex-col ${isLight ? 'bg-slate-100 text-slate-900' : 'bg-surface-950 text-surface-100'} overflow-hidden relative transition-colors duration-200`}>
       {/* Top Assessment Header */}
-      <div className="h-14 border-b border-surface-800 bg-surface-900 px-4 sm:px-6 flex items-center justify-between flex-shrink-0">
+      <div className={`h-14 border-b ${isLight ? 'border-slate-200 bg-white text-slate-900 shadow-sm' : 'border-surface-800 bg-surface-900 text-white'} px-4 sm:px-6 flex items-center justify-between flex-shrink-0 transition-colors`}>
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
             <span className="text-xs font-semibold uppercase px-2 py-0.5 rounded bg-brand-950 text-brand-300 border border-brand-800">
               {attempt?.courseName || 'Programming Exam'}
             </span>
-            <span className="text-sm font-bold text-white">
+            <span className={`text-sm font-bold ${isLight ? 'text-slate-900' : 'text-white'}`}>
               Level {attempt?.levelNumber} Assessment
             </span>
           </div>
 
           {/* Question Nav Pills */}
-          <div className="flex items-center space-x-1.5 ml-4 pl-4 border-l border-surface-800">
+          <div className={`flex items-center space-x-1.5 ml-4 pl-4 border-l ${isLight ? 'border-slate-200' : 'border-surface-800'}`}>
             {questions.map((q, idx) => {
               const sub = submissions[q._id];
               const isSelected = activeQuestionIndex === idx;
@@ -556,9 +560,11 @@ export const AssessmentWorkspace: React.FC = () => {
                 <button
                   key={q._id}
                   onClick={() => setActiveQuestionIndex(idx)}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 ${
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 cursor-pointer ${
                     isSelected
                       ? 'bg-brand-600 text-white shadow-sm'
+                      : isLight
+                      ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300'
                       : 'bg-surface-800 hover:bg-surface-700 text-surface-300'
                   }`}
                 >
@@ -574,8 +580,32 @@ export const AssessmentWorkspace: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Section: Safe Exam Badge, Timer & Overall Submit Button */}
-        <div className="flex items-center space-x-3 sm:space-x-4">
+        {/* Right Section: White BG Toggle, Safe Exam Badge, Timer & Overall Submit Button */}
+        <div className="flex items-center space-x-2.5 sm:space-x-3">
+          {/* White / Dark Background Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer ${
+              isLight
+                ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-sm'
+                : 'bg-surface-800 hover:bg-surface-700 border-surface-700 text-amber-300'
+            }`}
+            title={isLight ? 'Switch to Dark Mode Background' : 'Switch to White Background'}
+            aria-label="Toggle White/Dark Background"
+          >
+            {isLight ? (
+              <>
+                <Moon className="h-3.5 w-3.5 text-indigo-600" />
+                <span className="hidden sm:inline text-[11px]">Dark Mode</span>
+              </>
+            ) : (
+              <>
+                <Sun className="h-3.5 w-3.5 text-amber-400" />
+                <span className="hidden sm:inline text-[11px]">White BG</span>
+              </>
+            )}
+          </button>
+
           {/* Safe Exam Proctoring Badge */}
           <div 
             title="Safe Exam Browser Active: Switching tabs or minimizing this window will instantly terminate your exam and log you out."
@@ -587,9 +617,11 @@ export const AssessmentWorkspace: React.FC = () => {
           </div>
 
           {/* Timer */}
-          <div className="flex items-center space-x-2 text-xs font-mono bg-surface-950 px-3 py-1.5 rounded-lg border border-surface-800">
+          <div className={`flex items-center space-x-2 text-xs font-mono px-3 py-1.5 rounded-lg border ${
+            isLight ? 'bg-slate-100 border-slate-300 text-slate-800' : 'bg-surface-950 border-surface-800 text-white'
+          }`}>
             <Clock className={`h-4 w-4 ${secondsRemaining < 300 ? 'text-rose-400 animate-pulse' : 'text-amber-400'}`} />
-            <span className={secondsRemaining < 300 ? 'text-rose-400 font-bold' : 'text-white'}>
+            <span className={secondsRemaining < 300 ? 'text-rose-400 font-bold' : isLight ? 'text-slate-900 font-bold' : 'text-white'}>
               {formatTime(secondsRemaining)}
             </span>
           </div>
@@ -604,7 +636,7 @@ export const AssessmentWorkspace: React.FC = () => {
             <button
               onClick={() => setIsSubmitModalOpen(true)}
               disabled={submittingOverall}
-              className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center space-x-1.5 disabled:opacity-50"
+              className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center space-x-1.5 disabled:opacity-50 cursor-pointer"
             >
               {submittingOverall ? (
                 <>
@@ -631,78 +663,86 @@ export const AssessmentWorkspace: React.FC = () => {
             e.preventDefault();
             alert('Safe Exam Alert: Copying problem statements and assessment materials to external sources is strictly prohibited.');
           }}
-          className="lg:col-span-5 border-r border-surface-800 bg-surface-900/60 overflow-y-auto p-6 space-y-6 select-none"
+          className={`lg:col-span-5 border-r overflow-y-auto p-6 space-y-6 select-none transition-colors duration-200 ${
+            isLight ? 'border-slate-200 bg-white text-slate-800' : 'border-surface-800 bg-surface-900/60 text-surface-200'
+          }`}
         >
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs text-surface-400">
+            <div className={`flex items-center justify-between text-xs ${isLight ? 'text-slate-500' : 'text-surface-400'}`}>
               <span>Question {currentQuestion.questionNumber} of 2</span>
-              <span className="font-semibold text-accent-400">{currentQuestion.difficulty}</span>
+              <span className="font-semibold text-accent-500">{currentQuestion.difficulty}</span>
             </div>
-            <h2 className="text-xl font-bold text-white">{currentQuestion.title}</h2>
+            <h2 className={`text-xl font-bold ${isLight ? 'text-slate-900' : 'text-white'}`}>{currentQuestion.title}</h2>
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <h3 className="text-xs font-bold text-surface-400 uppercase tracking-wider">Problem Statement</h3>
-            <p className="text-xs sm:text-sm text-surface-200 leading-relaxed whitespace-pre-line">
+            <h3 className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-500' : 'text-surface-400'}`}>Problem Statement</h3>
+            <p className={`text-xs sm:text-sm leading-relaxed whitespace-pre-line ${isLight ? 'text-slate-700' : 'text-surface-200'}`}>
               {currentQuestion.problemStatement}
             </p>
           </div>
 
           {/* Input / Output Format */}
-          <div className="space-y-4 pt-2 border-t border-surface-800 text-xs">
+          <div className={`space-y-4 pt-2 border-t ${isLight ? 'border-slate-200' : 'border-surface-800'} text-xs`}>
             <div>
-              <h4 className="font-semibold text-surface-300 mb-1">Input Format</h4>
-              <p className="text-surface-400 leading-relaxed">{currentQuestion.inputFormat}</p>
+              <h4 className={`font-semibold mb-1 ${isLight ? 'text-slate-700' : 'text-surface-300'}`}>Input Format</h4>
+              <p className={`leading-relaxed ${isLight ? 'text-slate-600' : 'text-surface-400'}`}>{currentQuestion.inputFormat}</p>
             </div>
             <div>
-              <h4 className="font-semibold text-surface-300 mb-1">Output Format</h4>
-              <p className="text-surface-400 leading-relaxed">{currentQuestion.outputFormat}</p>
+              <h4 className={`font-semibold mb-1 ${isLight ? 'text-slate-700' : 'text-surface-300'}`}>Output Format</h4>
+              <p className={`leading-relaxed ${isLight ? 'text-slate-600' : 'text-surface-400'}`}>{currentQuestion.outputFormat}</p>
             </div>
             <div>
-              <h4 className="font-semibold text-surface-300 mb-1">Constraints</h4>
-              <p className="font-mono text-surface-400 bg-surface-950 p-2 rounded-lg border border-surface-800">
+              <h4 className={`font-semibold mb-1 ${isLight ? 'text-slate-700' : 'text-surface-300'}`}>Constraints</h4>
+              <p className={`font-mono p-2 rounded-lg border ${
+                isLight ? 'bg-slate-50 text-slate-800 border-slate-200' : 'bg-surface-950 text-surface-400 border-surface-800'
+              }`}>
                 {currentQuestion.constraints}
               </p>
             </div>
           </div>
 
           {/* Sample Test Case */}
-          <div className="space-y-2 pt-2 border-t border-surface-800">
-            <h3 className="text-xs font-bold text-surface-400 uppercase tracking-wider">Sample Test Case</h3>
+          <div className={`space-y-2 pt-2 border-t ${isLight ? 'border-slate-200' : 'border-surface-800'}`}>
+            <h3 className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-500' : 'text-surface-400'}`}>Sample Test Case</h3>
             <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-              <div className="p-2.5 rounded-lg bg-surface-950 border border-surface-800 space-y-1">
-                <span className="text-[10px] text-surface-500 font-sans uppercase">Input:</span>
-                <pre className="text-surface-200 whitespace-pre-wrap">{currentQuestion.sampleTestCase.input}</pre>
+              <div className={`p-2.5 rounded-lg border space-y-1 ${
+                isLight ? 'bg-slate-50 border-slate-200' : 'bg-surface-950 border-surface-800'
+              }`}>
+                <span className={`text-[10px] font-sans uppercase ${isLight ? 'text-slate-500' : 'text-surface-500'}`}>Input:</span>
+                <pre className={`whitespace-pre-wrap ${isLight ? 'text-slate-900' : 'text-surface-200'}`}>{currentQuestion.sampleTestCase.input}</pre>
               </div>
-              <div className="p-2.5 rounded-lg bg-surface-950 border border-surface-800 space-y-1">
-                <span className="text-[10px] text-surface-500 font-sans uppercase">Expected Output:</span>
-                <pre className="text-surface-200 whitespace-pre-wrap">{currentQuestion.sampleTestCase.expectedOutput}</pre>
+              <div className={`p-2.5 rounded-lg border space-y-1 ${
+                isLight ? 'bg-slate-50 border-slate-200' : 'bg-surface-950 border-surface-800'
+              }`}>
+                <span className={`text-[10px] font-sans uppercase ${isLight ? 'text-slate-500' : 'text-surface-500'}`}>Expected Output:</span>
+                <pre className={`whitespace-pre-wrap ${isLight ? 'text-emerald-700 font-bold' : 'text-surface-200'}`}>{currentQuestion.sampleTestCase.expectedOutput}</pre>
               </div>
             </div>
             {currentQuestion.sampleTestCase.explanation && (
-              <p className="text-[11px] text-surface-400 italic">
+              <p className={`text-[11px] italic ${isLight ? 'text-slate-500' : 'text-surface-400'}`}>
                 {currentQuestion.sampleTestCase.explanation}
               </p>
             )}
           </div>
 
           {/* Actual 5 Evaluation Test Cases */}
-          <div className="space-y-3 pt-3 border-t border-surface-800">
+          <div className={`space-y-3 pt-3 border-t ${isLight ? 'border-slate-200' : 'border-surface-800'}`}>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs font-bold text-surface-300 uppercase tracking-wider">
+                <h3 className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-800' : 'text-surface-300'}`}>
                   Evaluation Test Cases (5 Cases)
                 </h3>
-                <p className="text-[10px] text-surface-500">
+                <p className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-surface-500'}`}>
                   10 marks per case • 50 marks total
                 </p>
               </div>
               {currentSub?.testResults && currentSub.testResults.length > 0 && (
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                   currentSub.testResults.filter(t => t.passed).length === 5
-                    ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                    : 'bg-amber-950 text-amber-300 border border-amber-800'
+                    ? isLight ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                    : isLight ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-amber-950 text-amber-300 border border-amber-800'
                 }`}>
                   {currentSub.testResults.filter(t => t.passed).length} / 5 Passed ({currentSub.questionScore}/50 pts)
                 </span>
@@ -721,51 +761,63 @@ export const AssessmentWorkspace: React.FC = () => {
                     className={`p-3 rounded-xl border transition text-xs space-y-2 ${
                       isEvaluated
                         ? isPassed
-                          ? 'bg-emerald-950/20 border-emerald-700/60 shadow-sm'
-                          : 'bg-rose-950/20 border-rose-700/60 shadow-sm'
-                        : 'bg-surface-950/90 border-surface-800'
+                          ? isLight ? 'bg-emerald-50 border-emerald-200 shadow-sm' : 'bg-emerald-950/20 border-emerald-700/60 shadow-sm'
+                          : isLight ? 'bg-rose-50 border-rose-200 shadow-sm' : 'bg-rose-950/20 border-rose-700/60 shadow-sm'
+                        : isLight ? 'bg-slate-50 border-slate-200' : 'bg-surface-950/90 border-surface-800'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <span className="font-bold text-white text-xs">Test Case {idx + 1}</span>
-                        <span className="text-[10px] text-surface-500 font-mono">10 marks</span>
+                        <span className={`font-bold text-xs ${isLight ? 'text-slate-900' : 'text-white'}`}>Test Case {idx + 1}</span>
+                        <span className={`text-[10px] font-mono ${isLight ? 'text-slate-500' : 'text-surface-500'}`}>10 marks</span>
                       </div>
 
                       {isEvaluated ? (
                         isPassed ? (
-                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700">
-                            <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                          <span className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            isLight ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-emerald-950 text-emerald-300 border border-emerald-700'
+                          }`}>
+                            <CheckCircle2 className="h-3 w-3 text-emerald-500" />
                             <span>Passed</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-700">
-                            <XCircle className="h-3 w-3 text-rose-400" />
+                          <span className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            isLight ? 'bg-rose-100 text-rose-800 border border-rose-300' : 'bg-rose-950 text-rose-300 border border-rose-700'
+                          }`}>
+                            <XCircle className="h-3 w-3 text-rose-500" />
                             <span>Failed ({result.statusDescription || 'Wrong Answer'})</span>
                           </span>
                         )
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-surface-900 text-surface-400 border border-surface-800">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                          isLight ? 'bg-white text-slate-500 border border-slate-200' : 'bg-surface-900 text-surface-400 border border-surface-800'
+                        }`}>
                           Pending Submission
                         </span>
                       )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                      <div className="p-2 rounded-lg bg-surface-900/90 border border-surface-800 space-y-0.5">
-                        <span className="text-[9px] text-surface-500 font-sans uppercase block">Input:</span>
-                        <pre className="text-surface-200 truncate whitespace-pre-wrap">{tc.input || result?.input || `(Hidden Input ${idx + 1})`}</pre>
+                      <div className={`p-2 rounded-lg border space-y-0.5 ${
+                        isLight ? 'bg-white border-slate-200' : 'bg-surface-900/90 border-surface-800'
+                      }`}>
+                        <span className={`text-[9px] font-sans uppercase block ${isLight ? 'text-slate-500' : 'text-surface-500'}`}>Input:</span>
+                        <pre className={`truncate whitespace-pre-wrap ${isLight ? 'text-slate-800' : 'text-surface-200'}`}>{tc.input || result?.input || `(Hidden Input ${idx + 1})`}</pre>
                       </div>
-                      <div className="p-2 rounded-lg bg-surface-900/90 border border-surface-800 space-y-0.5">
-                        <span className="text-[9px] text-surface-500 font-sans uppercase block">Expected Output:</span>
-                        <pre className="text-emerald-400 truncate whitespace-pre-wrap">{tc.expectedOutput || result?.expectedOutput || `(Hidden Output ${idx + 1})`}</pre>
+                      <div className={`p-2 rounded-lg border space-y-0.5 ${
+                        isLight ? 'bg-white border-slate-200' : 'bg-surface-900/90 border-surface-800'
+                      }`}>
+                        <span className={`text-[9px] font-sans uppercase block ${isLight ? 'text-slate-500' : 'text-surface-500'}`}>Expected Output:</span>
+                        <pre className={`truncate whitespace-pre-wrap ${isLight ? 'text-emerald-700 font-semibold' : 'text-emerald-400'}`}>{tc.expectedOutput || result?.expectedOutput || `(Hidden Output ${idx + 1})`}</pre>
                       </div>
                     </div>
 
                     {isEvaluated && !isPassed && result?.actualOutput !== undefined && (
-                      <div className="p-2 rounded-lg bg-rose-950/30 border border-rose-800 text-[11px] font-mono">
-                        <span className="text-[9px] text-rose-400 font-sans uppercase block">Your Output:</span>
-                        <pre className="text-rose-200 whitespace-pre-wrap">{result.actualOutput || '(no stdout)'}</pre>
+                      <div className={`p-2 rounded-lg border text-[11px] font-mono ${
+                        isLight ? 'bg-rose-50 border-rose-200' : 'bg-rose-950/30 border border-rose-800'
+                      }`}>
+                        <span className="text-[9px] text-rose-600 font-sans uppercase block">Your Output:</span>
+                        <pre className={`whitespace-pre-wrap ${isLight ? 'text-rose-900' : 'text-rose-200'}`}>{result.actualOutput || '(no stdout)'}</pre>
                       </div>
                     )}
                   </div>
@@ -776,12 +828,31 @@ export const AssessmentWorkspace: React.FC = () => {
         </div>
 
         {/* Right Column: Monaco Code Editor & Testing Sandbox (7 cols) */}
-        <div className="lg:col-span-7 flex flex-col bg-surface-950 overflow-hidden">
+        <div className={`lg:col-span-7 flex flex-col overflow-hidden ${isLight ? 'bg-white' : 'bg-surface-950'}`}>
           {/* Action Toolbar */}
-          <div className="h-10 border-b border-surface-800 bg-surface-900/40 px-4 flex items-center justify-between text-xs">
-            <div className="flex items-center space-x-2 text-surface-400 font-mono text-[11px]">
-              <span>Track:</span>
-              <span className="font-bold text-white uppercase">{currentSub?.language}</span>
+          <div className={`h-10 border-b px-4 flex items-center justify-between text-xs ${
+            isLight ? 'border-slate-200 bg-slate-50 text-slate-700' : 'border-surface-800 bg-surface-900/40 text-surface-400'
+          }`}>
+            <div className="flex items-center space-x-3 text-[11px] font-mono">
+              <div className="flex items-center space-x-1.5">
+                <span className={isLight ? 'text-slate-500' : 'text-surface-400'}>Track:</span>
+                <span className={`font-bold uppercase ${isLight ? 'text-slate-900' : 'text-white'}`}>{currentSub?.language}</span>
+              </div>
+
+              {/* Quick White / Dark theme button right in editor toolbar */}
+              <button
+                onClick={toggleTheme}
+                className={`flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-sans font-semibold border transition cursor-pointer ${
+                  isLight
+                    ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-700 shadow-xs'
+                    : 'bg-surface-800 hover:bg-surface-700 border-surface-700 text-amber-300'
+                }`}
+                title={isLight ? 'Switch to Dark Mode Background' : 'Switch to White Background'}
+              >
+                {isLight ? <Moon className="h-3 w-3 text-indigo-600" /> : <Sun className="h-3 w-3 text-amber-400" />}
+                <span>{isLight ? 'Dark' : 'White'}</span>
+              </button>
+
               {isSubmitted && (
                 <span className="ml-2 px-2 py-0.5 rounded bg-surface-800 text-amber-300 text-[10px] font-semibold flex items-center space-x-1">
                   <Lock className="h-3 w-3" />
@@ -794,12 +865,14 @@ export const AssessmentWorkspace: React.FC = () => {
               <button
                 onClick={handleRunSample}
                 disabled={runningSample || submittingQuestion || isSubmitted}
-                className="px-3 py-1 rounded bg-surface-800 hover:bg-surface-700 text-white font-medium text-xs transition flex items-center space-x-1.5 disabled:opacity-50 cursor-pointer"
+                className={`px-3 py-1 rounded font-medium text-xs transition flex items-center space-x-1.5 disabled:opacity-50 cursor-pointer ${
+                  isLight ? 'bg-slate-200 hover:bg-slate-300 text-slate-800' : 'bg-surface-800 hover:bg-surface-700 text-white'
+                }`}
               >
                 {runningSample ? (
                   <RefreshCw className="h-3 w-3 animate-spin" />
                 ) : (
-                  <Play className="h-3 w-3 text-emerald-400" />
+                  <Play className="h-3 w-3 text-emerald-500" />
                 )}
                 <span>Run Sample Test</span>
               </button>
@@ -812,12 +885,12 @@ export const AssessmentWorkspace: React.FC = () => {
               >
                 {submittingQuestion ? (
                   <>
-                    <RefreshCw className="h-3 w-3 animate-spin" />
+                    <RefreshCw className="h-3.5 w-3.5 animate-spin" />
                     <span>Evaluating 5 Test Cases...</span>
                   </>
                 ) : (
                   <>
-                    <Send className="h-3 w-3" />
+                    <Send className="h-3.5 w-3.5" />
                     <span>Submit for this Question</span>
                   </>
                 )}
@@ -830,7 +903,7 @@ export const AssessmentWorkspace: React.FC = () => {
             <Editor
               height="100%"
               language={getMonacoLanguage(currentSub?.language || 'c')}
-              theme="vs-dark"
+              theme={isLight ? 'vs' : 'vs-dark'}
               value={currentSub?.code || ''}
               onChange={handleCodeChange}
               options={{
@@ -846,14 +919,20 @@ export const AssessmentWorkspace: React.FC = () => {
           </div>
 
           {/* Console / Output Drawer */}
-          <div className="h-48 border-t border-surface-800 bg-surface-900/90 flex flex-col overflow-hidden text-xs">
-            <div className="h-8 border-b border-surface-800 px-4 flex items-center justify-between text-surface-400 font-semibold text-[11px]">
+          <div className={`h-48 border-t flex flex-col overflow-hidden text-xs transition-colors duration-200 ${
+            isLight ? 'border-slate-200 bg-white text-slate-800' : 'border-surface-800 bg-surface-900/90 text-surface-200'
+          }`}>
+            <div className={`h-8 border-b px-4 flex items-center justify-between font-semibold text-[11px] ${
+              isLight ? 'border-slate-200 bg-slate-50 text-slate-600' : 'border-surface-800 bg-surface-900/90 text-surface-400'
+            }`}>
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => setConsoleTab('sample')}
                   className={`pb-1 font-semibold transition border-b-2 cursor-pointer ${
                     consoleTab === 'sample'
-                      ? 'border-brand-500 text-brand-400'
+                      ? 'border-brand-500 text-brand-500'
+                      : isLight
+                      ? 'border-transparent text-slate-500 hover:text-slate-900'
                       : 'border-transparent text-surface-400 hover:text-white'
                   }`}
                 >
@@ -863,13 +942,17 @@ export const AssessmentWorkspace: React.FC = () => {
                   onClick={() => setConsoleTab('evaluation')}
                   className={`pb-1 font-semibold transition border-b-2 flex items-center space-x-1.5 cursor-pointer ${
                     consoleTab === 'evaluation'
-                      ? 'border-brand-500 text-brand-400'
+                      ? 'border-brand-500 text-brand-500'
+                      : isLight
+                      ? 'border-transparent text-slate-500 hover:text-slate-900'
                       : 'border-transparent text-surface-400 hover:text-white'
                   }`}
                 >
                   <span>Question 5-Test Case Evaluation</span>
                   {currentSub?.testResults && currentSub.testResults.length > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-brand-950 text-brand-300 border border-brand-800 font-bold">
+                    <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold ${
+                      isLight ? 'bg-brand-50 text-brand-700 border border-brand-200' : 'bg-brand-950 text-brand-300 border border-brand-800'
+                    }`}>
                       {currentSub.testResults.filter(t => t.passed).length}/5
                     </span>
                   )}
@@ -877,12 +960,12 @@ export const AssessmentWorkspace: React.FC = () => {
               </div>
 
               {consoleTab === 'sample' && sampleOutput && (
-                <span className={sampleOutput.passed ? 'text-emerald-400' : 'text-rose-400'}>
+                <span className={sampleOutput.passed ? 'text-emerald-500 font-semibold' : 'text-rose-500 font-semibold'}>
                   {sampleOutput.passed ? 'Sample Test Passed' : 'Sample Test Failed'}
                 </span>
               )}
               {consoleTab === 'evaluation' && currentSub?.testResults && currentSub.testResults.length > 0 && (
-                <span className={currentSub.testResults.every(t => t.passed) ? 'text-emerald-400' : 'text-amber-400'}>
+                <span className={currentSub.testResults.every(t => t.passed) ? 'text-emerald-500 font-semibold' : 'text-amber-500 font-semibold'}>
                   Score: {currentSub.questionScore} / 50 pts ({currentSub.testResults.filter(t => t.passed).length}/5 Passed)
                 </span>
               )}
@@ -893,31 +976,39 @@ export const AssessmentWorkspace: React.FC = () => {
                 sampleOutput ? (
                   <div className="space-y-2">
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="p-2 rounded bg-surface-950 border border-surface-800">
-                        <p className="text-surface-500 font-sans text-[10px]">Your Output:</p>
-                        <pre className="text-white whitespace-pre-wrap">{sampleOutput.actualOutput || '(no stdout)'}</pre>
+                      <div className={`p-2 rounded border ${
+                        isLight ? 'bg-slate-50 border-slate-200' : 'bg-surface-950 border-surface-800'
+                      }`}>
+                        <p className={`font-sans text-[10px] ${isLight ? 'text-slate-500' : 'text-surface-500'}`}>Your Output:</p>
+                        <pre className={`whitespace-pre-wrap ${isLight ? 'text-slate-900' : 'text-white'}`}>{sampleOutput.actualOutput || '(no stdout)'}</pre>
                       </div>
-                      <div className="p-2 rounded bg-surface-950 border border-surface-800">
-                        <p className="text-surface-500 font-sans text-[10px]">Expected Output:</p>
-                        <pre className="text-emerald-400 whitespace-pre-wrap">{sampleOutput.expectedOutput}</pre>
+                      <div className={`p-2 rounded border ${
+                        isLight ? 'bg-slate-50 border-slate-200' : 'bg-surface-950 border-surface-800'
+                      }`}>
+                        <p className={`font-sans text-[10px] ${isLight ? 'text-slate-500' : 'text-surface-500'}`}>Expected Output:</p>
+                        <pre className={`whitespace-pre-wrap ${isLight ? 'text-emerald-700 font-semibold' : 'text-emerald-400'}`}>{sampleOutput.expectedOutput}</pre>
                       </div>
                     </div>
                     {sampleOutput.stderr && (
-                      <div className="p-2 rounded bg-rose-950/40 border border-rose-800 text-rose-300">
+                      <div className={`p-2 rounded border ${
+                        isLight ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-rose-950/40 border-rose-800 text-rose-300'
+                      }`}>
                         <pre className="whitespace-pre-wrap">{sampleOutput.stderr}</pre>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <p className="text-surface-500 italic">Click "Run Sample Test" to verify your code against sample I/O.</p>
+                  <p className={`italic ${isLight ? 'text-slate-400' : 'text-surface-500'}`}>Click "Run Sample Test" to verify your code against sample I/O.</p>
                 )
               ) : (
                 /* Question 5-Test Case Evaluation Tab */
                 currentSub?.testResults && currentSub.testResults.length > 0 ? (
                   <div className="space-y-2.5">
-                    <div className="flex items-center justify-between p-2 rounded-lg bg-surface-950 border border-surface-800 font-sans">
-                      <span className="font-semibold text-white">Evaluation Summary:</span>
-                      <span className="font-bold text-brand-400">
+                    <div className={`flex items-center justify-between p-2 rounded-lg border font-sans ${
+                      isLight ? 'bg-slate-50 border-slate-200' : 'bg-surface-950 border-surface-800'
+                    }`}>
+                      <span className={`font-semibold ${isLight ? 'text-slate-900' : 'text-white'}`}>Evaluation Summary:</span>
+                      <span className="font-bold text-brand-500">
                         {currentSub.testResults.filter(t => t.passed).length} of 5 Test Cases Passed ({currentSub.questionScore} / 50 Marks Earned)
                       </span>
                     </div>
@@ -928,22 +1019,26 @@ export const AssessmentWorkspace: React.FC = () => {
                           key={t.testCaseIndex}
                           className={`p-2 rounded-lg border text-center space-y-1 ${
                             t.passed
-                              ? 'bg-emerald-950/30 border-emerald-800 text-emerald-300'
+                              ? isLight
+                                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                                : 'bg-emerald-950/30 border-emerald-800 text-emerald-300'
+                              : isLight
+                              ? 'bg-rose-50 border-rose-200 text-rose-800'
                               : 'bg-rose-950/30 border-rose-800 text-rose-300'
                           }`}
                         >
                           <div className="flex items-center justify-center space-x-1">
-                            {t.passed ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" /> : <XCircle className="h-3.5 w-3.5 text-rose-400" />}
+                            {t.passed ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" /> : <XCircle className="h-3.5 w-3.5 text-rose-500" />}
                             <span className="font-bold">Case {t.testCaseIndex}</span>
                           </div>
                           <p className="text-[10px] font-semibold">{t.passed ? 'Passed (10 pts)' : `Failed (0 pts)`}</p>
-                          <p className="text-[9px] text-surface-400">{t.statusDescription}</p>
+                          <p className={`text-[9px] ${isLight ? 'text-slate-500' : 'text-surface-400'}`}>{t.statusDescription}</p>
                         </div>
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <p className="text-surface-500 italic">Click "Submit for this Question" above to evaluate your code against all 5 official test cases.</p>
+                  <p className={`italic ${isLight ? 'text-slate-400' : 'text-surface-500'}`}>Click "Submit for this Question" above to evaluate your code against all 5 official test cases.</p>
                 )
               )}
             </div>

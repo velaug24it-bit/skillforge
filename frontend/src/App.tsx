@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Navbar } from './components/Navbar';
 import { Login } from './pages/Login';
@@ -35,13 +36,24 @@ const RootRedirect: React.FC = () => {
   return <Navigate to="/login" replace />;
 };
 
+const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isLight } = useTheme();
+  return (
+    <div className={`min-h-screen ${isLight ? 'bg-slate-50 text-slate-900' : 'bg-surface-950 text-surface-100'} flex flex-col font-sans transition-colors duration-200`}>
+      <Navbar />
+      <main className="flex-1 flex flex-col">
+        {children}
+      </main>
+    </div>
+  );
+};
+
 export function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="min-h-screen bg-surface-950 text-surface-100 flex flex-col font-sans">
-          <Navbar />
-          <main className="flex-1 flex flex-col">
+        <ThemeProvider>
+          <AppLayout>
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<RootRedirect />} />
@@ -126,11 +138,8 @@ export function App() {
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </main>
-          <footer className="border-t border-surface-800 bg-surface-900/40 py-6 text-center text-xs text-surface-500">
-            <p>SkillForge &copy; {new Date().getFullYear()} — Programming Skill Assessment Portal. All rights reserved.</p>
-          </footer>
-        </div>
+          </AppLayout>
+        </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>
   );
