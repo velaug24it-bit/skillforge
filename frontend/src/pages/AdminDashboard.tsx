@@ -16,12 +16,48 @@ import {
   ChevronRight,
   X,
   Award,
-  Layers,
   Check,
   KeyRound,
   Copy,
-  Timer
+  Timer,
+  Code,
+  FileCode,
+  CalendarPlus,
+  Layers
 } from 'lucide-react';
+
+interface AdminQuestionRecord {
+  _id: string;
+  courseId: {
+    _id: string;
+    name: string;
+    language: string;
+    icon?: string;
+  };
+  levelNumber: number;
+  questionNumber: number;
+  title: string;
+  problemStatement: string;
+  inputFormat: string;
+  outputFormat: string;
+  constraints: string;
+  difficulty: string;
+  sampleTestCase: {
+    input: string;
+    expectedOutput: string;
+    explanation?: string;
+  };
+  mainTestCases: Array<{
+    input: string;
+    expectedOutput: string;
+    marks?: number;
+    explanation?: string;
+  }>;
+  timeLimitMs: number;
+  memoryLimitKb: number;
+  marks: number;
+  createdAt: string;
+}
 
 interface AssessmentSessionRecord {
   id: string;
@@ -261,6 +297,55 @@ export const AdminDashboard: React.FC = () => {
     description: '',
     icon: 'Terminal',
   });
+
+  // Questions Management state
+  const [isAddQuestionModalOpen, setIsAddQuestionModalOpen] = useState(false);
+  const [adminQuestions, setAdminQuestions] = useState<AdminQuestionRecord[]>([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [selectedCourseForQuestions, setSelectedCourseForQuestions] = useState<string>('ALL');
+  const [selectedLevelForQuestions, setSelectedLevelForQuestions] = useState<string>('ALL');
+  const [creatingQuestion, setCreatingQuestion] = useState(false);
+  const [questionFormData, setQuestionFormData] = useState({
+    courseId: '',
+    levelNumber: 1,
+    questionNumber: 1,
+    title: '',
+    difficulty: 'Beginner' as 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert',
+    problemStatement: '',
+    inputFormat: '',
+    outputFormat: '',
+    constraints: '',
+    sampleInput: '',
+    sampleOutput: '',
+    sampleExplanation: '',
+    mainTestCases: [
+      { input: '', expectedOutput: '', marks: 10, explanation: 'Test Case 1' },
+      { input: '', expectedOutput: '', marks: 10, explanation: 'Test Case 2' },
+      { input: '', expectedOutput: '', marks: 10, explanation: 'Test Case 3' },
+      { input: '', expectedOutput: '', marks: 10, explanation: 'Test Case 4' },
+      { input: '', expectedOutput: '', marks: 10, explanation: 'Test Case 5' },
+    ],
+    starterCode: '',
+  });
+
+  // Admin Quick Slot Booking for Student
+  const [isQuickBookModalOpen, setIsQuickBookModalOpen] = useState(false);
+  const [quickBookStudentInput, setQuickBookStudentInput] = useState('');
+  const [selectedQuickBookStudent, setSelectedQuickBookStudent] = useState<StudentRecord | null>(null);
+  const [quickBookCourseId, setQuickBookCourseId] = useState('');
+  const [quickBookLevelNumber, setQuickBookLevelNumber] = useState<number>(1);
+  const [quickBookDate, setQuickBookDate] = useState<string>(() => {
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    return formatter.format(now);
+  });
+  const [quickBookStartTime, setQuickBookStartTime] = useState('09:10');
+  const [submittingQuickBook, setSubmittingQuickBook] = useState(false);
 
   // Assessment Sessions & OTP Management state
   const [sessions, setSessions] = useState<AssessmentSessionRecord[]>([]);
@@ -542,11 +627,182 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  // Fetch Questions for courses
+  const fetchQuestions = async (courseId?: string, levelNum?: number) => {
+    setLoadingQuestions(true);
+    try {
+      let url = '/admin/questions';
+      const params = new URLSearchParams();
+      if (courseId && courseId !== 'ALL') params.append('courseId', courseId);
+      if (levelNum) params.append('levelNumber', String(levelNum));
+      if (params.toString()) url += `?${params.toString()}`;
+
+      const res = await api.get<{ success: boolean; questions: AdminQuestionRecord[] }>(url);
+      if (res.data.success) {
+        setAdminQuestions(res.data.questions);
+      }
+    } catch (err: any) {
+      console.error('Failed to load questions:', err);
+    } finally {
+      setLoadingQuestions(false);
+    }
+  };
+
+  // Open Quick Book Modal for a specific student with pre-filled details
+  const openQuickBookForStudent = (student: StudentRecord, defaultCourseId?: string, defaultLevel?: number) => {
+    setSelectedQuickBookStudent(student);
+    setQuickBookStudentInput(`${student.name} (${student.email})`);
+    if (defaultCourseId) {
+      setQuickBookCourseId(defaultCourseId);
+    } else if (courses.length > 0) {
+      setQuickBookCourseId(courses[0].id);
+    }
+    if (defaultLevel) {
+      setQuickBookLevelNumber(defaultLevel);
+    } else {
+      setQuickBookLevelNumber(Math.min(4, (student.totalClearedLevels || 0) + 1));
+    }
+    setIsQuickBookModalOpen(true);
+  };
+
+  // Submit Quick Slot Booking for Student
+  const handleQuickBookSlot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const studentIdentifier = selectedQuickBookStudent?.id || selectedQuickBookStudent?.email || quickBookStudentInput.trim();
+    if (!studentIdentifier) {
+      setNotification({ type: 'error', message: 'Please specify the student ID, email, or name.' });
+      return;
+    }
+    if (!quickBookCourseId) {
+      setNotification({ type: 'error', message: 'Please select a course for the examination.' });
+      return;
+    }
+
+    setSubmittingQuickBook(true);
+    try {
+      const res = await api.post<{ success: boolean; message: string; booking: any }>('/admin/book-slot', {
+        studentIdentifier,
+        studentId: selectedQuickBookStudent?.id,
+        courseId: quickBookCourseId,
+        levelNumber: quickBookLevelNumber,
+        date: quickBookDate,
+        startTime: quickBookStartTime,
+      });
+
+      if (res.data.success) {
+        setNotification({
+          type: 'success',
+          message: res.data.message || 'Slot successfully booked for student!',
+        });
+        setIsQuickBookModalOpen(false);
+        setSelectedQuickBookStudent(null);
+        setQuickBookStudentInput('');
+        // Refresh slot roster and stats
+        fetchSlots(selectedDate);
+        fetchOverview();
+        fetchStudents();
+      }
+    } catch (err: any) {
+      setNotification({
+        type: 'error',
+        message: err?.response?.data?.message || 'Failed to book slot for student',
+      });
+    } finally {
+      setSubmittingQuickBook(false);
+    }
+  };
+
+  // Submit Create Question
+  const handleCreateQuestion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!questionFormData.courseId) {
+      setNotification({ type: 'error', message: 'Please select a course for the question.' });
+      return;
+    }
+    if (!questionFormData.title.trim() || !questionFormData.problemStatement.trim()) {
+      setNotification({ type: 'error', message: 'Question title and problem statement are required.' });
+      return;
+    }
+    if (!questionFormData.sampleInput.trim() || !questionFormData.sampleOutput.trim()) {
+      setNotification({ type: 'error', message: 'Sample test case input and output are required.' });
+      return;
+    }
+
+    setCreatingQuestion(true);
+    try {
+      const selectedCourseObj = courses.find((c) => c.id === questionFormData.courseId);
+      const payload = {
+        courseId: questionFormData.courseId,
+        levelNumber: Number(questionFormData.levelNumber),
+        questionNumber: Number(questionFormData.questionNumber),
+        title: questionFormData.title.trim(),
+        difficulty: questionFormData.difficulty,
+        problemStatement: questionFormData.problemStatement.trim(),
+        inputFormat: questionFormData.inputFormat.trim(),
+        outputFormat: questionFormData.outputFormat.trim(),
+        constraints: questionFormData.constraints.trim(),
+        sampleTestCase: {
+          input: questionFormData.sampleInput.trim(),
+          expectedOutput: questionFormData.sampleOutput.trim(),
+          explanation: questionFormData.sampleExplanation.trim(),
+        },
+        mainTestCases: questionFormData.mainTestCases.map((tc, idx) => ({
+          input: tc.input.trim() || `Test Input ${idx + 1}`,
+          expectedOutput: tc.expectedOutput.trim() || `Test Output ${idx + 1}`,
+          marks: 10,
+          explanation: tc.explanation || `Evaluation Test Case ${idx + 1}`,
+        })),
+        starterCode: questionFormData.starterCode ? { [selectedCourseObj?.language || 'c']: questionFormData.starterCode } : undefined,
+      };
+
+      const res = await api.post<{ success: boolean; message: string; question: any }>('/admin/questions', payload);
+      if (res.data.success) {
+        setNotification({
+          type: 'success',
+          message: res.data.message || 'Coding question saved successfully with 5 test cases!',
+        });
+        setIsAddQuestionModalOpen(false);
+        // Reset form
+        setQuestionFormData({
+          courseId: '',
+          levelNumber: 1,
+          questionNumber: 1,
+          title: '',
+          difficulty: 'Beginner',
+          problemStatement: '',
+          inputFormat: '',
+          outputFormat: '',
+          constraints: '',
+          sampleInput: '',
+          sampleOutput: '',
+          sampleExplanation: '',
+          mainTestCases: [
+            { input: '', expectedOutput: '', marks: 10, explanation: 'Test Case 1' },
+            { input: '', expectedOutput: '', marks: 10, explanation: 'Test Case 2' },
+            { input: '', expectedOutput: '', marks: 10, explanation: 'Test Case 3' },
+            { input: '', expectedOutput: '', marks: 10, explanation: 'Test Case 4' },
+            { input: '', expectedOutput: '', marks: 10, explanation: 'Test Case 5' },
+          ],
+          starterCode: '',
+        });
+        fetchQuestions(selectedCourseForQuestions !== 'ALL' ? selectedCourseForQuestions : undefined);
+      }
+    } catch (err: any) {
+      setNotification({
+        type: 'error',
+        message: err?.response?.data?.message || 'Failed to save question',
+      });
+    } finally {
+      setCreatingQuestion(false);
+    }
+  };
+
   useEffect(() => {
     fetchOverview();
     fetchSlots(selectedDate);
     fetchStudents();
     fetchCourses();
+    fetchQuestions();
     fetchAssessmentSessions();
     fetchGlobalOtpStatus();
   }, []);
@@ -831,6 +1087,20 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-3">
+              <button
+                onClick={() => {
+                  setSelectedQuickBookStudent(null);
+                  setQuickBookStudentInput('');
+                  if (courses.length > 0) setQuickBookCourseId(courses[0].id);
+                  setQuickBookDate(selectedDate);
+                  setIsQuickBookModalOpen(true);
+                }}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center space-x-1.5 cursor-pointer"
+              >
+                <CalendarPlus className="h-4 w-4" />
+                <span>Book Slot for Student</span>
+              </button>
+
               <input
                 type="date"
                 value={selectedDate}
@@ -1085,7 +1355,16 @@ export const AdminDashboard: React.FC = () => {
                           )}
                         </td>
 
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-6 py-4 text-right space-x-2">
+                          <button
+                            onClick={() => openQuickBookForStudent(s)}
+                            className="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 text-[11px] font-semibold transition inline-flex items-center space-x-1 cursor-pointer"
+                            title="Book next examination slot for this student"
+                          >
+                            <CalendarPlus className="h-3 w-3" />
+                            <span>Book Slot</span>
+                          </button>
+
                           <button
                             onClick={() => handleOpenStudentHistory(s.id)}
                             className="px-3 py-1.5 rounded-xl bg-brand-600/20 hover:bg-brand-600 text-brand-300 hover:text-white border border-brand-500/30 text-[11px] font-semibold transition inline-flex items-center space-x-1"
@@ -1111,16 +1390,30 @@ export const AdminDashboard: React.FC = () => {
             <div>
               <h2 className="text-base font-bold text-white">Course Curriculum & Tracks</h2>
               <p className="text-xs text-surface-400 mt-0.5">
-                Manage programming tracks, check completion rates, and add new assessment curriculums.
+                Manage programming tracks, check completion rates, and add new assessment curriculums & coding questions.
               </p>
             </div>
-            <button
-              onClick={() => setIsAddCourseModalOpen(true)}
-              className="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs shadow-md shadow-brand-600/30 transition flex items-center space-x-2"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Add New Course</span>
-            </button>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => {
+                  if (courses.length > 0 && !questionFormData.courseId) {
+                    setQuestionFormData((prev) => ({ ...prev, courseId: courses[0].id }));
+                  }
+                  setIsAddQuestionModalOpen(true);
+                }}
+                className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-md shadow-indigo-600/30 transition flex items-center space-x-2 cursor-pointer"
+              >
+                <Code className="h-4 w-4" />
+                <span>Add Coding Question</span>
+              </button>
+              <button
+                onClick={() => setIsAddCourseModalOpen(true)}
+                className="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs shadow-md shadow-brand-600/30 transition flex items-center space-x-2 cursor-pointer"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add New Course</span>
+              </button>
+            </div>
           </div>
 
           {loadingCourses ? (
@@ -1169,6 +1462,174 @@ export const AdminDashboard: React.FC = () => {
               ))}
             </div>
           )}
+
+          {/* Coding Questions Repository & Manager */}
+          <div className="bg-surface-900 border border-surface-800 rounded-2xl p-6 shadow-xl space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-800 pb-4">
+              <div>
+                <div className="flex items-center space-x-2">
+                  <FileCode className="h-5 w-5 text-indigo-400" />
+                  <h3 className="text-base font-bold text-white">Course Assessment Question Bank</h3>
+                </div>
+                <p className="text-xs text-surface-400 mt-0.5">
+                  View and manage verified coding challenges with 5 rigorous evaluation test cases (10 marks each) for every track and level.
+                </p>
+              </div>
+
+              {/* Filters */}
+              <div className="flex flex-wrap items-center gap-3">
+                <select
+                  value={selectedCourseForQuestions}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedCourseForQuestions(val);
+                    fetchQuestions(
+                      val === 'ALL' ? undefined : val,
+                      selectedLevelForQuestions === 'ALL' ? undefined : Number(selectedLevelForQuestions)
+                    );
+                  }}
+                  className="px-3 py-2 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs focus:outline-none focus:border-indigo-500"
+                >
+                  <option value="ALL">All Courses ({courses.length})</option>
+                  {courses.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} ({c.language.toUpperCase()})
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedLevelForQuestions}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedLevelForQuestions(val);
+                    fetchQuestions(
+                      selectedCourseForQuestions === 'ALL' ? undefined : selectedCourseForQuestions,
+                      val === 'ALL' ? undefined : Number(val)
+                    );
+                  }}
+                  className="px-3 py-2 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs focus:outline-none focus:border-indigo-500"
+                >
+                  <option value="ALL">All Levels</option>
+                  <option value="1">Level 1 (Beginner)</option>
+                  <option value="2">Level 2 (Intermediate)</option>
+                  <option value="3">Level 3 (Advanced)</option>
+                  <option value="4">Level 4 (Expert)</option>
+                </select>
+
+                <button
+                  onClick={() => {
+                    if (selectedCourseForQuestions !== 'ALL') {
+                      setQuestionFormData((prev) => ({
+                        ...prev,
+                        courseId: selectedCourseForQuestions,
+                        levelNumber: selectedLevelForQuestions !== 'ALL' ? Number(selectedLevelForQuestions) : 1,
+                      }));
+                    } else if (courses.length > 0) {
+                      setQuestionFormData((prev) => ({ ...prev, courseId: courses[0].id }));
+                    }
+                    setIsAddQuestionModalOpen(true);
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow transition flex items-center space-x-1.5 cursor-pointer"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Add Question</span>
+                </button>
+              </div>
+            </div>
+
+            {loadingQuestions ? (
+              <div className="py-12 text-center text-surface-400 text-xs space-y-2">
+                <RefreshCw className="h-6 w-6 animate-spin mx-auto text-indigo-400" />
+                <p>Loading question bank...</p>
+              </div>
+            ) : adminQuestions.length === 0 ? (
+              <div className="py-12 text-center text-surface-500 text-xs space-y-3">
+                <FileCode className="h-8 w-8 mx-auto text-surface-600" />
+                <p>No questions found for the selected course / level filter.</p>
+                <button
+                  onClick={() => {
+                    if (selectedCourseForQuestions !== 'ALL') {
+                      setQuestionFormData((prev) => ({ ...prev, courseId: selectedCourseForQuestions }));
+                    } else if (courses.length > 0) {
+                      setQuestionFormData((prev) => ({ ...prev, courseId: courses[0].id }));
+                    }
+                    setIsAddQuestionModalOpen(true);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-surface-800 hover:bg-surface-700 text-white text-xs font-semibold cursor-pointer"
+                >
+                  Add First Question
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {adminQuestions.map((q) => (
+                  <div
+                    key={q._id}
+                    className="p-5 rounded-2xl bg-surface-950/60 border border-surface-800 hover:border-surface-700 transition flex flex-col justify-between space-y-4"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex items-center space-x-2">
+                          <span className="px-2 py-0.5 rounded-md bg-indigo-950 text-indigo-300 border border-indigo-800 text-[10px] font-bold uppercase">
+                            {q.courseId?.name || 'Course'}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-md bg-brand-950 text-brand-300 border border-brand-800 text-[10px] font-bold">
+                            Level {q.levelNumber} • Q{q.questionNumber}
+                          </span>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          q.difficulty === 'Expert' || q.difficulty === 'Advanced'
+                            ? 'bg-purple-950 text-purple-300 border border-purple-800'
+                            : q.difficulty === 'Intermediate'
+                            ? 'bg-amber-950 text-amber-300 border border-amber-800'
+                            : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                        }`}>
+                          {q.difficulty}
+                        </span>
+                      </div>
+
+                      <h4 className="text-sm font-bold text-white">{q.title}</h4>
+                      <p className="text-xs text-surface-400 line-clamp-2 leading-relaxed">
+                        {q.problemStatement}
+                      </p>
+                    </div>
+
+                    <div className="space-y-3 pt-3 border-t border-surface-800/80 text-xs">
+                      {/* Sample Test Case Preview */}
+                      {q.sampleTestCase && (
+                        <div className="p-2.5 rounded-xl bg-surface-900 border border-surface-800 space-y-1">
+                          <div className="flex items-center justify-between text-[10px] text-surface-400 font-semibold">
+                            <span>Sample Test Case</span>
+                            <span className="text-emerald-400">Public Preview</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
+                            <div className="truncate text-surface-300 bg-surface-950 px-2 py-1 rounded">
+                              <span className="text-surface-500">In:</span> {q.sampleTestCase.input}
+                            </div>
+                            <div className="truncate text-surface-300 bg-surface-950 px-2 py-1 rounded">
+                              <span className="text-surface-500">Out:</span> {q.sampleTestCase.expectedOutput}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Main 5 Test Cases Badge */}
+                      <div className="flex items-center justify-between text-xs text-surface-400">
+                        <div className="flex items-center space-x-1.5 text-emerald-400 font-semibold">
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                          <span>5 Private Test Cases (50 Marks)</span>
+                        </div>
+                        <span className="text-surface-500 text-[10px]">
+                          {q.timeLimitMs || 2000}ms • {Math.round((q.memoryLimitKb || 262144) / 1024)}MB
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -1657,12 +2118,31 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => setSelectedStudentHistory(null)}
-                    className="p-2 rounded-xl text-surface-400 hover:text-white hover:bg-surface-800 transition"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => {
+                        const sRecord: any = {
+                          id: selectedStudentHistory.student.id,
+                          name: selectedStudentHistory.student.name,
+                          email: selectedStudentHistory.student.email,
+                          totalClearedLevels: selectedStudentHistory.stats.totalLevelsCleared,
+                        };
+                        openQuickBookForStudent(sRecord);
+                      }}
+                      className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center space-x-1.5 cursor-pointer"
+                      title="Quick book examination slot for this student"
+                    >
+                      <CalendarPlus className="h-4 w-4" />
+                      <span>Book Next Slot</span>
+                    </button>
+
+                    <button
+                      onClick={() => setSelectedStudentHistory(null)}
+                      className="p-2 rounded-xl text-surface-400 hover:text-white hover:bg-surface-800 transition cursor-pointer"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Aggregate Stats Strip */}
@@ -2069,6 +2549,554 @@ export const AdminDashboard: React.FC = () => {
                     <>
                       <Plus className="h-3.5 w-3.5" />
                       <span>Create Course</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Slot Booking Modal */}
+      {isQuickBookModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-surface-900 border border-surface-700 rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl space-y-6 my-8">
+            <div className="flex items-center justify-between border-b border-surface-800 pb-3">
+              <div className="flex items-center space-x-2.5">
+                <div className="h-9 w-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                  <CalendarPlus className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Book Examination Slot for Student</h3>
+                  <p className="text-xs text-surface-400">Fast-track slot reservation for students who finished early or require next level test.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setIsQuickBookModalOpen(false);
+                  setSelectedQuickBookStudent(null);
+                  setQuickBookStudentInput('');
+                }}
+                className="text-surface-400 hover:text-white p-1 rounded-lg"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleQuickBookSlot} className="space-y-4">
+              {/* Student Lookup */}
+              <div>
+                <label className="block text-xs font-semibold text-surface-300 mb-1">
+                  Student Name, Email, or Student ID *
+                </label>
+                {selectedQuickBookStudent ? (
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-950/40 border border-emerald-800/80">
+                    <div>
+                      <p className="text-xs font-bold text-white">{selectedQuickBookStudent.name}</p>
+                      <p className="text-[11px] text-emerald-300">{selectedQuickBookStudent.email}</p>
+                      <p className="text-[10px] text-surface-400 mt-0.5">
+                        Cleared Levels: {selectedQuickBookStudent.totalClearedLevels || 0} • Best Score: {selectedQuickBookStudent.bestScore || 0}%
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedQuickBookStudent(null);
+                        setQuickBookStudentInput('');
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-xs text-surface-300 hover:text-white"
+                    >
+                      Change
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="text"
+                      required
+                      list="students-datalist"
+                      value={quickBookStudentInput}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setQuickBookStudentInput(val);
+                        // Check if exact match from student list
+                        const matched = students.find(
+                          (s) => s.id === val || s.email.toLowerCase() === val.toLowerCase() || s.name.toLowerCase() === val.toLowerCase()
+                        );
+                        if (matched) {
+                          setSelectedQuickBookStudent(matched);
+                        }
+                      }}
+                      placeholder="Type student name, email (e.g. velraj@gmail.com), or ID..."
+                      className="w-full px-3.5 py-2.5 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs placeholder-surface-500 focus:outline-none focus:border-emerald-500"
+                    />
+                    <datalist id="students-datalist">
+                      {students.map((s) => (
+                        <option key={s.id} value={s.email}>
+                          {s.name} ({s.id})
+                        </option>
+                      ))}
+                    </datalist>
+                    <p className="text-[10px] text-surface-400 mt-1">
+                      You can type any student's name, email, or direct MongoDB Object ID.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Course Selection */}
+              <div>
+                <label className="block text-xs font-semibold text-surface-300 mb-1">
+                  Examination Course & Language *
+                </label>
+                <select
+                  required
+                  value={quickBookCourseId}
+                  onChange={(e) => setQuickBookCourseId(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs focus:outline-none focus:border-emerald-500"
+                >
+                  <option value="" disabled>Select course track...</option>
+                  {courses.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} ({c.language.toUpperCase()})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Level Selection */}
+              <div>
+                <label className="block text-xs font-semibold text-surface-300 mb-1">
+                  Examination Level (Level 1 - 4) *
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[1, 2, 3, 4].map((lvl) => (
+                    <button
+                      key={lvl}
+                      type="button"
+                      onClick={() => setQuickBookLevelNumber(lvl)}
+                      className={`py-2 px-3 rounded-xl text-xs font-bold transition flex flex-col items-center justify-center space-y-0.5 border ${
+                        quickBookLevelNumber === lvl
+                          ? 'bg-emerald-600 border-emerald-500 text-white shadow-md'
+                          : 'bg-surface-950 border-surface-700 text-surface-300 hover:border-surface-600'
+                      }`}
+                    >
+                      <span>L{lvl}</span>
+                      <span className="text-[10px] font-normal opacity-80">
+                        {lvl === 1 ? 'Beginner' : lvl === 2 ? 'Intermediate' : lvl === 3 ? 'Advanced' : 'Expert'}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Date Selection */}
+              <div>
+                <label className="block text-xs font-semibold text-surface-300 mb-1">
+                  Examination Date (IST) *
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={quickBookDate}
+                  onChange={(e) => setQuickBookDate(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              {/* Timing Slot Selection (8 Campus Slots) */}
+              <div>
+                <label className="block text-xs font-semibold text-surface-300 mb-1">
+                  Choose Time Slot (09:10 to 16:10 IST) *
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    '09:10',
+                    '10:10',
+                    '11:10',
+                    '12:10',
+                    '13:10',
+                    '14:10',
+                    '15:10',
+                    '16:10',
+                  ].map((time) => (
+                    <button
+                      key={time}
+                      type="button"
+                      onClick={() => setQuickBookStartTime(time)}
+                      className={`py-2 px-2.5 rounded-xl text-xs font-mono font-bold transition border ${
+                        quickBookStartTime === time
+                          ? 'bg-brand-600 border-brand-500 text-white shadow-md shadow-brand-600/30'
+                          : 'bg-surface-950 border-surface-700 text-surface-300 hover:border-surface-600'
+                      }`}
+                    >
+                      {time}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-surface-950 border border-surface-800 text-[11px] text-surface-400 space-y-1">
+                <p className="font-semibold text-white flex items-center space-x-1.5">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>Proctored Campus Exam Slot</span>
+                </p>
+                <p>
+                  This booking will be officially registered with an immutable slot reference code. The student can view it on their dashboard and attend during this window.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-surface-800">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsQuickBookModalOpen(false);
+                    setSelectedQuickBookStudent(null);
+                    setQuickBookStudentInput('');
+                  }}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-surface-400 hover:text-white transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingQuickBook}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center space-x-2 disabled:opacity-50 cursor-pointer"
+                >
+                  {submittingQuickBook ? (
+                    <>
+                      <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                      <span>Confirming Booking...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-3.5 w-3.5" />
+                      <span>Confirm & Book Slot</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Coding Question Modal */}
+      {isAddQuestionModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-surface-900 border border-surface-700 rounded-3xl max-w-3xl w-full p-6 sm:p-7 shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-surface-800 pb-3">
+              <div className="flex items-center space-x-2.5">
+                <div className="h-9 w-9 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+                  <Code className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Add Course Coding Question</h3>
+                  <p className="text-xs text-surface-400">Create problem specification with public sample and 5 evaluation test cases (10 marks each).</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAddQuestionModalOpen(false)}
+                className="text-surface-400 hover:text-white p-1 rounded-lg"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateQuestion} className="space-y-4">
+              {/* Row 1: Course, Level, Question #, Difficulty */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-surface-300 mb-1">
+                    Course Track *
+                  </label>
+                  <select
+                    required
+                    value={questionFormData.courseId}
+                    onChange={(e) => setQuestionFormData({ ...questionFormData, courseId: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs focus:outline-none focus:border-indigo-500"
+                  >
+                    <option value="" disabled>Select target course...</option>
+                    {courses.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.language.toUpperCase()})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-surface-300 mb-1">
+                    Level (1-4) *
+                  </label>
+                  <select
+                    value={questionFormData.levelNumber}
+                    onChange={(e) => setQuestionFormData({ ...questionFormData, levelNumber: Number(e.target.value) })}
+                    className="w-full px-3.5 py-2.5 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs focus:outline-none focus:border-indigo-500"
+                  >
+                    <option value={1}>Level 1 (Beginner)</option>
+                    <option value={2}>Level 2 (Intermediate)</option>
+                    <option value={3}>Level 3 (Advanced)</option>
+                    <option value={4}>Level 4 (Expert)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-surface-300 mb-1">
+                    Difficulty *
+                  </label>
+                  <select
+                    value={questionFormData.difficulty}
+                    onChange={(e) =>
+                      setQuestionFormData({
+                        ...questionFormData,
+                        difficulty: e.target.value as any,
+                      })
+                    }
+                    className="w-full px-3.5 py-2.5 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs focus:outline-none focus:border-indigo-500"
+                  >
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Expert">Expert</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Row 2: Question Number and Title */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-surface-300 mb-1">
+                    Question No. *
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={20}
+                    required
+                    value={questionFormData.questionNumber}
+                    onChange={(e) => setQuestionFormData({ ...questionFormData, questionNumber: Number(e.target.value) })}
+                    className="w-full px-3.5 py-2.5 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div className="sm:col-span-3">
+                  <label className="block text-xs font-semibold text-surface-300 mb-1">
+                    Question Title *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={questionFormData.title}
+                    onChange={(e) => setQuestionFormData({ ...questionFormData, title: e.target.value })}
+                    placeholder="e.g. Invert Binary Tree or Longest Palindromic Substring"
+                    className="w-full px-3.5 py-2.5 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs placeholder-surface-500 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              {/* Problem Statement */}
+              <div>
+                <label className="block text-xs font-semibold text-surface-300 mb-1">
+                  Problem Statement *
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={questionFormData.problemStatement}
+                  onChange={(e) => setQuestionFormData({ ...questionFormData, problemStatement: e.target.value })}
+                  placeholder="Detailed description of the problem, input specifications, and requirements..."
+                  className="w-full px-3.5 py-2 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs placeholder-surface-500 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              {/* Input Format & Output Format */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-surface-300 mb-1">
+                    Input Format
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={questionFormData.inputFormat}
+                    onChange={(e) => setQuestionFormData({ ...questionFormData, inputFormat: e.target.value })}
+                    placeholder="e.g. First line contains integer N, followed by N integers."
+                    className="w-full px-3 py-1.5 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs placeholder-surface-500 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-surface-300 mb-1">
+                    Output Format
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={questionFormData.outputFormat}
+                    onChange={(e) => setQuestionFormData({ ...questionFormData, outputFormat: e.target.value })}
+                    placeholder="e.g. Print single integer representing maximum sum."
+                    className="w-full px-3 py-1.5 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs placeholder-surface-500 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              {/* Constraints */}
+              <div>
+                <label className="block text-xs font-semibold text-surface-300 mb-1">
+                  Constraints
+                </label>
+                <input
+                  type="text"
+                  value={questionFormData.constraints}
+                  onChange={(e) => setQuestionFormData({ ...questionFormData, constraints: e.target.value })}
+                  placeholder="e.g. 1 <= N <= 10^5, -10^9 <= A[i] <= 10^9"
+                  className="w-full px-3.5 py-2 bg-surface-950 border border-surface-700 rounded-xl text-white text-xs placeholder-surface-500 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              {/* Sample Test Case */}
+              <div className="p-4 rounded-2xl bg-surface-950 border border-surface-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-white flex items-center space-x-1.5">
+                    <FileCode className="h-4 w-4 text-emerald-400" />
+                    <span>Public Sample Test Case</span>
+                  </h4>
+                  <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">
+                    Visible to Student
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-semibold text-surface-400 mb-1 font-mono">
+                      Sample Input *
+                    </label>
+                    <textarea
+                      required
+                      rows={2}
+                      value={questionFormData.sampleInput}
+                      onChange={(e) => setQuestionFormData({ ...questionFormData, sampleInput: e.target.value })}
+                      placeholder="e.g. 5&#10;1 2 3 4 5"
+                      className="w-full px-3 py-1.5 bg-surface-900 border border-surface-700 rounded-lg text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-semibold text-surface-400 mb-1 font-mono">
+                      Sample Expected Output *
+                    </label>
+                    <textarea
+                      required
+                      rows={2}
+                      value={questionFormData.sampleOutput}
+                      onChange={(e) => setQuestionFormData({ ...questionFormData, sampleOutput: e.target.value })}
+                      placeholder="e.g. 15"
+                      className="w-full px-3 py-1.5 bg-surface-900 border border-surface-700 rounded-lg text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-semibold text-surface-400 mb-1">
+                    Sample Explanation (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={questionFormData.sampleExplanation}
+                    onChange={(e) => setQuestionFormData({ ...questionFormData, sampleExplanation: e.target.value })}
+                    placeholder="e.g. The sum of numbers 1+2+3+4+5 is 15."
+                    className="w-full px-3 py-1.5 bg-surface-900 border border-surface-700 rounded-lg text-white text-xs focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              {/* 5 Evaluation Test Cases */}
+              <div className="p-4 rounded-2xl bg-surface-950 border border-surface-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-white flex items-center space-x-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-brand-400" />
+                    <span>5 Evaluation Test Cases (10 Marks Each • Total 50 Marks)</span>
+                  </h4>
+                  <span className="text-[10px] text-brand-400 font-semibold bg-brand-950/60 px-2 py-0.5 rounded border border-brand-800">
+                    Graded on Submit
+                  </span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {questionFormData.mainTestCases.map((tc, idx) => (
+                    <div key={idx} className="p-3 rounded-xl bg-surface-900 border border-surface-800 space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-semibold text-white">Test Case {idx + 1}</span>
+                        <span className="text-[10px] text-emerald-400 font-bold">10 Marks</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] text-surface-400 mb-0.5 font-mono">Input</label>
+                          <input
+                            type="text"
+                            value={tc.input}
+                            onChange={(e) => {
+                              const updated = [...questionFormData.mainTestCases];
+                              updated[idx].input = e.target.value;
+                              setQuestionFormData({ ...questionFormData, mainTestCases: updated });
+                            }}
+                            placeholder={`Test case ${idx + 1} input`}
+                            className="w-full px-2.5 py-1 bg-surface-950 border border-surface-700 rounded text-white font-mono text-xs focus:outline-none focus:border-brand-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-surface-400 mb-0.5 font-mono">Expected Output</label>
+                          <input
+                            type="text"
+                            value={tc.expectedOutput}
+                            onChange={(e) => {
+                              const updated = [...questionFormData.mainTestCases];
+                              updated[idx].expectedOutput = e.target.value;
+                              setQuestionFormData({ ...questionFormData, mainTestCases: updated });
+                            }}
+                            placeholder={`Test case ${idx + 1} expected output`}
+                            className="w-full px-2.5 py-1 bg-surface-950 border border-surface-700 rounded text-white font-mono text-xs focus:outline-none focus:border-brand-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Starter Code (Optional) */}
+              <div>
+                <label className="block text-xs font-semibold text-surface-300 mb-1">
+                  Starter Code Template (Optional)
+                </label>
+                <textarea
+                  rows={3}
+                  value={questionFormData.starterCode}
+                  onChange={(e) => setQuestionFormData({ ...questionFormData, starterCode: e.target.value })}
+                  placeholder="// Provide starter code skeleton or function signature..."
+                  className="w-full px-3.5 py-2 bg-surface-950 border border-surface-700 rounded-xl text-white font-mono text-xs placeholder-surface-500 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-surface-800">
+                <button
+                  type="button"
+                  onClick={() => setIsAddQuestionModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-surface-400 hover:text-white transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creatingQuestion}
+                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-md shadow-indigo-600/30 transition flex items-center space-x-2 disabled:opacity-50 cursor-pointer"
+                >
+                  {creatingQuestion ? (
+                    <>
+                      <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                      <span>Saving Question...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-3.5 w-3.5" />
+                      <span>Save Question</span>
                     </>
                   )}
                 </button>

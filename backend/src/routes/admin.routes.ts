@@ -12,6 +12,9 @@ import {
   getSessionOtpStatus,
   generateGlobalExitOtp,
   getGlobalExitOtpStatus,
+  adminBookSlot,
+  createAdminQuestion,
+  getAdminQuestions,
 } from '../controllers/admin.controller';
 import { protect, authorize } from '../middlewares/auth';
 
@@ -26,8 +29,12 @@ router.get('/students', getAdminStudents);
 router.get('/students/:studentId/history', getAdminStudentHistory);
 router.get('/slots', getDailyHourwiseBookings);
 router.patch('/bookings/:bookingId/attendance', updateBookingAttendance);
+router.post('/book-slot', adminBookSlot);
+
 router.get('/courses', getAdminCourses);
 router.post('/courses', createAdminCourse);
+router.get('/questions', getAdminQuestions);
+router.post('/questions', createAdminQuestion);
 
 // Global / Universal 30-Second Exit OTP for all students
 router.post('/global-exit-otp', generateGlobalExitOtp);

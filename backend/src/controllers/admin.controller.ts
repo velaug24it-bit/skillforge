@@ -1,8 +1,9 @@
+import mongoose from 'mongoose';
 import { Response, NextFunction } from 'express';
-import { User, Booking, Course, AssessmentAttempt, StudentProgress, AssessmentLevel, GlobalExitOtp } from '../models';
+import { User, Booking, Course, AssessmentAttempt, StudentProgress, AssessmentLevel, GlobalExitOtp, CodingQuestion } from '../models';
 import { AuthRequest } from '../middlewares/auth';
 import { AppError } from '../middlewares/errorHandler';
-import { EXAM_SLOTS, checkSlotTiming, getCampusNow } from '../utils/slots';
+import { EXAM_SLOTS, checkSlotTiming, getCampusNow, generateSlotReference } from '../utils/slots';
 import { generateSixDigitOtp, hashOtp, OTP_VALIDITY_SECONDS } from '../utils/otpHelper';
 
 export const getAdminOverview = async (
@@ -723,6 +724,294 @@ export const getGlobalExitOtpStatus = async (
       remainingSeconds: remaining,
       expiresAt: latest.otpExpiresAt,
       generatedAt: latest.otpGeneratedAt,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const adminBookSlot = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { studentIdentifier, studentId, studentName, courseId, levelNumber, date, startTime } = req.body;
+
+    const queryIdentifier = (studentId || studentIdentifier || studentName || '').trim();
+    if (!queryIdentifier) {
+      return next(new AppError('Please enter the student ID, email, or name', 400));
+    }
+
+    if (!courseId || !date || !startTime) {
+      return next(new AppError('Missing required booking details: courseId, date, startTime', 400));
+    }
+
+    // 1. Locate student
+    let student = null;
+    if (mongoose.Types.ObjectId.isValid(queryIdentifier)) {
+      student = await User.findById(queryIdentifier);
+    }
+    if (!student) {
+      student = await User.findOne({
+        $or: [
+          { email: queryIdentifier.toLowerCase() },
+          { name: { $regex: new RegExp(`^${queryIdentifier}$`, 'i') } },
+        ],
+        role: 'student',
+      });
+    }
+    if (!student) {
+      student = await User.findOne({
+        name: { $regex: new RegExp(queryIdentifier, 'i') },
+        role: 'student',
+      });
+    }
+
+    if (!student) {
+      return next(new AppError(`Student "${queryIdentifier}" not found. Please verify the student ID, email, or name.`, 404));
+    }
+
+    // 2. Validate course
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return next(new AppError('Course not found', 404));
+    }
+
+    // 3. Determine level to book (default to student's next unlocked level for this course)
+    const progress = await StudentProgress.findOne({
+      studentId: student._id,
+      courseId: course._id,
+    });
+
+    const currentUnlockedLevel = progress ? progress.currentUnlockedLevel : 1;
+    const targetLevelNumber = levelNumber ? Number(levelNumber) : currentUnlockedLevel;
+
+    let level = await AssessmentLevel.findOne({
+      courseId: course._id,
+      levelNumber: targetLevelNumber,
+    });
+
+    if (!level) {
+      level = await AssessmentLevel.create({
+        courseId: course._id,
+        levelNumber: targetLevelNumber,
+        title: `Level ${targetLevelNumber} Assessment`,
+        description: `Level ${targetLevelNumber} evaluation for ${course.name}`,
+        passingScore: 100,
+        timeLimitMinutes: 60,
+        totalQuestions: 2,
+      });
+    }
+
+    // 4. Validate slot definition
+    const slotDef = EXAM_SLOTS.find((s) => s.startTime === startTime);
+    if (!slotDef) {
+      return next(new AppError(`Invalid slot start time: ${startTime}. Allowed slots: 09:10, 10:10, 11:10, 12:10, 13:10, 14:10, 15:10, 16:10`, 400));
+    }
+
+    // 5. Ensure slot is not already booked on that date
+    const existingSlotBooking = await Booking.findOne({
+      date,
+      startTime,
+      status: 'BOOKED',
+    }).populate('studentId', 'name email');
+
+    if (existingSlotBooking) {
+      const bookedByName = (existingSlotBooking.studentId as any)?.name || 'another student';
+      return next(new AppError(`Slot ${slotDef.label} on ${date} is already reserved by ${bookedByName}. Please choose another slot.`, 409));
+    }
+
+    // 6. Generate slot reference & create booking
+    const slotReference = generateSlotReference(date, startTime);
+    const booking = await Booking.create({
+      studentId: student._id,
+      courseId: course._id,
+      levelId: level._id,
+      date,
+      startTime,
+      endTime: slotDef.endTime,
+      status: 'BOOKED',
+      attendanceStatus: 'PENDING',
+      slotReference,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: `Successfully booked slot ${slotDef.label} on ${date} for student ${student.name} (${course.name} - Level ${level.levelNumber})!`,
+      booking: {
+        id: booking._id,
+        slotReference,
+        student: {
+          id: student._id,
+          name: student.name,
+          email: student.email,
+        },
+        course: {
+          id: course._id,
+          name: course.name,
+          language: course.language,
+        },
+        level: {
+          id: level._id,
+          levelNumber: level.levelNumber,
+          title: level.title,
+        },
+        date,
+        startTime,
+        endTime: slotDef.endTime,
+        status: booking.status,
+        attendanceStatus: booking.attendanceStatus,
+      },
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const createAdminQuestion = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const {
+      courseId,
+      levelNumber,
+      questionNumber,
+      title,
+      problemStatement,
+      inputFormat,
+      outputFormat,
+      constraints,
+      difficulty,
+      sampleTestCase,
+      mainTestCases,
+      referenceSolution,
+      starterCode,
+      topicTags,
+      timeLimitMs,
+      memoryLimitKb,
+    } = req.body;
+
+    if (!courseId || !levelNumber || !questionNumber || !title || !problemStatement || !inputFormat || !outputFormat || !constraints) {
+      return next(new AppError('Missing required question fields. Please complete all required question specifications.', 400));
+    }
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return next(new AppError('Selected course not found', 404));
+    }
+
+    // Find or create assessment level if needed
+    let level = await AssessmentLevel.findOne({
+      courseId: course._id,
+      levelNumber: Number(levelNumber),
+    });
+
+    if (!level) {
+      level = await AssessmentLevel.create({
+        courseId: course._id,
+        levelNumber: Number(levelNumber),
+        title: `Level ${levelNumber} Assessment`,
+        description: `Comprehensive Level ${levelNumber} practical coding assessment for ${course.name}`,
+        passingScore: 100,
+        timeLimitMinutes: 60,
+        totalQuestions: 2,
+      });
+    }
+
+    // Validate sample test case
+    if (!sampleTestCase || !sampleTestCase.input || !sampleTestCase.expectedOutput) {
+      return next(new AppError('A sample test case with both input and expected output is required.', 400));
+    }
+
+    // Exactly 5 main evaluation test cases
+    let processedMainTestCases: any[] = [];
+    if (Array.isArray(mainTestCases) && mainTestCases.length > 0) {
+      processedMainTestCases = mainTestCases.slice(0, 5).map((tc, idx) => ({
+        input: tc.input ?? '',
+        expectedOutput: tc.expectedOutput ?? '',
+        marks: tc.marks ?? 10,
+        explanation: tc.explanation || `Evaluation Test Case ${idx + 1}`,
+      }));
+    }
+
+    while (processedMainTestCases.length < 5) {
+      const idx = processedMainTestCases.length + 1;
+      processedMainTestCases.push({
+        input: `Sample Input ${idx}`,
+        expectedOutput: `Sample Output ${idx}`,
+        marks: 10,
+        explanation: `Evaluation Test Case ${idx}`,
+      });
+    }
+
+    const cleanDifficulty = difficulty || (Number(levelNumber) === 1 ? 'Beginner' : Number(levelNumber) === 2 ? 'Intermediate' : Number(levelNumber) === 3 ? 'Advanced' : 'Expert');
+
+    const question = await CodingQuestion.findOneAndUpdate(
+      {
+        courseId: course._id,
+        levelNumber: Number(levelNumber),
+        questionNumber: Number(questionNumber),
+      },
+      {
+        courseId: course._id,
+        levelId: level._id,
+        language: course.language,
+        levelNumber: Number(levelNumber),
+        questionNumber: Number(questionNumber),
+        title: title.trim(),
+        problemStatement: problemStatement.trim(),
+        inputFormat: inputFormat.trim(),
+        outputFormat: outputFormat.trim(),
+        constraints: constraints.trim(),
+        sampleTestCase: {
+          input: sampleTestCase.input,
+          expectedOutput: sampleTestCase.expectedOutput,
+          explanation: sampleTestCase.explanation || '',
+        },
+        mainTestCases: processedMainTestCases,
+        referenceSolution: referenceSolution || `// Reference solution for ${title}`,
+        starterCode: starterCode || { [course.language]: `// Write your ${course.name} solution here\n` },
+        difficulty: cleanDifficulty,
+        topicTags: Array.isArray(topicTags) ? topicTags : [course.name, `Level ${levelNumber}`],
+        timeLimitMs: Number(timeLimitMs) || 2000,
+        memoryLimitKb: Number(memoryLimitKb) || 128000,
+        marks: 50,
+      },
+      { new: true, upsert: true, runValidators: true }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Question "${title}" created successfully for ${course.name} Level ${levelNumber} (Question ${questionNumber})!`,
+      question,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getAdminQuestions = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { courseId, levelNumber } = req.query;
+    const filter: any = {};
+    if (courseId) filter.courseId = courseId;
+    if (levelNumber) filter.levelNumber = Number(levelNumber);
+
+    const questions = await CodingQuestion.find(filter)
+      .populate('courseId', 'name language icon')
+      .sort({ courseId: 1, levelNumber: 1, questionNumber: 1 });
+
+    res.status(200).json({
+      success: true,
+      count: questions.length,
+      questions,
     });
   } catch (error: any) {
     next(error);
