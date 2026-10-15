@@ -175,12 +175,12 @@ export const startAssessment = async (
       await progress.save();
     }
 
-    // Fetch questions and SANITIZE by omitting mainTestCases (never leak hidden tests!)
+    // Fetch questions and omit referenceSolution
     const rawQuestions = await CodingQuestion.find({
       courseId: course._id,
       levelNumber: level.levelNumber,
     })
-      .select('-mainTestCases -referenceSolution')
+      .select('-referenceSolution')
       .sort({ questionNumber: 1 });
 
     res.status(200).json({
@@ -336,6 +336,9 @@ export const submitQuestion = async (
           passed,
           marksEarned,
           statusDescription: statusDesc,
+          input: tc.input,
+          expectedOutput: cleanExpected,
+          actualOutput: cleanActual,
           executionTimeMs: execution.executionTimeMs,
         };
       })
@@ -373,6 +376,9 @@ export const submitQuestion = async (
         passed: t.passed,
         marksEarned: t.marksEarned,
         statusDescription: t.statusDescription,
+        input: t.input,
+        expectedOutput: t.expectedOutput,
+        actualOutput: t.actualOutput,
         executionTimeMs: t.executionTimeMs,
       })),
     });
@@ -558,12 +564,12 @@ export const getAssessmentAttemptById = async (
       await attempt.save();
     }
 
-    // Fetch and sanitize questions (omit mainTestCases, referenceSolution)
+    // Fetch questions and omit referenceSolution
     const questions = await CodingQuestion.find({
       courseId: (attempt.courseId as any)._id,
       levelNumber: attempt.levelNumber,
     })
-      .select('-mainTestCases -referenceSolution')
+      .select('-referenceSolution')
       .sort({ questionNumber: 1 });
 
     const isSubmitted = ['SUBMITTED', 'AWAITING_EXIT_VERIFICATION', 'EXIT_VERIFIED', 'COMPLETED'].includes(attempt.status);

@@ -30,6 +30,12 @@ interface SanitizedQuestion {
     expectedOutput: string;
     explanation?: string;
   };
+  mainTestCases?: Array<{
+    input: string;
+    expectedOutput: string;
+    marks?: number;
+    explanation?: string;
+  }>;
   timeLimitMs: number;
   memoryLimitKb: number;
   marks: number;
@@ -46,6 +52,10 @@ interface QuestionSubmissionState {
     passed: boolean;
     marksEarned: number;
     statusDescription: string;
+    input?: string;
+    expectedOutput?: string;
+    actualOutput?: string;
+    executionTimeMs?: number;
   }>;
 }
 
@@ -93,6 +103,8 @@ export const AssessmentWorkspace: React.FC = () => {
   // Execution states
   const [runningSample, setRunningSample] = useState(false);
   const [sampleOutput, setSampleOutput] = useState<any | null>(null);
+  const [submittingQuestion, setSubmittingQuestion] = useState(false);
+  const [consoleTab, setConsoleTab] = useState<'sample' | 'evaluation'>('sample');
 
   // Final Overall Submission states
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
@@ -226,11 +238,58 @@ export const AssessmentWorkspace: React.FC = () => {
 
       if (response.data.success) {
         setSampleOutput(response.data.sampleTest);
+        setConsoleTab('sample');
       }
     } catch (err: any) {
       alert(err?.response?.data?.message || 'Error running sample test');
     } finally {
       setRunningSample(false);
+    }
+  };
+
+  // Submit single question and evaluate all 5 test cases
+  const handleSubmitQuestion = async () => {
+    if (!attempt || !currentQuestion || !currentSub || isSubmitted) return;
+    setSubmittingQuestion(true);
+    setConsoleTab('evaluation');
+    try {
+      const response = await api.post<{
+        success: boolean;
+        message: string;
+        questionScore: number;
+        maxScore: number;
+        testCasesPassed: number;
+        totalTestCases: number;
+        testResults: Array<{
+          testCaseIndex: number;
+          passed: boolean;
+          marksEarned: number;
+          statusDescription: string;
+          input?: string;
+          expectedOutput?: string;
+          actualOutput?: string;
+          executionTimeMs?: number;
+        }>;
+      }>(`/assessments/${attempt.id}/submit-question`, {
+        questionId: currentQuestion._id,
+        code: currentSub.code,
+        language: currentSub.language,
+      });
+
+      if (response.data.success) {
+        setSubmissions((prev) => ({
+          ...prev,
+          [currentQuestion._id]: {
+            ...prev[currentQuestion._id],
+            questionScore: response.data.questionScore,
+            testResults: response.data.testResults,
+          },
+        }));
+      }
+    } catch (err: any) {
+      alert(err?.response?.data?.message || 'Error submitting question for evaluation');
+    } finally {
+      setSubmittingQuestion(false);
     }
   };
 
@@ -500,6 +559,93 @@ export const AssessmentWorkspace: React.FC = () => {
               </p>
             )}
           </div>
+
+          {/* Actual 5 Evaluation Test Cases */}
+          <div className="space-y-3 pt-3 border-t border-surface-800">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-bold text-surface-300 uppercase tracking-wider">
+                  Evaluation Test Cases (5 Cases)
+                </h3>
+                <p className="text-[10px] text-surface-500">
+                  10 marks per case • 50 marks total
+                </p>
+              </div>
+              {currentSub?.testResults && currentSub.testResults.length > 0 && (
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                  currentSub.testResults.filter(t => t.passed).length === 5
+                    ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                    : 'bg-amber-950 text-amber-300 border border-amber-800'
+                }`}>
+                  {currentSub.testResults.filter(t => t.passed).length} / 5 Passed ({currentSub.questionScore}/50 pts)
+                </span>
+              )}
+            </div>
+
+            <div className="space-y-2.5">
+              {(currentQuestion.mainTestCases || [1, 2, 3, 4, 5].map(() => ({ input: '', expectedOutput: '' }))).map((tc, idx) => {
+                const result = currentSub?.testResults?.find((r) => r.testCaseIndex === idx + 1);
+                const isEvaluated = !!result;
+                const isPassed = result?.passed === true;
+
+                return (
+                  <div
+                    key={idx}
+                    className={`p-3 rounded-xl border transition text-xs space-y-2 ${
+                      isEvaluated
+                        ? isPassed
+                          ? 'bg-emerald-950/20 border-emerald-700/60 shadow-sm'
+                          : 'bg-rose-950/20 border-rose-700/60 shadow-sm'
+                        : 'bg-surface-950/90 border-surface-800'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-bold text-white text-xs">Test Case {idx + 1}</span>
+                        <span className="text-[10px] text-surface-500 font-mono">10 marks</span>
+                      </div>
+
+                      {isEvaluated ? (
+                        isPassed ? (
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700">
+                            <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                            <span>Passed</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-700">
+                            <XCircle className="h-3 w-3 text-rose-400" />
+                            <span>Failed ({result.statusDescription || 'Wrong Answer'})</span>
+                          </span>
+                        )
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-surface-900 text-surface-400 border border-surface-800">
+                          Pending Submission
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                      <div className="p-2 rounded-lg bg-surface-900/90 border border-surface-800 space-y-0.5">
+                        <span className="text-[9px] text-surface-500 font-sans uppercase block">Input:</span>
+                        <pre className="text-surface-200 truncate whitespace-pre-wrap">{tc.input || result?.input || `(Hidden Input ${idx + 1})`}</pre>
+                      </div>
+                      <div className="p-2 rounded-lg bg-surface-900/90 border border-surface-800 space-y-0.5">
+                        <span className="text-[9px] text-surface-500 font-sans uppercase block">Expected Output:</span>
+                        <pre className="text-emerald-400 truncate whitespace-pre-wrap">{tc.expectedOutput || result?.expectedOutput || `(Hidden Output ${idx + 1})`}</pre>
+                      </div>
+                    </div>
+
+                    {isEvaluated && !isPassed && result?.actualOutput !== undefined && (
+                      <div className="p-2 rounded-lg bg-rose-950/30 border border-rose-800 text-[11px] font-mono">
+                        <span className="text-[9px] text-rose-400 font-sans uppercase block">Your Output:</span>
+                        <pre className="text-rose-200 whitespace-pre-wrap">{result.actualOutput || '(no stdout)'}</pre>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         {/* Right Column: Monaco Code Editor & Testing Sandbox (7 cols) */}
@@ -520,8 +666,8 @@ export const AssessmentWorkspace: React.FC = () => {
             <div className="flex items-center space-x-2">
               <button
                 onClick={handleRunSample}
-                disabled={runningSample || isSubmitted}
-                className="px-3 py-1 rounded bg-surface-800 hover:bg-surface-700 text-white font-medium text-xs transition flex items-center space-x-1.5 disabled:opacity-50"
+                disabled={runningSample || submittingQuestion || isSubmitted}
+                className="px-3 py-1 rounded bg-surface-800 hover:bg-surface-700 text-white font-medium text-xs transition flex items-center space-x-1.5 disabled:opacity-50 cursor-pointer"
               >
                 {runningSample ? (
                   <RefreshCw className="h-3 w-3 animate-spin" />
@@ -529,6 +675,25 @@ export const AssessmentWorkspace: React.FC = () => {
                   <Play className="h-3 w-3 text-emerald-400" />
                 )}
                 <span>Run Sample Test</span>
+              </button>
+
+              <button
+                onClick={handleSubmitQuestion}
+                disabled={runningSample || submittingQuestion || isSubmitted}
+                className="px-3.5 py-1 rounded bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs shadow-md shadow-brand-600/30 transition flex items-center space-x-1.5 disabled:opacity-50 cursor-pointer"
+                title="Submit and evaluate all 5 test cases for this question"
+              >
+                {submittingQuestion ? (
+                  <>
+                    <RefreshCw className="h-3 w-3 animate-spin" />
+                    <span>Evaluating 5 Test Cases...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-3 w-3" />
+                    <span>Submit for this Question</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -554,37 +719,105 @@ export const AssessmentWorkspace: React.FC = () => {
           </div>
 
           {/* Console / Output Drawer */}
-          <div className="h-44 border-t border-surface-800 bg-surface-900/90 flex flex-col overflow-hidden text-xs">
-            <div className="h-7 border-b border-surface-800 px-4 flex items-center justify-between text-surface-400 font-semibold text-[11px]">
-              <span>Sample Test Output & Execution</span>
-              {sampleOutput && (
+          <div className="h-48 border-t border-surface-800 bg-surface-900/90 flex flex-col overflow-hidden text-xs">
+            <div className="h-8 border-b border-surface-800 px-4 flex items-center justify-between text-surface-400 font-semibold text-[11px]">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => setConsoleTab('sample')}
+                  className={`pb-1 font-semibold transition border-b-2 cursor-pointer ${
+                    consoleTab === 'sample'
+                      ? 'border-brand-500 text-brand-400'
+                      : 'border-transparent text-surface-400 hover:text-white'
+                  }`}
+                >
+                  Sample Test Output
+                </button>
+                <button
+                  onClick={() => setConsoleTab('evaluation')}
+                  className={`pb-1 font-semibold transition border-b-2 flex items-center space-x-1.5 cursor-pointer ${
+                    consoleTab === 'evaluation'
+                      ? 'border-brand-500 text-brand-400'
+                      : 'border-transparent text-surface-400 hover:text-white'
+                  }`}
+                >
+                  <span>Question 5-Test Case Evaluation</span>
+                  {currentSub?.testResults && currentSub.testResults.length > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-brand-950 text-brand-300 border border-brand-800 font-bold">
+                      {currentSub.testResults.filter(t => t.passed).length}/5
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              {consoleTab === 'sample' && sampleOutput && (
                 <span className={sampleOutput.passed ? 'text-emerald-400' : 'text-rose-400'}>
                   {sampleOutput.passed ? 'Sample Test Passed' : 'Sample Test Failed'}
+                </span>
+              )}
+              {consoleTab === 'evaluation' && currentSub?.testResults && currentSub.testResults.length > 0 && (
+                <span className={currentSub.testResults.every(t => t.passed) ? 'text-emerald-400' : 'text-amber-400'}>
+                  Score: {currentSub.questionScore} / 50 pts ({currentSub.testResults.filter(t => t.passed).length}/5 Passed)
                 </span>
               )}
             </div>
 
             <div className="flex-1 p-3 overflow-y-auto font-mono text-[11px] space-y-2">
-              {sampleOutput ? (
-                <div className="space-y-2">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="p-2 rounded bg-surface-950 border border-surface-800">
-                      <p className="text-surface-500 font-sans text-[10px]">Your Output:</p>
-                      <pre className="text-white whitespace-pre-wrap">{sampleOutput.actualOutput || '(no stdout)'}</pre>
+              {consoleTab === 'sample' ? (
+                sampleOutput ? (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="p-2 rounded bg-surface-950 border border-surface-800">
+                        <p className="text-surface-500 font-sans text-[10px]">Your Output:</p>
+                        <pre className="text-white whitespace-pre-wrap">{sampleOutput.actualOutput || '(no stdout)'}</pre>
+                      </div>
+                      <div className="p-2 rounded bg-surface-950 border border-surface-800">
+                        <p className="text-surface-500 font-sans text-[10px]">Expected Output:</p>
+                        <pre className="text-emerald-400 whitespace-pre-wrap">{sampleOutput.expectedOutput}</pre>
+                      </div>
                     </div>
-                    <div className="p-2 rounded bg-surface-950 border border-surface-800">
-                      <p className="text-surface-500 font-sans text-[10px]">Expected Output:</p>
-                      <pre className="text-emerald-400 whitespace-pre-wrap">{sampleOutput.expectedOutput}</pre>
+                    {sampleOutput.stderr && (
+                      <div className="p-2 rounded bg-rose-950/40 border border-rose-800 text-rose-300">
+                        <pre className="whitespace-pre-wrap">{sampleOutput.stderr}</pre>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-surface-500 italic">Click "Run Sample Test" to verify your code against sample I/O.</p>
+                )
+              ) : (
+                /* Question 5-Test Case Evaluation Tab */
+                currentSub?.testResults && currentSub.testResults.length > 0 ? (
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-surface-950 border border-surface-800 font-sans">
+                      <span className="font-semibold text-white">Evaluation Summary:</span>
+                      <span className="font-bold text-brand-400">
+                        {currentSub.testResults.filter(t => t.passed).length} of 5 Test Cases Passed ({currentSub.questionScore} / 50 Marks Earned)
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
+                      {currentSub.testResults.map((t) => (
+                        <div
+                          key={t.testCaseIndex}
+                          className={`p-2 rounded-lg border text-center space-y-1 ${
+                            t.passed
+                              ? 'bg-emerald-950/30 border-emerald-800 text-emerald-300'
+                              : 'bg-rose-950/30 border-rose-800 text-rose-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center space-x-1">
+                            {t.passed ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" /> : <XCircle className="h-3.5 w-3.5 text-rose-400" />}
+                            <span className="font-bold">Case {t.testCaseIndex}</span>
+                          </div>
+                          <p className="text-[10px] font-semibold">{t.passed ? 'Passed (10 pts)' : `Failed (0 pts)`}</p>
+                          <p className="text-[9px] text-surface-400">{t.statusDescription}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  {sampleOutput.stderr && (
-                    <div className="p-2 rounded bg-rose-950/40 border border-rose-800 text-rose-300">
-                      <pre className="whitespace-pre-wrap">{sampleOutput.stderr}</pre>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-surface-500 italic">Click "Run Sample Test" to verify your code against sample I/O.</p>
+                ) : (
+                  <p className="text-surface-500 italic">Click "Submit for this Question" above to evaluate your code against all 5 official test cases.</p>
+                )
               )}
             </div>
           </div>
