@@ -395,26 +395,27 @@ export const CourseDetails: React.FC = () => {
                         )
                       ) : level.booking.isFuture ? (
                         <>
-                          <div className="p-2.5 rounded-lg bg-brand-950/40 border border-brand-800 text-[11px] text-brand-300 space-y-1">
+                          <div className="p-3 rounded-xl bg-blue-50 dark:bg-brand-950/40 border border-blue-200 dark:border-brand-800 space-y-1.5">
                             <div className="flex items-center justify-between">
-                              <span className="font-semibold text-white flex items-center space-x-1">
-                                <Calendar className="h-3.5 w-3.5 text-brand-400" />
+                              <span className="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5 text-xs">
+                                <Calendar className="h-4 w-4 text-brand-600 dark:text-brand-400" />
                                 <span>Slot Reserved ({level.booking.date})</span>
                               </span>
-                              <span className="font-mono text-[10px] text-brand-400">{level.booking.slotReference}</span>
+                              <span className="font-mono text-xs font-bold text-brand-700 dark:text-brand-300">{level.booking.slotReference}</span>
                             </div>
-                            <p className="text-[10px] text-brand-300/80">
-                              Window: {level.booking.startTime} – {level.booking.endTime} (Asia/Kolkata)
-                            </p>
+                            <div className="flex items-center space-x-1.5 text-xs font-bold text-blue-900 dark:text-brand-200 pt-0.5">
+                              <Clock className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400 flex-shrink-0" />
+                              <span>Window: {level.booking.startTime} – {level.booking.endTime} (Asia/Kolkata)</span>
+                            </div>
                           </div>
                           <button
                             disabled
-                            className="w-full py-2.5 px-4 rounded-xl bg-surface-800/80 border border-surface-700/60 text-surface-400 font-semibold text-xs transition flex items-center justify-center space-x-2 cursor-not-allowed"
+                            className="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-surface-800 border border-slate-300 dark:border-surface-700 text-slate-800 dark:text-surface-200 font-bold text-xs transition flex items-center justify-center space-x-2 cursor-not-allowed shadow-sm"
                           >
-                            <Clock className="h-3.5 w-3.5 text-surface-500" />
+                            <Clock className="h-4 w-4 text-brand-600 dark:text-brand-400" />
                             <span>Exam Starts at {level.booking.startTime}</span>
                           </button>
-                          <p className="text-[10px] text-center text-surface-500">
+                          <p className="text-[11px] font-medium text-center text-slate-600 dark:text-surface-400">
                             Assessment unlocks automatically during your booked timing.
                           </p>
                         </>

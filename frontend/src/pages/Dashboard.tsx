@@ -209,26 +209,26 @@ export const Dashboard: React.FC = () => {
             </div>
 
             {summary?.upcomingBooking ? (
-              <div className="p-4 rounded-xl bg-surface-950 border border-surface-800 space-y-3">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-surface-800 space-y-3">
                 <div>
-                  <span className="text-xs text-brand-400 font-semibold uppercase">
+                  <span className="text-xs text-brand-600 dark:text-brand-400 font-bold uppercase">
                     {summary.upcomingBooking.courseName}
                   </span>
-                  <p className="text-sm font-bold text-white mt-0.5">
+                  <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
                     {summary.upcomingBooking.levelTitle}
                   </p>
                 </div>
-                <div className="space-y-1.5 text-xs text-surface-300">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-3.5 w-3.5 text-surface-500" />
-                    <span>{summary.upcomingBooking.date}</span>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center space-x-2 text-slate-700 dark:text-surface-200">
+                    <Calendar className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+                    <span className="font-semibold">{summary.upcomingBooking.date}</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-3.5 w-3.5 text-surface-500" />
-                    <span>{summary.upcomingBooking.startTime} – {summary.upcomingBooking.endTime} (IST)</span>
+                  <div className="flex items-center space-x-2 text-slate-900 dark:text-white">
+                    <Clock className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+                    <span className="font-bold text-sm tracking-wide text-brand-700 dark:text-brand-300">{summary.upcomingBooking.startTime} – {summary.upcomingBooking.endTime} (IST)</span>
                   </div>
-                  <div className="flex items-center space-x-2 font-mono text-[11px] text-surface-400">
-                    <span>Ref: {summary.upcomingBooking.slotReference}</span>
+                  <div className="flex items-center space-x-2 font-mono text-[11px] text-slate-600 dark:text-surface-400 pt-1.5 border-t border-slate-200 dark:border-surface-800/60">
+                    <span>Ref: <strong className="text-slate-900 dark:text-white">{summary.upcomingBooking.slotReference}</strong></span>
                   </div>
                 </div>
                 <Link

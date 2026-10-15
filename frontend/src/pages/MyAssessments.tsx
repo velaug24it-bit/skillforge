@@ -193,23 +193,23 @@ export const MyAssessments: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-surface-950 border border-surface-800/80 space-y-1.5 text-xs text-surface-300">
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-3.5 w-3.5 text-surface-500" />
-                      <span>{b.date}</span>
+                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-surface-800/80 space-y-2 text-xs">
+                    <div className="flex items-center space-x-2 text-slate-700 dark:text-surface-200">
+                      <Calendar className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+                      <span className="font-semibold">{b.date}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Clock className="h-3.5 w-3.5 text-surface-500" />
-                      <span>{b.startTime} – {b.endTime} (Asia/Kolkata)</span>
+                    <div className="flex items-center space-x-2 text-slate-900 dark:text-white">
+                      <Clock className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+                      <span className="font-bold text-sm tracking-wide text-brand-700 dark:text-brand-300">{b.startTime} – {b.endTime} (Asia/Kolkata)</span>
                     </div>
-                    <div className="flex items-center space-x-2 font-mono text-[11px] text-surface-400 pt-1 border-t border-surface-800/60">
-                      <span>Ref: {b.slotReference}</span>
+                    <div className="flex items-center space-x-2 font-mono text-[11px] text-slate-600 dark:text-surface-400 pt-1.5 border-t border-slate-200 dark:border-surface-800/60">
+                      <span>Ref: <strong className="text-slate-900 dark:text-white">{b.slotReference}</strong></span>
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="pt-4 border-t border-surface-800 flex items-center space-x-3">
+                <div className="pt-4 border-t border-slate-200 dark:border-surface-800 flex items-center space-x-3">
                   {b.isNow ? (
                     b.attendanceStatus === 'PRESENT' ? (
                       <button
@@ -237,19 +237,19 @@ export const MyAssessments: React.FC = () => {
                     ) : (
                       <button
                         disabled
-                        className="flex-1 py-2 px-3 rounded-xl bg-surface-800/80 border border-surface-700/60 text-amber-300/80 font-semibold text-xs transition flex items-center justify-center space-x-1.5 cursor-not-allowed"
+                        className="flex-1 py-2 px-3 rounded-xl bg-amber-50 dark:bg-surface-800/80 border border-amber-300 dark:border-surface-700/60 text-amber-800 dark:text-amber-300 font-bold text-xs transition flex items-center justify-center space-x-1.5 cursor-not-allowed"
                         title="Waiting for admin to verify attendance"
                       >
-                        <Clock className="h-3.5 w-3.5 text-amber-400" />
+                        <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                         <span>Awaiting Admin Verification</span>
                       </button>
                     )
                   ) : b.isFuture ? (
                     <button
                       disabled
-                      className="flex-1 py-2 px-3 rounded-xl bg-surface-800/80 border border-surface-700/60 text-surface-400 font-semibold text-xs transition flex items-center justify-center space-x-1.5 cursor-not-allowed"
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-surface-800 border border-slate-300 dark:border-surface-700 text-slate-800 dark:text-surface-200 font-bold text-xs transition flex items-center justify-center space-x-2 cursor-not-allowed shadow-sm"
                     >
-                      <Clock className="h-3.5 w-3.5 text-surface-500" />
+                      <Clock className="h-4 w-4 text-brand-600 dark:text-brand-400" />
                       <span>Starts at {b.startTime}</span>
                     </button>
                   ) : (

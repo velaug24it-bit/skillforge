@@ -1130,63 +1130,63 @@ export const AdminDashboard: React.FC = () => {
                     className={`rounded-2xl border p-5 flex flex-col justify-between transition-all ${
                       booking
                         ? isNow
-                          ? 'bg-brand-950/20 border-brand-500/80 shadow-lg ring-1 ring-brand-500/30'
-                          : 'bg-surface-900 border-surface-700/80 shadow-md'
-                        : 'bg-surface-950/40 border-surface-800/60 opacity-60'
+                          ? 'bg-blue-50/60 dark:bg-brand-950/20 border-brand-500 shadow-lg ring-1 ring-brand-500/30'
+                          : 'bg-white dark:bg-surface-900 border-slate-200 dark:border-surface-700/80 shadow-md'
+                        : 'bg-slate-50 dark:bg-surface-950/40 border-slate-200 dark:border-surface-800/60'
                     }`}
                   >
                     <div className="space-y-3">
                       {/* Slot Header */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <span className="w-6 h-6 rounded-md bg-surface-800 text-surface-300 flex items-center justify-center text-[10px] font-bold">
+                          <span className="w-6 h-6 rounded-md bg-slate-200 dark:bg-surface-800 text-slate-800 dark:text-surface-300 flex items-center justify-center text-[10px] font-bold">
                             #{slot.slotIndex}
                           </span>
-                          <span className="text-xs font-bold text-white">{slot.label}</span>
+                          <span className="text-xs font-extrabold text-slate-900 dark:text-white tracking-wide">{slot.label}</span>
                         </div>
 
                         {isNow && (
-                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-950 text-brand-300 border border-brand-800 animate-pulse">
-                            <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
+                          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300 dark:bg-brand-950 dark:text-brand-300 dark:border-brand-800 animate-pulse">
+                            <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
                             <span>Active Now</span>
                           </span>
                         )}
                         {isPast && !isNow && (
-                          <span className="text-[10px] text-surface-500 font-medium">Slot Ended</span>
+                          <span className="text-[11px] text-slate-600 dark:text-surface-400 font-bold">Slot Ended</span>
                         )}
                       </div>
 
                       {/* Candidate Info or Empty Slot */}
                       {booking ? (
-                        <div className="space-y-2.5 pt-2 border-t border-surface-800">
+                        <div className="space-y-2.5 pt-2 border-t border-slate-200 dark:border-surface-800">
                           <div>
-                            <p className="text-xs font-bold text-white flex items-center justify-between">
+                            <p className="text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between">
                               <span>{booking.student.name}</span>
-                              <span className="font-mono text-[10px] text-surface-400">{booking.slotReference}</span>
+                              <span className="font-mono text-[10px] text-slate-600 dark:text-surface-400 font-semibold">{booking.slotReference}</span>
                             </p>
-                            <p className="text-[11px] text-surface-400">{booking.student.email}</p>
+                            <p className="text-[11px] text-slate-600 dark:text-surface-400 font-medium">{booking.student.email}</p>
                           </div>
 
-                          <div className="p-2 rounded-lg bg-surface-950 border border-surface-800 text-[11px] space-y-1">
+                          <div className="p-2.5 rounded-lg bg-slate-100/80 dark:bg-surface-950 border border-slate-200 dark:border-surface-800 text-[11px] space-y-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-surface-300 font-medium">{booking.course.name}</span>
-                              <span className="px-1.5 py-0.2 rounded bg-surface-800 text-surface-300 font-mono text-[10px]">
+                              <span className="text-slate-800 dark:text-surface-300 font-bold">{booking.course.name}</span>
+                              <span className="px-2 py-0.5 rounded bg-slate-200 dark:bg-surface-800 text-slate-800 dark:text-surface-300 font-mono text-[10px] font-bold">
                                 Level {booking.level.levelNumber}
                               </span>
                             </div>
-                            <p className="text-[10px] text-surface-400">{booking.level.title}</p>
+                            <p className="text-[10px] text-slate-600 dark:text-surface-400">{booking.level.title}</p>
                           </div>
 
                           {/* Attendance Status Badge */}
                           <div className="flex items-center justify-between pt-1">
-                            <span className="text-[11px] text-surface-400 font-medium">Attendance:</span>
+                            <span className="text-[11px] text-slate-600 dark:text-surface-400 font-semibold">Attendance:</span>
                             <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center space-x-1 uppercase ${
+                              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center space-x-1 uppercase ${
                                 booking.attendanceStatus === 'PRESENT'
-                                  ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800'
                                   : booking.attendanceStatus === 'ABSENT'
-                                  ? 'bg-rose-950 text-rose-300 border border-rose-800'
-                                  : 'bg-amber-950 text-amber-300 border border-amber-800'
+                                  ? 'bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800'
+                                  : 'bg-amber-100 text-amber-800 border border-amber-300 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800'
                               }`}
                             >
                               {booking.attendanceStatus === 'PRESENT' && <CheckCircle2 className="h-3 w-3" />}
@@ -1197,9 +1197,9 @@ export const AdminDashboard: React.FC = () => {
                           </div>
                         </div>
                       ) : (
-                        <div className="py-6 text-center text-surface-500 text-xs border-t border-surface-800">
-                          <p>No booking for this slot</p>
-                          <span className="text-[10px] text-surface-600">Available for reservation</span>
+                        <div className="py-6 text-center text-xs border-t border-slate-200 dark:border-surface-800 space-y-1">
+                          <p className="font-bold text-slate-700 dark:text-surface-400">No booking for this slot</p>
+                          <span className="text-[11px] font-medium text-slate-500 dark:text-surface-500">Available for reservation</span>
                         </div>
                       )}
                     </div>
