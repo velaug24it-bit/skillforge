@@ -12,8 +12,11 @@ import {
   ArrowLeft, 
   RefreshCw,
   AlertCircle,
-  RotateCcw
+  RotateCcw,
+  Video
 } from 'lucide-react';
+import { StudyMaterialsModal } from '../components/StudyMaterialsModal';
+import { getStudyMaterial, StudyMaterial } from '../data/studyMaterials';
 
 interface LevelBooking {
   id: string;
@@ -69,6 +72,7 @@ export const CourseDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [startingLevel, setStartingLevel] = useState<number | null>(null);
+  const [selectedStudyMaterial, setSelectedStudyMaterial] = useState<StudyMaterial | null>(null);
 
   const fetchCourseDetails = async () => {
     setLoading(true);
@@ -299,6 +303,28 @@ export const CourseDetails: React.FC = () => {
                       ))}
                     </div>
                   </div>
+
+                  {/* Study Materials & Video Guide Button */}
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedStudyMaterial(
+                          getStudyMaterial(course.language, level.levelNumber, level.title, level.topics)
+                        )
+                      }
+                      className="w-full py-2.5 px-3.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800/80 text-indigo-700 dark:text-indigo-300 font-bold text-xs transition flex items-center justify-between shadow-sm cursor-pointer group"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <Video className="h-4 w-4 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
+                        <span>Level {level.levelNumber} Study Materials & Videos</span>
+                      </div>
+                      <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-indigo-200/80 dark:bg-indigo-800 text-indigo-900 dark:text-indigo-100 font-bold flex items-center space-x-1">
+                        <span>Learn Concepts</span>
+                        <span>&rarr;</span>
+                      </span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Bottom Action Area */}
@@ -483,6 +509,15 @@ export const CourseDetails: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* Study Materials & Concept Video Modal */}
+      {selectedStudyMaterial && (
+        <StudyMaterialsModal
+          material={selectedStudyMaterial}
+          isOpen={!!selectedStudyMaterial}
+          onClose={() => setSelectedStudyMaterial(null)}
+        />
+      )}
     </div>
   );
 };
