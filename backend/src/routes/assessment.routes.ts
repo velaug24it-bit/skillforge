@@ -10,6 +10,7 @@ import {
   verifyExitOtp,
   exitAssessment,
   getMyResults,
+  reportSecurityViolation,
 } from '../controllers/assessment.controller';
 import { protect } from '../middlewares/auth';
 import { env } from '../config/env';
@@ -52,5 +53,6 @@ router.post('/:attemptId/submit-overall', codeExecutionLimiter, submitOverallAss
 router.post('/:attemptId/submit-level', submitLevel);
 router.post('/:attemptId/verify-exit-otp', otpVerificationLimiter, verifyExitOtp);
 router.post('/:attemptId/exit', exitAssessment);
+router.post('/:attemptId/security-violation', reportSecurityViolation);
 
 export default router;

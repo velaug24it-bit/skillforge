@@ -1050,3 +1050,56 @@ export const exitAssessment = async (
   }
 };
 
+export const reportSecurityViolation = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      return next(new AppError('Unauthorized', 401));
+    }
+
+    const { attemptId } = req.params;
+    const { reason, details } = req.body;
+
+    let attempt = null;
+    if (mongoose.Types.ObjectId.isValid(attemptId)) {
+      attempt = await AssessmentAttempt.findById(attemptId);
+    }
+    if (!attempt) {
+      attempt = await AssessmentAttempt.findOne({
+        studentId: req.user._id,
+      }).sort({ createdAt: -1 });
+    }
+
+    if (!attempt) {
+      return next(new AppError('Assessment session not found', 404));
+    }
+
+    if (attempt.studentId.toString() !== req.user._id.toString()) {
+      return next(new AppError('Not authorized for this attempt', 403));
+    }
+
+    // Invalidate session immediately if currently in progress
+    if (attempt.status === 'IN_PROGRESS') {
+      attempt.status = 'EXPIRED';
+      attempt.passed = false;
+      attempt.completedAt = new Date();
+      attempt.isDisqualified = true;
+      attempt.violationReason = reason || 'Tab switch / external window navigation detected during active examination.';
+      await attempt.save();
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Exam terminated due to Safe Exam security violation (tab switch/external navigation).',
+      attemptId: attempt._id,
+      status: attempt.status,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+

@@ -43,6 +43,8 @@ export interface IAssessmentAttempt extends Document {
   otpVerifiedAt?: Date;
   otpGeneratedBy?: mongoose.Types.ObjectId;
   exitedAt?: Date;
+  violationReason?: string;
+  isDisqualified?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -164,6 +166,13 @@ const assessmentAttemptSchema = new Schema<IAssessmentAttempt>(
     },
     exitedAt: {
       type: Date,
+    },
+    violationReason: {
+      type: String,
+    },
+    isDisqualified: {
+      type: Boolean,
+      default: false,
     },
   },
   {

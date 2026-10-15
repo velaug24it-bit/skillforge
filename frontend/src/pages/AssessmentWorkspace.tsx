@@ -13,7 +13,8 @@ import {
   RefreshCw, 
   Lock,
   KeyRound,
-  LogOut
+  LogOut,
+  ShieldAlert
 } from 'lucide-react';
 
 interface SanitizedQuestion {
@@ -237,6 +238,64 @@ export const AssessmentWorkspace: React.FC = () => {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isExitVerified]);
+
+  // Safe Exam Proctoring: Detect Tab Switch & Window Minimization
+  // When a student switches tabs or leaves the exam window, immediately terminate attempt and log out
+  const hasViolationTriggeredRef = useRef(false);
+
+  useEffect(() => {
+    // Only monitor if the test is currently active (not submitted, not exit verified, not loading)
+    if (isSubmitted || isExitVerified || loading || error || !attempt) {
+      return;
+    }
+
+    const triggerTabSwitchLogout = async (reasonText: string) => {
+      if (hasViolationTriggeredRef.current) return;
+      hasViolationTriggeredRef.current = true;
+
+      const targetAttemptId = attemptId || attempt?.id || attempt?._id;
+      try {
+        if (targetAttemptId) {
+          await api.post(`/assessments/${targetAttemptId}/security-violation`, {
+            reason: 'TAB_SWITCH_OUTSOURCE_COPYING_VIOLATION',
+            details: reasonText,
+          });
+        }
+      } catch (_) {}
+
+      try {
+        await logout();
+      } catch (_) {}
+
+      sessionStorage.setItem('safe_exam_violation', 'true');
+      sessionStorage.setItem(
+        'safe_exam_violation_reason',
+        'Safe Exam Security Violation: You were automatically logged out and your examination was terminated because you switched tabs or minimized the active examination window. Copying answers from external sources is strictly prohibited.'
+      );
+
+      // Immediately navigate to login with violation parameter
+      window.location.href = '/login?violation=tab_switch';
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden || document.visibilityState === 'hidden') {
+        triggerTabSwitchLogout('Tab switch or window minimization detected via document visibilitychange.');
+      }
+    };
+
+    const handleWindowBlur = () => {
+      // Window lost focus (candidate alt-tabbed or clicked outside browser)
+      triggerTabSwitchLogout('Window focus lost (candidate switched application or window).');
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleWindowBlur);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleWindowBlur);
+    };
+  }, [isSubmitted, isExitVerified, loading, error, attempt]);
 
   const currentQuestion = questions[activeQuestionIndex];
   const currentSub = currentQuestion ? submissions[currentQuestion._id] : null;
@@ -515,8 +574,18 @@ export const AssessmentWorkspace: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Section: Timer & Overall Submit Button */}
-        <div className="flex items-center space-x-4">
+        {/* Right Section: Safe Exam Badge, Timer & Overall Submit Button */}
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          {/* Safe Exam Proctoring Badge */}
+          <div 
+            title="Safe Exam Browser Active: Switching tabs or minimizing this window will instantly terminate your exam and log you out."
+            className="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-rose-950/50 border border-rose-800/80 text-[11px] text-rose-300 font-semibold shadow-inner"
+          >
+            <ShieldAlert className="h-3.5 w-3.5 text-rose-400 animate-pulse flex-shrink-0" />
+            <span>Safe Exam Active:</span>
+            <span className="text-rose-400 font-mono text-[10px]">Tab Switching Locked</span>
+          </div>
+
           {/* Timer */}
           <div className="flex items-center space-x-2 text-xs font-mono bg-surface-950 px-3 py-1.5 rounded-lg border border-surface-800">
             <Clock className={`h-4 w-4 ${secondsRemaining < 300 ? 'text-rose-400 animate-pulse' : 'text-amber-400'}`} />
@@ -555,8 +624,15 @@ export const AssessmentWorkspace: React.FC = () => {
 
       {/* Main Split Body: Left Problem Description, Right Monaco Editor */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
-        {/* Left Column: Problem Statement (5 cols) */}
-        <div className="lg:col-span-5 border-r border-surface-800 bg-surface-900/60 overflow-y-auto p-6 space-y-6">
+        {/* Left Column: Problem Statement (5 cols) with Anti-Copy Lock */}
+        <div 
+          onContextMenu={(e) => e.preventDefault()}
+          onCopy={(e) => {
+            e.preventDefault();
+            alert('Safe Exam Alert: Copying problem statements and assessment materials to external sources is strictly prohibited.');
+          }}
+          className="lg:col-span-5 border-r border-surface-800 bg-surface-900/60 overflow-y-auto p-6 space-y-6 select-none"
+        >
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs text-surface-400">
               <span>Question {currentQuestion.questionNumber} of 2</span>

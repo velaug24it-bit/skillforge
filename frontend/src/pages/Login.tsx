@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Terminal, Lock, Mail, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
+import { Terminal, Lock, Mail, ArrowRight, AlertCircle, RefreshCw, ShieldAlert } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const { user, login } = useAuth();
@@ -18,12 +18,19 @@ export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const searchParams = new URLSearchParams(location.search);
+  const isViolation = searchParams.get('violation') === 'tab_switch' || sessionStorage.getItem('safe_exam_violation') === 'true';
+  const violationMsg = sessionStorage.getItem('safe_exam_violation_reason') || 
+    'Safe Exam Security Violation: You were automatically logged out and your examination was terminated because you switched tabs or minimized the exam window. External resource copying and outsourcing are strictly prohibited.';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
+      sessionStorage.removeItem('safe_exam_violation');
+      sessionStorage.removeItem('safe_exam_violation_reason');
       const loggedUser = await login(email, password);
       if (loggedUser.role === 'admin') {
         navigate('/admin', { replace: true });
@@ -51,6 +58,22 @@ export const Login: React.FC = () => {
         </div>
 
         <div className="bg-surface-900 border border-surface-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+          {/* Safe Exam Security Violation Alert */}
+          {isViolation && (
+            <div className="mb-5 p-4 rounded-2xl bg-gradient-to-br from-rose-950/70 via-rose-900/40 to-surface-950 border-2 border-rose-500/80 shadow-xl shadow-rose-900/30 space-y-2">
+              <div className="flex items-center space-x-2 text-rose-300 font-bold text-xs uppercase tracking-wider">
+                <ShieldAlert className="h-4 w-4 text-rose-400 animate-pulse flex-shrink-0" />
+                <span>Safe Exam Security Violation</span>
+              </div>
+              <p className="text-xs text-rose-200/90 leading-relaxed">
+                {violationMsg}
+              </p>
+              <div className="pt-1 text-[10px] text-rose-400 font-semibold flex items-center space-x-1">
+                <span>• Tab switching & external outsourcing are locked during tests.</span>
+              </div>
+            </div>
+          )}
+
           {error && (
             <div className="mb-5 p-3 rounded-xl bg-rose-950/40 border border-rose-800/60 flex items-start space-x-2.5 text-rose-300 text-xs">
               <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
