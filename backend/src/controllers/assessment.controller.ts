@@ -881,11 +881,19 @@ export const verifyExitOtp = async (
 
     const cleanOtp = otp.trim();
 
-    // Query attempt including hidden otpHash field
-    const attempt = await AssessmentAttempt.findOne({
-      _id: attemptId,
-      studentId: req.user?._id,
-    }).select('+otpHash');
+    // Query attempt: Try by attemptId param first, then fallback to candidate's latest session
+    let attempt = null;
+    const resolvedAttemptId = (attemptId && attemptId !== 'undefined') ? attemptId : null;
+
+    if (resolvedAttemptId && mongoose.Types.ObjectId.isValid(resolvedAttemptId)) {
+      attempt = await AssessmentAttempt.findById(resolvedAttemptId).select('+otpHash +otp');
+    }
+
+    if (!attempt && req.user?._id) {
+      attempt = await AssessmentAttempt.findOne({
+        studentId: req.user._id,
+      }).sort({ createdAt: -1 }).select('+otpHash +otp');
+    }
 
     if (!attempt) {
       return next(new AppError('Assessment session not found', 404));
@@ -1000,10 +1008,18 @@ export const exitAssessment = async (
   try {
     const { attemptId } = req.params;
 
-    const attempt = await AssessmentAttempt.findOne({
-      _id: attemptId,
-      studentId: req.user?._id,
-    });
+    let attempt = null;
+    const resolvedAttemptId = (attemptId && attemptId !== 'undefined') ? attemptId : null;
+
+    if (resolvedAttemptId && mongoose.Types.ObjectId.isValid(resolvedAttemptId)) {
+      attempt = await AssessmentAttempt.findById(resolvedAttemptId);
+    }
+
+    if (!attempt && req.user?._id) {
+      attempt = await AssessmentAttempt.findOne({
+        studentId: req.user._id,
+      }).sort({ createdAt: -1 });
+    }
 
     if (!attempt) {
       return next(new AppError('Assessment session not found', 404));

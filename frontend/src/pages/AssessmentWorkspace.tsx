@@ -254,11 +254,12 @@ export const AssessmentWorkspace: React.FC = () => {
 
   // Run Sample Test against non-secret sample test case
   const handleRunSample = async () => {
-    if (!attempt || !currentQuestion || !currentSub || isSubmitted) return;
+    const targetAttemptId = attemptId || attempt?.id || attempt?._id;
+    if (!targetAttemptId || !currentQuestion || !currentSub || isSubmitted) return;
     setRunningSample(true);
     setSampleOutput(null);
     try {
-      const response = await api.post(`/assessments/${attempt.id}/run-sample`, {
+      const response = await api.post(`/assessments/${targetAttemptId}/run-sample`, {
         questionId: currentQuestion._id,
         code: currentSub.code,
         language: currentSub.language,
@@ -277,7 +278,8 @@ export const AssessmentWorkspace: React.FC = () => {
 
   // Submit single question and evaluate all 5 test cases
   const handleSubmitQuestion = async () => {
-    if (!attempt || !currentQuestion || !currentSub || isSubmitted) return;
+    const targetAttemptId = attemptId || attempt?.id || attempt?._id;
+    if (!targetAttemptId || !currentQuestion || !currentSub || isSubmitted) return;
     setSubmittingQuestion(true);
     setConsoleTab('evaluation');
     try {
@@ -298,7 +300,7 @@ export const AssessmentWorkspace: React.FC = () => {
           actualOutput?: string;
           executionTimeMs?: number;
         }>;
-      }>(`/assessments/${attempt.id}/submit-question`, {
+      }>(`/assessments/${targetAttemptId}/submit-question`, {
         questionId: currentQuestion._id,
         code: currentSub.code,
         language: currentSub.language,
@@ -323,7 +325,8 @@ export const AssessmentWorkspace: React.FC = () => {
 
   // Execute Overall Assessment Submission (evaluates both questions against 10 official test cases)
   const handleConfirmSubmitOverall = async (isAuto = false) => {
-    if (!attempt || isSubmitted || submittingOverall) return;
+    const targetAttemptId = attemptId || attempt?.id || attempt?._id;
+    if (!targetAttemptId || isSubmitted || submittingOverall) return;
     setSubmittingOverall(true);
     if (isAuto) {
       setIsAutoSubmitting(true);
@@ -338,7 +341,7 @@ export const AssessmentWorkspace: React.FC = () => {
         return {
           questionId: q._id,
           code: sub ? sub.code : '',
-          language: sub ? sub.language : attempt.language,
+          language: sub ? sub.language : (attempt?.language || 'c'),
         };
       });
 
@@ -346,7 +349,7 @@ export const AssessmentWorkspace: React.FC = () => {
         success: boolean;
         message: string;
         result: AssessmentResultBreakdown;
-      }>(`/assessments/${attempt.id}/submit-overall`, {
+      }>(`/assessments/${targetAttemptId}/submit-overall`, {
         submissions: payloadSubmissions,
       });
 
@@ -358,7 +361,7 @@ export const AssessmentWorkspace: React.FC = () => {
       // Fallback: Check if attempt is already finalized on server and retrieve result
       try {
         const checkRes = await api.get<{ success: boolean; result: AssessmentResultBreakdown | null }>(
-          `/assessments/${attempt.id}`
+          `/assessments/${targetAttemptId}`
         );
         if (checkRes.data.result) {
           setFinalResult(checkRes.data.result);
@@ -375,7 +378,10 @@ export const AssessmentWorkspace: React.FC = () => {
   // Verify Administrator OTP to exit assessment
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!attempt || !otpInput.trim()) return;
+    if (!otpInput.trim()) return;
+
+    const targetAttemptId = attemptId || attempt?.id || attempt?._id;
+    if (!targetAttemptId) return;
 
     setVerifyingOtp(true);
     setOtpError(null);
@@ -383,7 +389,7 @@ export const AssessmentWorkspace: React.FC = () => {
 
     try {
       const res = await api.post<{ success: boolean; message: string; isExitVerified: boolean; redirectTo?: string }>(
-        `/assessments/${attempt.id}/verify-exit-otp`,
+        `/assessments/${targetAttemptId}/verify-exit-otp`,
         { otp: otpInput.trim() }
       );
 
@@ -395,8 +401,8 @@ export const AssessmentWorkspace: React.FC = () => {
           try {
             await logout();
           } catch (_) {}
-          navigate('/login');
-        }, 1500);
+          window.location.href = '/login';
+        }, 1200);
       }
     } catch (err: any) {
       setOtpError(err?.response?.data?.message || 'The OTP has expired (30-second window exceeded) or is invalid. Please wait for the administrator to generate a new OTP.');
@@ -408,23 +414,20 @@ export const AssessmentWorkspace: React.FC = () => {
 
   // Exit Assessment after OTP verification
   const handleExitAssessment = async () => {
-    if (!attempt || !isExitVerified) return;
+    const targetAttemptId = attemptId || attempt?.id || attempt?._id;
+    if (!isExitVerified || !targetAttemptId) return;
     setExitingSession(true);
 
     try {
       await api.post<{ success: boolean; redirectTo: string }>(
-        `/assessments/${attempt.id}/exit`
+        `/assessments/${targetAttemptId}/exit`
       );
+    } catch (_) {}
 
-      try {
-        await logout();
-      } catch (_) {}
-      navigate('/login');
-    } catch (err: any) {
-      alert(err?.response?.data?.message || 'Error exiting assessment session');
-    } finally {
-      setExitingSession(false);
-    }
+    try {
+      await logout();
+    } catch (_) {}
+    window.location.href = '/login';
   };
 
   const formatTime = (totalSeconds: number) => {
