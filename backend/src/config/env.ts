@@ -11,7 +11,7 @@ export const env = {
   MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/skillforge',
   JWT_SECRET: process.env.JWT_SECRET || 'skillforge_dev_secret_key_change_in_production',
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
-  JUDGE0_API_URL: process.env.JUDGE0_API_URL || '',
+  JUDGE0_API_URL: process.env.JUDGE0_API_URL || 'https://ce.judge0.com',
   JUDGE0_API_KEY: process.env.JUDGE0_API_KEY || '',
   JUDGE0_API_HOST: process.env.JUDGE0_API_HOST || '',
   CAMPUS_TIMEZONE: process.env.CAMPUS_TIMEZONE || 'Asia/Kolkata',

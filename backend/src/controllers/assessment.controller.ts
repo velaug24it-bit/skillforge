@@ -306,44 +306,43 @@ export const submitQuestion = async (
     const question = await CodingQuestion.findById(questionId);
     if (!question) return next(new AppError('Question not found', 404));
 
-    // Evaluate all 5 hidden main test cases
-    const testResults = [];
-    let questionScore = 0;
+    // Evaluate all 5 hidden main test cases in parallel
+    const testResults = await Promise.all(
+      question.mainTestCases.map(async (tc, i) => {
+        const execution = await CodeExecutionService.execute(
+          code,
+          language,
+          tc.input,
+          question.timeLimitMs,
+          question.memoryLimitKb
+        );
 
-    for (let i = 0; i < question.mainTestCases.length; i++) {
-      const tc = question.mainTestCases[i];
-      const execution = await CodeExecutionService.execute(
-        code,
-        language,
-        tc.input,
-        question.timeLimitMs,
-        question.memoryLimitKb
-      );
+        const cleanActual = (execution.stdout || '').trim();
+        const cleanExpected = tc.expectedOutput.trim();
+        const passed = execution.success && cleanActual === cleanExpected;
+        const marksEarned = passed ? 10 : 0;
 
-      const cleanActual = (execution.stdout || '').trim();
-      const cleanExpected = tc.expectedOutput.trim();
-      const passed = execution.success && cleanActual === cleanExpected;
+        let statusDesc = 'Passed';
+        if (!execution.isServiceAvailable) {
+          statusDesc = 'Service Unavailable';
+        } else if (!execution.success) {
+          statusDesc = execution.statusDescription;
+        } else if (!passed) {
+          statusDesc = 'Wrong Answer';
+        }
 
-      const marksEarned = passed ? 10 : 0;
-      questionScore += marksEarned;
+        return {
+          testCaseIndex: i + 1,
+          passed,
+          marksEarned,
+          statusDescription: statusDesc,
+          executionTimeMs: execution.executionTimeMs,
+        };
+      })
+    );
 
-      let statusDesc = 'Passed';
-      if (!execution.isServiceAvailable) {
-        statusDesc = 'Service Unavailable';
-      } else if (!execution.success) {
-        statusDesc = execution.statusDescription;
-      } else if (!passed) {
-        statusDesc = 'Wrong Answer';
-      }
-
-      testResults.push({
-        testCaseIndex: i + 1,
-        passed,
-        marksEarned,
-        statusDescription: statusDesc,
-        executionTimeMs: execution.executionTimeMs,
-      });
-    }
+    testResults.sort((a, b) => a.testCaseIndex - b.testCaseIndex);
+    const questionScore = testResults.reduce((acc, t) => acc + t.marksEarned, 0);
 
     // Persist question submission in attempt
     const subIndex = attempt.questionSubmissions.findIndex(
@@ -690,36 +689,40 @@ export const submitOverallAssessment = async (
         continue;
       }
 
-      const testResults = [];
+      // Exactly 5 main evaluation test cases (evaluated in parallel)
+      const testResults = await Promise.all(
+        question.mainTestCases.map(async (tc, index) => {
+          const execution = await CodeExecutionService.execute(
+            sub.code,
+            sub.language || question.language,
+            tc.input,
+            question.timeLimitMs,
+            question.memoryLimitKb
+          );
+
+          const cleanActual = (execution.stdout || '').trim();
+          const cleanExpected = tc.expectedOutput.trim();
+          const passed = execution.success && cleanActual === cleanExpected;
+          const marks = passed ? (tc.marks || 10) : 0;
+
+          return {
+            testCaseIndex: index + 1,
+            passed,
+            marksEarned: marks,
+            statusDescription: passed
+              ? 'Passed'
+              : execution.statusDescription || 'Wrong Answer',
+            executionTimeMs: execution.executionTimeMs,
+          };
+        })
+      );
+
+      testResults.sort((a, b) => a.testCaseIndex - b.testCaseIndex);
+
       let questionScore = 0;
-
-      // Exactly 5 main evaluation test cases (10 marks each)
-      for (const tc of question.mainTestCases) {
-        const execution = await CodeExecutionService.execute(
-          sub.code,
-          sub.language || question.language,
-          tc.input,
-          question.timeLimitMs,
-          question.memoryLimitKb
-        );
-
-        const cleanActual = (execution.stdout || '').trim();
-        const cleanExpected = tc.expectedOutput.trim();
-        const passed = execution.success && cleanActual === cleanExpected;
-        const marks = passed ? (tc.marks || 10) : 0;
-
-        testResults.push({
-          testCaseIndex: testResults.length + 1,
-          passed,
-          marksEarned: marks,
-          statusDescription: passed
-            ? 'Passed'
-            : execution.statusDescription || 'Wrong Answer',
-          executionTimeMs: execution.executionTimeMs,
-        });
-
-        if (passed) {
-          questionScore += marks;
+      for (const res of testResults) {
+        questionScore += res.marksEarned;
+        if (res.passed) {
           totalPassedTestCases += 1;
         }
       }

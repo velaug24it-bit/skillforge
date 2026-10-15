@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { spawn } from 'child_process';
 import { env } from '../config/env';
 
 export interface ExecutionResult {
@@ -24,19 +25,124 @@ const LANGUAGE_IDS: Record<string, number> = {
 
 export class CodeExecutionService {
   public static isConfigured(): boolean {
-    return Boolean(env.JUDGE0_API_URL && env.JUDGE0_API_KEY);
+    return true;
+  }
+
+  /**
+   * Fast, zero-network local execution for Python and JavaScript
+   */
+  private static async executeLocally(
+    code: string,
+    language: string,
+    stdin: string,
+    timeLimitMs: number
+  ): Promise<ExecutionResult | null> {
+    const lang = language.toLowerCase();
+    let command = '';
+    let args: string[] = [];
+
+    if (lang === 'python') {
+      command = 'python';
+      args = ['-c', code];
+    } else if (lang === 'javascript') {
+      command = 'node';
+      args = ['-e', code];
+    } else {
+      return null;
+    }
+
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+      let stdout = '';
+      let stderr = '';
+      let killed = false;
+
+      let child;
+      try {
+        child = spawn(command, args, { stdio: ['pipe', 'pipe', 'pipe'] });
+      } catch {
+        return resolve(null);
+      }
+
+      const timer = setTimeout(() => {
+        killed = true;
+        child.kill();
+        resolve({
+          success: false,
+          stdout: null,
+          stderr: 'Time Limit Exceeded (Execution timed out)',
+          compileOutput: null,
+          statusId: 5,
+          statusDescription: 'Time Limit Exceeded',
+          executionTimeMs: timeLimitMs,
+          memoryKb: 0,
+          isServiceAvailable: true,
+        });
+      }, timeLimitMs);
+
+      child.stdout.on('data', (d) => { stdout += d.toString(); });
+      child.stderr.on('data', (d) => { stderr += d.toString(); });
+
+      child.on('error', () => {
+        clearTimeout(timer);
+        resolve(null);
+      });
+
+      child.on('close', (code) => {
+        clearTimeout(timer);
+        if (killed) return;
+        const executionTimeMs = Date.now() - startTime;
+        const cleanStdout = stdout ? stdout.trim() : null;
+        const cleanStderr = stderr ? stderr.trim() : null;
+
+        resolve({
+          success: code === 0,
+          stdout: cleanStdout,
+          stderr: code === 0 ? null : cleanStderr,
+          compileOutput: null,
+          statusId: code === 0 ? 3 : 11,
+          statusDescription: code === 0 ? 'Accepted' : 'Runtime Error',
+          executionTimeMs,
+          memoryKb: 0,
+          isServiceAvailable: true,
+        });
+      });
+
+      if (stdin) {
+        try {
+          child.stdin.write(stdin);
+          child.stdin.end();
+        } catch {
+          // ignore
+        }
+      } else {
+        child.stdin.end();
+      }
+    });
   }
 
   public static async execute(
     code: string,
     language: string,
     stdin = '',
-    timeLimitMs = 2000,
+    timeLimitMs = 8000,
     memoryLimitKb = 128000
   ): Promise<ExecutionResult> {
     const langKey = language.toLowerCase();
-    const languageId = LANGUAGE_IDS[langKey];
 
+    // 1. If Python or JavaScript, attempt immediate, fast local execution first
+    if (langKey === 'python' || langKey === 'javascript') {
+      try {
+        const localRes = await this.executeLocally(code, langKey, stdin, timeLimitMs);
+        if (localRes) {
+          return localRes;
+        }
+      } catch {
+        // Fall back to Judge0 CE
+      }
+    }
+
+    const languageId = LANGUAGE_IDS[langKey];
     if (!languageId) {
       return {
         success: false,
@@ -51,37 +157,32 @@ export class CodeExecutionService {
       };
     }
 
-    if (!this.isConfigured()) {
-      return {
-        success: false,
-        stdout: null,
-        stderr: 'Code execution service is currently unconfigured. Please configure JUDGE0_API_URL and JUDGE0_API_KEY in backend/.env.',
-        compileOutput: null,
-        statusId: 14,
-        statusDescription: 'Execution Service Unconfigured',
-        executionTimeMs: 0,
-        memoryKb: 0,
-        isServiceAvailable: false,
-      };
-    }
+    // 2. Execute via Judge0 CE (ce.judge0.com)
+    const apiUrl = (env.JUDGE0_API_URL || 'https://ce.judge0.com').replace(/\/+$/, '');
 
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (env.JUDGE0_API_KEY) {
+        headers['X-RapidAPI-Key'] = env.JUDGE0_API_KEY;
+      }
+      if (env.JUDGE0_API_HOST) {
+        headers['X-RapidAPI-Host'] = env.JUDGE0_API_HOST;
+      }
+
       const response = await axios.post(
-        `${env.JUDGE0_API_URL}/submissions?base64_encoded=false&wait=true`,
+        `${apiUrl}/submissions?base64_encoded=false&wait=true`,
         {
           source_code: code,
           language_id: languageId,
           stdin,
-          cpu_time_limit: Math.max(1, timeLimitMs / 1000),
+          cpu_time_limit: Math.max(1, Math.ceil(timeLimitMs / 1000)),
           memory_limit: memoryLimitKb,
         },
         {
-          headers: {
-            'Content-Type': 'application/json',
-            ...(env.JUDGE0_API_KEY && { 'X-RapidAPI-Key': env.JUDGE0_API_KEY }),
-            ...(env.JUDGE0_API_HOST && { 'X-RapidAPI-Host': env.JUDGE0_API_HOST }),
-          },
-          timeout: 10000,
+          headers,
+          timeout: 15000,
         }
       );
 
@@ -89,15 +190,15 @@ export class CodeExecutionService {
       const statusId = data.status?.id || 0;
       const statusDescription = data.status?.description || 'Unknown Execution Status';
       const stdout = data.stdout ? data.stdout.trim() : null;
-      const stderr = data.stderr ? data.stderr.trim() : null;
       const compileOutput = data.compile_output ? data.compile_output.trim() : null;
+      const stderr = compileOutput || (data.stderr ? data.stderr.trim() : null) || (data.message ? data.message.trim() : null);
       const executionTimeMs = data.time ? Math.round(parseFloat(data.time) * 1000) : 0;
       const memoryKb = data.memory || 0;
 
       return {
         success: statusId === 3, // 3 = Accepted
         stdout,
-        stderr,
+        stderr: statusId === 3 ? null : stderr,
         compileOutput,
         statusId,
         statusDescription,
@@ -110,7 +211,7 @@ export class CodeExecutionService {
       return {
         success: false,
         stdout: null,
-        stderr: `Failed to connect to isolated code execution service: ${error.message}`,
+        stderr: `Code execution error: ${error.response?.data?.error || error.message}`,
         compileOutput: null,
         statusId: 15,
         statusDescription: 'Code Execution Engine Unreachable',

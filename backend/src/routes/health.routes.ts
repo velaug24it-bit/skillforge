@@ -6,7 +6,7 @@ const router = Router();
 
 router.get('/health', (req: Request, res: Response) => {
   const dbStatus = getDatabaseStatus();
-  const executionServiceConfigured = Boolean(env.JUDGE0_API_URL && env.JUDGE0_API_KEY);
+  const executionServiceConfigured = Boolean(env.JUDGE0_API_URL);
 
   res.status(200).json({
     success: true,
