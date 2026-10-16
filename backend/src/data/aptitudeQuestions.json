@@ -1,0 +1,6962 @@
+[
+  {
+    "levelNumber": 1,
+    "questionNumber": 1,
+    "topicTag": "Percentages",
+    "difficulty": "Beginner",
+    "questionText": "If 20% of a number is 50, what is 70% of that number?",
+    "options": [
+      {
+        "key": "A",
+        "text": "125"
+      },
+      {
+        "key": "B",
+        "text": "150"
+      },
+      {
+        "key": "C",
+        "text": "175"
+      },
+      {
+        "key": "D",
+        "text": "200"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Let the number be x. 0.20 * x = 50 => x = 250. 70% of 250 = 0.70 * 250 = 175.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 2,
+    "topicTag": "Percentages",
+    "difficulty": "Beginner",
+    "questionText": "A student scored 360 marks out of 500 in an examination. What is the percentage obtained?",
+    "options": [
+      {
+        "key": "A",
+        "text": "68%"
+      },
+      {
+        "key": "B",
+        "text": "72%"
+      },
+      {
+        "key": "C",
+        "text": "75%"
+      },
+      {
+        "key": "D",
+        "text": "70%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Percentage = (360 / 500) * 100 = 72%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 3,
+    "topicTag": "Percentages",
+    "difficulty": "Beginner",
+    "questionText": "The price of an item increases from $80 to $100. Find the percentage increase.",
+    "options": [
+      {
+        "key": "A",
+        "text": "20%"
+      },
+      {
+        "key": "B",
+        "text": "25%"
+      },
+      {
+        "key": "C",
+        "text": "15%"
+      },
+      {
+        "key": "D",
+        "text": "30%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Increase = 100 - 80 = 20. Percentage increase = (20 / 80) * 100 = 25%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 4,
+    "topicTag": "Percentages",
+    "difficulty": "Beginner",
+    "questionText": "If x is 25% less than y, by what percent is y more than x?",
+    "options": [
+      {
+        "key": "A",
+        "text": "25%"
+      },
+      {
+        "key": "B",
+        "text": "33.33%"
+      },
+      {
+        "key": "C",
+        "text": "20%"
+      },
+      {
+        "key": "D",
+        "text": "50%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Let y = 100, then x = 75. y is more than x by 25. Percentage = (25 / 75) * 100 = 33.33%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 5,
+    "topicTag": "Percentages",
+    "difficulty": "Beginner",
+    "questionText": "In a class of 60 students, 45% are boys. How many girls are in the class?",
+    "options": [
+      {
+        "key": "A",
+        "text": "27"
+      },
+      {
+        "key": "B",
+        "text": "33"
+      },
+      {
+        "key": "C",
+        "text": "30"
+      },
+      {
+        "key": "D",
+        "text": "35"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Percentage of girls = 100% - 45% = 55%. Number of girls = 0.55 * 60 = 33.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 6,
+    "topicTag": "Percentages",
+    "difficulty": "Beginner",
+    "questionText": "A person saves 15% of his monthly salary. If his monthly savings are $450, what is his total monthly salary?",
+    "options": [
+      {
+        "key": "A",
+        "text": "$2,500"
+      },
+      {
+        "key": "B",
+        "text": "$3,000"
+      },
+      {
+        "key": "C",
+        "text": "$3,200"
+      },
+      {
+        "key": "D",
+        "text": "$3,500"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "0.15 * Salary = 450 => Salary = 450 / 0.15 = $3,000.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 7,
+    "topicTag": "Percentages",
+    "difficulty": "Beginner",
+    "questionText": "What is 12.5% of 640?",
+    "options": [
+      {
+        "key": "A",
+        "text": "60"
+      },
+      {
+        "key": "B",
+        "text": "75"
+      },
+      {
+        "key": "C",
+        "text": "80"
+      },
+      {
+        "key": "D",
+        "text": "90"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "12.5% = 1/8. 640 / 8 = 80.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 8,
+    "topicTag": "Percentages",
+    "difficulty": "Beginner",
+    "questionText": "If the radius of a circle is increased by 10%, by what percentage does its area increase?",
+    "options": [
+      {
+        "key": "A",
+        "text": "10%"
+      },
+      {
+        "key": "B",
+        "text": "20%"
+      },
+      {
+        "key": "C",
+        "text": "21%"
+      },
+      {
+        "key": "D",
+        "text": "25%"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Area proportional to r^2. New area factor = (1.1)^2 = 1.21. Increase = 21%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 9,
+    "topicTag": "Percentages",
+    "difficulty": "Beginner",
+    "questionText": "A number is first increased by 20% and then decreased by 20%. The net change is:",
+    "options": [
+      {
+        "key": "A",
+        "text": "No change"
+      },
+      {
+        "key": "B",
+        "text": "4% increase"
+      },
+      {
+        "key": "C",
+        "text": "4% decrease"
+      },
+      {
+        "key": "D",
+        "text": "2% decrease"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Net change = 20 - 20 - (20 * 20)/100 = -4% (a 4% decrease).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 10,
+    "topicTag": "Percentages",
+    "difficulty": "Beginner",
+    "questionText": "Express 0.04 as a percentage.",
+    "options": [
+      {
+        "key": "A",
+        "text": "0.4%"
+      },
+      {
+        "key": "B",
+        "text": "4%"
+      },
+      {
+        "key": "C",
+        "text": "40%"
+      },
+      {
+        "key": "D",
+        "text": "0.04%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "0.04 * 100% = 4%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 11,
+    "topicTag": "Ratios & Proportions",
+    "difficulty": "Beginner",
+    "questionText": "If A : B = 2 : 3 and B : C = 4 : 5, find the ratio A : B : C.",
+    "options": [
+      {
+        "key": "A",
+        "text": "8 : 12 : 15"
+      },
+      {
+        "key": "B",
+        "text": "6 : 9 : 10"
+      },
+      {
+        "key": "C",
+        "text": "2 : 4 : 5"
+      },
+      {
+        "key": "D",
+        "text": "8 : 10 : 15"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Multiply first ratio by 4 (A:B = 8:12) and second by 3 (B:C = 12:15). Thus A:B:C = 8:12:15.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 12,
+    "topicTag": "Ratios & Proportions",
+    "difficulty": "Beginner",
+    "questionText": "Divide $1,200 between Alice and Bob in the ratio 3 : 5. How much does Bob receive?",
+    "options": [
+      {
+        "key": "A",
+        "text": "$450"
+      },
+      {
+        "key": "B",
+        "text": "$600"
+      },
+      {
+        "key": "C",
+        "text": "$750"
+      },
+      {
+        "key": "D",
+        "text": "$800"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Total parts = 3 + 5 = 8. Bob's share = (5 / 8) * 1200 = $750.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 13,
+    "topicTag": "Ratios & Proportions",
+    "difficulty": "Beginner",
+    "questionText": "Find the mean proportional between 9 and 25.",
+    "options": [
+      {
+        "key": "A",
+        "text": "15"
+      },
+      {
+        "key": "B",
+        "text": "16"
+      },
+      {
+        "key": "C",
+        "text": "17"
+      },
+      {
+        "key": "D",
+        "text": "18"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Mean proportional = sqrt(9 * 25) = sqrt(225) = 15.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 14,
+    "topicTag": "Ratios & Proportions",
+    "difficulty": "Beginner",
+    "questionText": "Find the fourth proportional to 4, 9, and 12.",
+    "options": [
+      {
+        "key": "A",
+        "text": "24"
+      },
+      {
+        "key": "B",
+        "text": "27"
+      },
+      {
+        "key": "C",
+        "text": "30"
+      },
+      {
+        "key": "D",
+        "text": "36"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "4 / 9 = 12 / x => 4x = 108 => x = 27.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 15,
+    "topicTag": "Ratios & Proportions",
+    "difficulty": "Beginner",
+    "questionText": "The ratio of boys to girls in a school is 7 : 8. If there are 560 boys, find the total number of students.",
+    "options": [
+      {
+        "key": "A",
+        "text": "1,120"
+      },
+      {
+        "key": "B",
+        "text": "1,200"
+      },
+      {
+        "key": "C",
+        "text": "1,240"
+      },
+      {
+        "key": "D",
+        "text": "1,280"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "7 parts = 560 => 1 part = 80. Total students = (7 + 8) * 80 = 15 * 80 = 1,200.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 16,
+    "topicTag": "Ratios & Proportions",
+    "difficulty": "Beginner",
+    "questionText": "If 5 : x = 20 : 60, what is the value of x?",
+    "options": [
+      {
+        "key": "A",
+        "text": "12"
+      },
+      {
+        "key": "B",
+        "text": "15"
+      },
+      {
+        "key": "C",
+        "text": "18"
+      },
+      {
+        "key": "D",
+        "text": "20"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "5 / x = 1 / 3 => x = 15.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 17,
+    "topicTag": "Ratios & Proportions",
+    "difficulty": "Beginner",
+    "questionText": "The sum of three numbers is 98. If the ratio of the first to second is 2:3 and that of the second to third is 5:8, find the second number.",
+    "options": [
+      {
+        "key": "A",
+        "text": "20"
+      },
+      {
+        "key": "B",
+        "text": "30"
+      },
+      {
+        "key": "C",
+        "text": "48"
+      },
+      {
+        "key": "D",
+        "text": "35"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "A:B = 10:15, B:C = 15:24 => A:B:C = 10:15:24. Sum = 49 parts = 98 => 1 part = 2. Second number B = 15 * 2 = 30.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 18,
+    "topicTag": "Ratios & Proportions",
+    "difficulty": "Beginner",
+    "questionText": "Salaries of A, B, and C are in the ratio 2 : 3 : 5. If increments of 15%, 10%, and 20% are allowed, what will be their new ratio?",
+    "options": [
+      {
+        "key": "A",
+        "text": "23 : 33 : 60"
+      },
+      {
+        "key": "B",
+        "text": "23 : 30 : 60"
+      },
+      {
+        "key": "C",
+        "text": "21 : 33 : 55"
+      },
+      {
+        "key": "D",
+        "text": "11 : 15 : 25"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Let salaries be 200, 300, 500. New salaries: 200 * 1.15 = 230, 300 * 1.10 = 330, 500 * 1.20 = 600. Ratio = 23 : 33 : 60.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 19,
+    "topicTag": "Averages",
+    "difficulty": "Beginner",
+    "questionText": "Find the average of the first five prime numbers.",
+    "options": [
+      {
+        "key": "A",
+        "text": "5.2"
+      },
+      {
+        "key": "B",
+        "text": "5.6"
+      },
+      {
+        "key": "C",
+        "text": "6.0"
+      },
+      {
+        "key": "D",
+        "text": "7.0"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "First five primes are 2, 3, 5, 7, 11. Sum = 28. Average = 28 / 5 = 5.6.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 20,
+    "topicTag": "Averages",
+    "difficulty": "Beginner",
+    "questionText": "The average of 5 consecutive odd numbers is 27. Find the largest number.",
+    "options": [
+      {
+        "key": "A",
+        "text": "29"
+      },
+      {
+        "key": "B",
+        "text": "31"
+      },
+      {
+        "key": "C",
+        "text": "33"
+      },
+      {
+        "key": "D",
+        "text": "25"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "In 5 consecutive odd numbers, the average is the middle number (3rd number). So the numbers are 23, 25, 27, 29, 31. Largest is 31.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 21,
+    "topicTag": "Averages",
+    "difficulty": "Beginner",
+    "questionText": "The average age of 24 students and their teacher is 15 years. If the teacher's age is excluded, the average reduces by 1 year. Find the teacher's age.",
+    "options": [
+      {
+        "key": "A",
+        "text": "35 years"
+      },
+      {
+        "key": "B",
+        "text": "39 years"
+      },
+      {
+        "key": "C",
+        "text": "40 years"
+      },
+      {
+        "key": "D",
+        "text": "42 years"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Total with teacher = 25 * 15 = 375. Total without teacher = 24 * 14 = 336. Teacher's age = 375 - 336 = 39 years.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 22,
+    "topicTag": "Averages",
+    "difficulty": "Beginner",
+    "questionText": "The average of 6 numbers is 12. If each number is increased by 3, what is the new average?",
+    "options": [
+      {
+        "key": "A",
+        "text": "12"
+      },
+      {
+        "key": "B",
+        "text": "15"
+      },
+      {
+        "key": "C",
+        "text": "18"
+      },
+      {
+        "key": "D",
+        "text": "36"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Adding a constant k to each item increases the average by k. New average = 12 + 3 = 15.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 23,
+    "topicTag": "Averages",
+    "difficulty": "Beginner",
+    "questionText": "A batsman scored 85 runs in his 12th innings, thereby increasing his average by 3 runs. Find his average after the 12th innings.",
+    "options": [
+      {
+        "key": "A",
+        "text": "48"
+      },
+      {
+        "key": "B",
+        "text": "50"
+      },
+      {
+        "key": "C",
+        "text": "52"
+      },
+      {
+        "key": "D",
+        "text": "54"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Let old average be A. Total after 12 innings = 11A + 85 = 12(A + 3) => 11A + 85 = 12A + 36 => A = 49. New average = 49 + 3 = 52.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 24,
+    "topicTag": "Averages",
+    "difficulty": "Beginner",
+    "questionText": "The average score of 40 students in an exam is 65. Later, it was discovered that a score of 84 was wrongly entered as 44. Find the correct average.",
+    "options": [
+      {
+        "key": "A",
+        "text": "66"
+      },
+      {
+        "key": "B",
+        "text": "67"
+      },
+      {
+        "key": "C",
+        "text": "65.5"
+      },
+      {
+        "key": "D",
+        "text": "66.5"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Difference = 84 - 44 = +40. Increase in average = 40 / 40 = 1. Correct average = 65 + 1 = 66.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 25,
+    "topicTag": "Averages",
+    "difficulty": "Beginner",
+    "questionText": "Find the average of all multiples of 7 between 10 and 50.",
+    "options": [
+      {
+        "key": "A",
+        "text": "28"
+      },
+      {
+        "key": "B",
+        "text": "31.5"
+      },
+      {
+        "key": "C",
+        "text": "35"
+      },
+      {
+        "key": "D",
+        "text": "29.5"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Multiples are 14, 21, 28, 35, 42, 49. In an arithmetic progression, average = (first + last) / 2 = (14 + 49) / 2 = 63 / 2 = 31.5.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 26,
+    "topicTag": "Averages",
+    "difficulty": "Beginner",
+    "questionText": "The average of 4 numbers is 30. If the sum of the first three numbers is 85, what is the fourth number?",
+    "options": [
+      {
+        "key": "A",
+        "text": "25"
+      },
+      {
+        "key": "B",
+        "text": "35"
+      },
+      {
+        "key": "C",
+        "text": "40"
+      },
+      {
+        "key": "D",
+        "text": "45"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Total sum = 4 * 30 = 120. Fourth number = 120 - 85 = 35.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 27,
+    "topicTag": "Numbers & Divisibility",
+    "difficulty": "Beginner",
+    "questionText": "Find the HCF of 36, 54, and 72.",
+    "options": [
+      {
+        "key": "A",
+        "text": "9"
+      },
+      {
+        "key": "B",
+        "text": "12"
+      },
+      {
+        "key": "C",
+        "text": "18"
+      },
+      {
+        "key": "D",
+        "text": "24"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "36 = 18 * 2, 54 = 18 * 3, 72 = 18 * 4. The greatest common divisor is 18.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 28,
+    "topicTag": "Numbers & Divisibility",
+    "difficulty": "Beginner",
+    "questionText": "Find the LCM of 12, 15, and 20.",
+    "options": [
+      {
+        "key": "A",
+        "text": "40"
+      },
+      {
+        "key": "B",
+        "text": "60"
+      },
+      {
+        "key": "C",
+        "text": "80"
+      },
+      {
+        "key": "D",
+        "text": "120"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Prime factors: 12 = 2^2 * 3, 15 = 3 * 5, 20 = 2^2 * 5. LCM = 2^2 * 3 * 5 = 60.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 29,
+    "topicTag": "Numbers & Divisibility",
+    "difficulty": "Beginner",
+    "questionText": "The product of two numbers is 1,280 and their HCF is 8. What is their LCM?",
+    "options": [
+      {
+        "key": "A",
+        "text": "120"
+      },
+      {
+        "key": "B",
+        "text": "140"
+      },
+      {
+        "key": "C",
+        "text": "160"
+      },
+      {
+        "key": "D",
+        "text": "180"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Product of numbers = HCF * LCM => 1280 = 8 * LCM => LCM = 1280 / 8 = 160.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 30,
+    "topicTag": "Numbers & Divisibility",
+    "difficulty": "Beginner",
+    "questionText": "Which of the following numbers is divisible by 9?",
+    "options": [
+      {
+        "key": "A",
+        "text": "34,512"
+      },
+      {
+        "key": "B",
+        "text": "68,418"
+      },
+      {
+        "key": "C",
+        "text": "72,314"
+      },
+      {
+        "key": "D",
+        "text": "54,233"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "A number is divisible by 9 if the sum of its digits is divisible by 9. For 68,418: 6+8+4+1+8 = 27 (divisible by 9).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 31,
+    "topicTag": "Numbers & Divisibility",
+    "difficulty": "Beginner",
+    "questionText": "What smallest number must be added to 1,000 to make it exactly divisible by 45?",
+    "options": [
+      {
+        "key": "A",
+        "text": "25"
+      },
+      {
+        "key": "B",
+        "text": "35"
+      },
+      {
+        "key": "C",
+        "text": "40"
+      },
+      {
+        "key": "D",
+        "text": "15"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "1000 / 45 = 22 with remainder 10. Number to add = 45 - 10 = 35. (1000 + 35 = 1035 = 45 * 23).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 32,
+    "topicTag": "Numbers & Divisibility",
+    "difficulty": "Beginner",
+    "questionText": "Find the unit digit in the product 784 * 618 * 917 * 463.",
+    "options": [
+      {
+        "key": "A",
+        "text": "2"
+      },
+      {
+        "key": "B",
+        "text": "4"
+      },
+      {
+        "key": "C",
+        "text": "6"
+      },
+      {
+        "key": "D",
+        "text": "8"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Multiply unit digits: 4 * 8 = 32 (unit 2); 2 * 7 = 14 (unit 4); 4 * 3 = 12 (unit 2). The unit digit is 2.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 33,
+    "topicTag": "Numbers & Divisibility",
+    "difficulty": "Beginner",
+    "questionText": "What is the remainder when 2^31 is divided by 5?",
+    "options": [
+      {
+        "key": "A",
+        "text": "1"
+      },
+      {
+        "key": "B",
+        "text": "2"
+      },
+      {
+        "key": "C",
+        "text": "3"
+      },
+      {
+        "key": "D",
+        "text": "4"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Powers of 2 mod 5 cycle in period 4: 2^1=2, 2^2=4, 2^3=3, 2^4=1. 31 mod 4 = 3, so 2^31 mod 5 = 2^3 mod 5 = 8 mod 5 = 3.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 34,
+    "topicTag": "Numbers & Divisibility",
+    "difficulty": "Beginner",
+    "questionText": "How many prime numbers are there between 1 and 20?",
+    "options": [
+      {
+        "key": "A",
+        "text": "6"
+      },
+      {
+        "key": "B",
+        "text": "7"
+      },
+      {
+        "key": "C",
+        "text": "8"
+      },
+      {
+        "key": "D",
+        "text": "9"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Primes are 2, 3, 5, 7, 11, 13, 17, 19. There are exactly 8 primes.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 35,
+    "topicTag": "Simple Interest",
+    "difficulty": "Beginner",
+    "questionText": "Find the simple interest on $5,000 at 6% per annum for 3 years.",
+    "options": [
+      {
+        "key": "A",
+        "text": "$800"
+      },
+      {
+        "key": "B",
+        "text": "$900"
+      },
+      {
+        "key": "C",
+        "text": "$1,000"
+      },
+      {
+        "key": "D",
+        "text": "$1,200"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "SI = (P * R * T) / 100 = (5000 * 6 * 3) / 100 = $900.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 36,
+    "topicTag": "Simple Interest",
+    "difficulty": "Beginner",
+    "questionText": "At what rate percent per annum will a sum of money double itself in 8 years at simple interest?",
+    "options": [
+      {
+        "key": "A",
+        "text": "10%"
+      },
+      {
+        "key": "B",
+        "text": "12.5%"
+      },
+      {
+        "key": "C",
+        "text": "15%"
+      },
+      {
+        "key": "D",
+        "text": "16.67%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Interest = Principal P. P = (P * R * 8) / 100 => R = 100 / 8 = 12.5%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 37,
+    "topicTag": "Simple Interest",
+    "difficulty": "Beginner",
+    "questionText": "A sum of $2,000 amounts to $2,600 in 5 years at simple interest. What is the rate of interest?",
+    "options": [
+      {
+        "key": "A",
+        "text": "5%"
+      },
+      {
+        "key": "B",
+        "text": "6%"
+      },
+      {
+        "key": "C",
+        "text": "7%"
+      },
+      {
+        "key": "D",
+        "text": "8%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "SI = 2600 - 2000 = 600. 600 = (2000 * R * 5) / 100 => 600 = 100R => R = 6%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 38,
+    "topicTag": "Simple Interest",
+    "difficulty": "Beginner",
+    "questionText": "How long will it take for $1,500 to yield $450 as simple interest at 5% per annum?",
+    "options": [
+      {
+        "key": "A",
+        "text": "4 years"
+      },
+      {
+        "key": "B",
+        "text": "5 years"
+      },
+      {
+        "key": "C",
+        "text": "6 years"
+      },
+      {
+        "key": "D",
+        "text": "7 years"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "T = (SI * 100) / (P * R) = (450 * 100) / (1500 * 5) = 45000 / 7500 = 6 years.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 39,
+    "topicTag": "Simple Interest",
+    "difficulty": "Beginner",
+    "questionText": "A sum of money triples itself in 10 years at simple interest. In how many years will it become 5 times itself?",
+    "options": [
+      {
+        "key": "A",
+        "text": "15 years"
+      },
+      {
+        "key": "B",
+        "text": "18 years"
+      },
+      {
+        "key": "C",
+        "text": "20 years"
+      },
+      {
+        "key": "D",
+        "text": "25 years"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Tripling means interest = 2P in 10 years (rate = 2P/10 = 0.2P per year). 5 times means interest = 4P. Time = 4P / 0.2P = 20 years.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 1,
+    "questionNumber": 40,
+    "topicTag": "Simple Interest",
+    "difficulty": "Beginner",
+    "questionText": "If simple interest on a certain sum for 2 years at 4% per annum is $80, what is the principal?",
+    "options": [
+      {
+        "key": "A",
+        "text": "$800"
+      },
+      {
+        "key": "B",
+        "text": "$1,000"
+      },
+      {
+        "key": "C",
+        "text": "$1,200"
+      },
+      {
+        "key": "D",
+        "text": "$1,500"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "P = (SI * 100) / (R * T) = (80 * 100) / (4 * 2) = 8000 / 8 = $1,000.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 1,
+    "topicTag": "Profit & Loss",
+    "difficulty": "Elementary",
+    "questionText": "A vendor buys an article for $250 and sells it for $300. What is his profit percentage?",
+    "options": [
+      {
+        "key": "A",
+        "text": "16.67%"
+      },
+      {
+        "key": "B",
+        "text": "20%"
+      },
+      {
+        "key": "C",
+        "text": "25%"
+      },
+      {
+        "key": "D",
+        "text": "15%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Profit = 300 - 250 = 50. Profit % = (50 / 250) * 100 = 20%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 2,
+    "topicTag": "Profit & Loss",
+    "difficulty": "Elementary",
+    "questionText": "By selling a book for $450, a shopkeeper incurs a loss of 10%. At what price should he sell it to gain 10%?",
+    "options": [
+      {
+        "key": "A",
+        "text": "$500"
+      },
+      {
+        "key": "B",
+        "text": "$525"
+      },
+      {
+        "key": "C",
+        "text": "$550"
+      },
+      {
+        "key": "D",
+        "text": "$600"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Selling price = 90% of Cost => CP = 450 / 0.90 = $500. For 10% gain, SP = 500 * 1.10 = $550.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 3,
+    "topicTag": "Profit & Loss",
+    "difficulty": "Elementary",
+    "questionText": "The cost price of 15 articles is equal to the selling price of 12 articles. What is the profit percentage?",
+    "options": [
+      {
+        "key": "A",
+        "text": "20%"
+      },
+      {
+        "key": "B",
+        "text": "25%"
+      },
+      {
+        "key": "C",
+        "text": "30%"
+      },
+      {
+        "key": "D",
+        "text": "33.33%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "15 CP = 12 SP => SP/CP = 15/12 = 5/4. Profit = 5 - 4 = 1. Profit % = (1 / 4) * 100 = 25%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 4,
+    "topicTag": "Profit & Loss",
+    "difficulty": "Elementary",
+    "questionText": "An article marked at $800 is sold for $680. What is the percentage discount offered?",
+    "options": [
+      {
+        "key": "A",
+        "text": "12%"
+      },
+      {
+        "key": "B",
+        "text": "15%"
+      },
+      {
+        "key": "C",
+        "text": "16%"
+      },
+      {
+        "key": "D",
+        "text": "18%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Discount = 800 - 680 = 120. Discount % = (120 / 800) * 100 = 15%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 5,
+    "topicTag": "Profit & Loss",
+    "difficulty": "Elementary",
+    "questionText": "Find the single discount equivalent to two successive discounts of 20% and 10%.",
+    "options": [
+      {
+        "key": "A",
+        "text": "30%"
+      },
+      {
+        "key": "B",
+        "text": "28%"
+      },
+      {
+        "key": "C",
+        "text": "25%"
+      },
+      {
+        "key": "D",
+        "text": "27%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Equivalent discount = d1 + d2 - (d1 * d2)/100 = 20 + 10 - 2 = 28%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 6,
+    "topicTag": "Profit & Loss",
+    "difficulty": "Elementary",
+    "questionText": "A dishonest dealer claims to sell goods at cost price but uses a weight of 900 grams instead of 1 kg. His profit percentage is:",
+    "options": [
+      {
+        "key": "A",
+        "text": "10%"
+      },
+      {
+        "key": "B",
+        "text": "11.11%"
+      },
+      {
+        "key": "C",
+        "text": "12.5%"
+      },
+      {
+        "key": "D",
+        "text": "9.09%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Gain % = [Error / (True Value - Error)] * 100 = [100 / 900] * 100 = 11.11%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 7,
+    "topicTag": "Profit & Loss",
+    "difficulty": "Elementary",
+    "questionText": "A person sells two chairs for $990 each, gaining 10% on one and losing 10% on the other. His overall result is:",
+    "options": [
+      {
+        "key": "A",
+        "text": "No gain no loss"
+      },
+      {
+        "key": "B",
+        "text": "1% gain"
+      },
+      {
+        "key": "C",
+        "text": "1% loss"
+      },
+      {
+        "key": "D",
+        "text": "2% loss"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "When two items are sold at the same price with equal % gain and loss x, there is always a loss of (x/10)^2 % = (10/10)^2 % = 1% loss.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 8,
+    "topicTag": "Profit & Loss",
+    "difficulty": "Elementary",
+    "questionText": "If a product is sold at a 20% profit, the ratio of its cost price to selling price is:",
+    "options": [
+      {
+        "key": "A",
+        "text": "4 : 5"
+      },
+      {
+        "key": "B",
+        "text": "5 : 6"
+      },
+      {
+        "key": "C",
+        "text": "5 : 4"
+      },
+      {
+        "key": "D",
+        "text": "6 : 5"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Let CP = 100, then SP = 120. Ratio CP : SP = 100 : 120 = 5 : 6.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 9,
+    "topicTag": "Profit & Loss",
+    "difficulty": "Elementary",
+    "questionText": "A merchant marks his goods 40% above the cost price and allows a discount of 25%. His profit percentage is:",
+    "options": [
+      {
+        "key": "A",
+        "text": "5%"
+      },
+      {
+        "key": "B",
+        "text": "10%"
+      },
+      {
+        "key": "C",
+        "text": "15%"
+      },
+      {
+        "key": "D",
+        "text": "20%"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Let CP = 100. Marked Price = 140. Selling Price = 140 * 0.75 = 105. Profit = 5%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 10,
+    "topicTag": "Profit & Loss",
+    "difficulty": "Elementary",
+    "questionText": "A man buys lemons at 6 for $10 and sells them at 4 for $8. What is his profit percentage?",
+    "options": [
+      {
+        "key": "A",
+        "text": "15%"
+      },
+      {
+        "key": "B",
+        "text": "20%"
+      },
+      {
+        "key": "C",
+        "text": "25%"
+      },
+      {
+        "key": "D",
+        "text": "30%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "CP of 1 lemon = 10/6 = $5/3. SP of 1 lemon = 8/4 = $2. Profit = 2 - 5/3 = $1/3. Profit % = [(1/3) / (5/3)] * 100 = 20%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 11,
+    "topicTag": "Compound Interest",
+    "difficulty": "Elementary",
+    "questionText": "Find the compound interest on $10,000 for 2 years at 10% per annum, compounded annually.",
+    "options": [
+      {
+        "key": "A",
+        "text": "$2,000"
+      },
+      {
+        "key": "B",
+        "text": "$2,100"
+      },
+      {
+        "key": "C",
+        "text": "$2,200"
+      },
+      {
+        "key": "D",
+        "text": "$2,050"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Amount = 10000 * (1.10)^2 = 10000 * 1.21 = $12,100. CI = 12100 - 10000 = $2,100.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 12,
+    "topicTag": "Compound Interest",
+    "difficulty": "Elementary",
+    "questionText": "What is the difference between simple and compound interest on $5,000 for 2 years at 8% per annum?",
+    "options": [
+      {
+        "key": "A",
+        "text": "$28"
+      },
+      {
+        "key": "B",
+        "text": "$32"
+      },
+      {
+        "key": "C",
+        "text": "$36"
+      },
+      {
+        "key": "D",
+        "text": "$40"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Difference for 2 years = P * (R/100)^2 = 5000 * (8/100)^2 = 5000 * 0.0064 = $32.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 13,
+    "topicTag": "Compound Interest",
+    "difficulty": "Elementary",
+    "questionText": "A sum of money doubles itself in 4 years at compound interest. In how many years will it become 8 times itself?",
+    "options": [
+      {
+        "key": "A",
+        "text": "8 years"
+      },
+      {
+        "key": "B",
+        "text": "12 years"
+      },
+      {
+        "key": "C",
+        "text": "16 years"
+      },
+      {
+        "key": "D",
+        "text": "20 years"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "2^1 in 4 years. 8 = 2^3, so time = 3 * 4 = 12 years.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 14,
+    "topicTag": "Compound Interest",
+    "difficulty": "Elementary",
+    "questionText": "Find the amount of $8,000 in 1.5 years at 10% per annum compounded half-yearly.",
+    "options": [
+      {
+        "key": "A",
+        "text": "$9,261"
+      },
+      {
+        "key": "B",
+        "text": "$9,180"
+      },
+      {
+        "key": "C",
+        "text": "$9,320"
+      },
+      {
+        "key": "D",
+        "text": "$9,400"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Rate per half-year = 5%, periods n = 3. Amount = 8000 * (1.05)^3 = 8000 * 1.157625 = $9,261.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 15,
+    "topicTag": "Compound Interest",
+    "difficulty": "Elementary",
+    "questionText": "At what rate percent compound interest will $2,000 amount to $2,420 in 2 years?",
+    "options": [
+      {
+        "key": "A",
+        "text": "8%"
+      },
+      {
+        "key": "B",
+        "text": "10%"
+      },
+      {
+        "key": "C",
+        "text": "12%"
+      },
+      {
+        "key": "D",
+        "text": "15%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "(1 + R/100)^2 = 2420 / 2000 = 1.21 => 1 + R/100 = 1.10 => R = 10%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 16,
+    "topicTag": "Compound Interest",
+    "difficulty": "Elementary",
+    "questionText": "The compound interest on a certain sum for 2 years at 5% is $328. Find the sum.",
+    "options": [
+      {
+        "key": "A",
+        "text": "$3,000"
+      },
+      {
+        "key": "B",
+        "text": "$3,200"
+      },
+      {
+        "key": "C",
+        "text": "$3,500"
+      },
+      {
+        "key": "D",
+        "text": "$3,600"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "CI factor for 2 yrs at 5% = (1.05)^2 - 1 = 0.1025. P = 328 / 0.1025 = $3,200.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 17,
+    "topicTag": "Compound Interest",
+    "difficulty": "Elementary",
+    "questionText": "If the compound interest on a sum for 3 years at 10% is $331, find the simple interest on the same sum for the same period.",
+    "options": [
+      {
+        "key": "A",
+        "text": "$280"
+      },
+      {
+        "key": "B",
+        "text": "$300"
+      },
+      {
+        "key": "C",
+        "text": "$310"
+      },
+      {
+        "key": "D",
+        "text": "$320"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "CI factor = (1.1)^3 - 1 = 0.331. Principal = 331 / 0.331 = $1,000. SI = (1000 * 10 * 3)/100 = $300.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 18,
+    "topicTag": "Compound Interest",
+    "difficulty": "Elementary",
+    "questionText": "A sum of money amounts to $1,331 in 3 years at 10% compound interest. What was the principal?",
+    "options": [
+      {
+        "key": "A",
+        "text": "$900"
+      },
+      {
+        "key": "B",
+        "text": "$1,000"
+      },
+      {
+        "key": "C",
+        "text": "$1,100"
+      },
+      {
+        "key": "D",
+        "text": "$1,200"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "P = 1331 / (1.1)^3 = 1331 / 1.331 = $1,000.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 19,
+    "topicTag": "Time & Work",
+    "difficulty": "Elementary",
+    "questionText": "A can complete a project in 12 days and B can do it in 24 days. How many days will they take working together?",
+    "options": [
+      {
+        "key": "A",
+        "text": "6 days"
+      },
+      {
+        "key": "B",
+        "text": "8 days"
+      },
+      {
+        "key": "C",
+        "text": "9 days"
+      },
+      {
+        "key": "D",
+        "text": "10 days"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Combined 1 day rate = 1/12 + 1/24 = 3/24 = 1/8. Together they will complete the project in 8 days.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 20,
+    "topicTag": "Time & Work",
+    "difficulty": "Elementary",
+    "questionText": "A and B together can do a job in 6 days. If A alone can do it in 10 days, how long does B take alone?",
+    "options": [
+      {
+        "key": "A",
+        "text": "12 days"
+      },
+      {
+        "key": "B",
+        "text": "15 days"
+      },
+      {
+        "key": "C",
+        "text": "18 days"
+      },
+      {
+        "key": "D",
+        "text": "20 days"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "1/B = 1/6 - 1/10 = (5 - 3) / 30 = 2/30 = 1/15. B takes 15 days.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 21,
+    "topicTag": "Time & Work",
+    "difficulty": "Elementary",
+    "questionText": "A is twice as efficient as B and can finish a work in 30 days less than B. In how many days can they finish it together?",
+    "options": [
+      {
+        "key": "A",
+        "text": "15 days"
+      },
+      {
+        "key": "B",
+        "text": "18 days"
+      },
+      {
+        "key": "C",
+        "text": "20 days"
+      },
+      {
+        "key": "D",
+        "text": "24 days"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Let B take 2x days and A take x days. 2x - x = 30 => x = 30 (A takes 30 days, B takes 60 days). Together = (30 * 60) / (30 + 60) = 1800 / 90 = 20 days.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 22,
+    "topicTag": "Time & Work",
+    "difficulty": "Elementary",
+    "questionText": "12 workers can build a wall in 8 days. How many workers are needed to build the same wall in 6 days?",
+    "options": [
+      {
+        "key": "A",
+        "text": "14"
+      },
+      {
+        "key": "B",
+        "text": "16"
+      },
+      {
+        "key": "C",
+        "text": "18"
+      },
+      {
+        "key": "D",
+        "text": "20"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Total work = 12 * 8 = 96 worker-days. Workers needed = 96 / 6 = 16 workers.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 23,
+    "topicTag": "Time & Work",
+    "difficulty": "Elementary",
+    "questionText": "Pipe A can fill a tank in 20 minutes and Pipe B can empty it in 30 minutes. If both are opened together, in what time will the tank be full?",
+    "options": [
+      {
+        "key": "A",
+        "text": "40 mins"
+      },
+      {
+        "key": "B",
+        "text": "50 mins"
+      },
+      {
+        "key": "C",
+        "text": "60 mins"
+      },
+      {
+        "key": "D",
+        "text": "75 mins"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Net filling rate = 1/20 - 1/30 = 1/60 per minute. The tank will be full in 60 minutes.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 24,
+    "topicTag": "Time & Work",
+    "difficulty": "Elementary",
+    "questionText": "Two pipes can fill a cistern in 12 hours and 15 hours respectively. A waste pipe can empty it in 20 hours. If all three are opened, how long to fill the cistern?",
+    "options": [
+      {
+        "key": "A",
+        "text": "8 hours"
+      },
+      {
+        "key": "B",
+        "text": "10 hours"
+      },
+      {
+        "key": "C",
+        "text": "12 hours"
+      },
+      {
+        "key": "D",
+        "text": "14 hours"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Net rate = 1/12 + 1/15 - 1/20 = (5 + 4 - 3)/60 = 6/60 = 1/10. Cistern fills in 10 hours.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 25,
+    "topicTag": "Time & Work",
+    "difficulty": "Elementary",
+    "questionText": "A can do a piece of work in 15 days and B in 20 days. They work together for 4 days, then A leaves. In how many more days will B finish the remaining work?",
+    "options": [
+      {
+        "key": "A",
+        "text": "8 days"
+      },
+      {
+        "key": "B",
+        "text": "10 days"
+      },
+      {
+        "key": "C",
+        "text": "10.67 days"
+      },
+      {
+        "key": "D",
+        "text": "11 days"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Work done in 4 days = 4 * (1/15 + 1/20) = 4 * (7/60) = 28/60 = 7/15. Remaining = 8/15. Days for B = (8/15) / (1/20) = 160 / 15 = 10.67 days (10 2/3 days).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 26,
+    "topicTag": "Time & Work",
+    "difficulty": "Elementary",
+    "questionText": "Pipe A fills a tank 3 times faster than Pipe B. If together they fill it in 36 minutes, how long will Pipe B take alone?",
+    "options": [
+      {
+        "key": "A",
+        "text": "108 mins"
+      },
+      {
+        "key": "B",
+        "text": "120 mins"
+      },
+      {
+        "key": "C",
+        "text": "144 mins"
+      },
+      {
+        "key": "D",
+        "text": "150 mins"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Let B's rate = 1 unit/min, A's rate = 3 units/min. Combined = 4 units/min. Total tank capacity = 4 * 36 = 144 units. Pipe B takes 144 / 1 = 144 minutes.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 27,
+    "topicTag": "Time & Work",
+    "difficulty": "Elementary",
+    "questionText": "If 8 men or 12 women can reap a field in 25 days, in how many days can 6 men and 11 women reap the same field?",
+    "options": [
+      {
+        "key": "A",
+        "text": "12 days"
+      },
+      {
+        "key": "B",
+        "text": "15 days"
+      },
+      {
+        "key": "C",
+        "text": "18 days"
+      },
+      {
+        "key": "D",
+        "text": "20 days"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "8M = 12W => 1M = 1.5W. 6M + 11W = 6(1.5) + 11 = 20W. 12W * 25 days = 20W * D => D = 300 / 20 = 15 days.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 28,
+    "topicTag": "Time & Work",
+    "difficulty": "Elementary",
+    "questionText": "A leak in the bottom of a tank can empty it in 8 hours. An inlet pipe admits water at 6 liters/min. When both are open, the tank empties in 12 hours. Capacity of the tank is:",
+    "options": [
+      {
+        "key": "A",
+        "text": "7,200 L"
+      },
+      {
+        "key": "B",
+        "text": "8,640 L"
+      },
+      {
+        "key": "C",
+        "text": "9,000 L"
+      },
+      {
+        "key": "D",
+        "text": "10,200 L"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Inlet rate = 1/8 - 1/12 = 1/24 per hour. Inlet fills the tank in 24 hours. Rate = 6 L/min = 360 L/hr. Capacity = 24 * 360 = 8,640 liters.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 29,
+    "topicTag": "Speed, Time & Distance",
+    "difficulty": "Elementary",
+    "questionText": "Convert 72 km/h into meters per second (m/s).",
+    "options": [
+      {
+        "key": "A",
+        "text": "15 m/s"
+      },
+      {
+        "key": "B",
+        "text": "18 m/s"
+      },
+      {
+        "key": "C",
+        "text": "20 m/s"
+      },
+      {
+        "key": "D",
+        "text": "25 m/s"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "To convert km/h to m/s, multiply by 5/18: 72 * (5/18) = 20 m/s.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 30,
+    "topicTag": "Speed, Time & Distance",
+    "difficulty": "Elementary",
+    "questionText": "A car travels 180 km in 3 hours. If it increases its speed by 15 km/h, how long will it take to travel 300 km?",
+    "options": [
+      {
+        "key": "A",
+        "text": "3.5 hours"
+      },
+      {
+        "key": "B",
+        "text": "4 hours"
+      },
+      {
+        "key": "C",
+        "text": "4.5 hours"
+      },
+      {
+        "key": "D",
+        "text": "5 hours"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Initial speed = 180 / 3 = 60 km/h. New speed = 60 + 15 = 75 km/h. Time = 300 / 75 = 4 hours.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 31,
+    "topicTag": "Speed, Time & Distance",
+    "difficulty": "Elementary",
+    "questionText": "A train 150 meters long passes an electric pole in 15 seconds. Find the speed of the train in km/h.",
+    "options": [
+      {
+        "key": "A",
+        "text": "30 km/h"
+      },
+      {
+        "key": "B",
+        "text": "36 km/h"
+      },
+      {
+        "key": "C",
+        "text": "40 km/h"
+      },
+      {
+        "key": "D",
+        "text": "45 km/h"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Speed in m/s = 150 / 15 = 10 m/s. In km/h = 10 * (18/5) = 36 km/h.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 32,
+    "topicTag": "Speed, Time & Distance",
+    "difficulty": "Elementary",
+    "questionText": "A train 200 meters long is running at 54 km/h. How long will it take to pass a bridge 250 meters long?",
+    "options": [
+      {
+        "key": "A",
+        "text": "20 sec"
+      },
+      {
+        "key": "B",
+        "text": "25 sec"
+      },
+      {
+        "key": "C",
+        "text": "30 sec"
+      },
+      {
+        "key": "D",
+        "text": "35 sec"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Total distance = 200 + 250 = 450 m. Speed = 54 * (5/18) = 15 m/s. Time = 450 / 15 = 30 seconds.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 33,
+    "topicTag": "Speed, Time & Distance",
+    "difficulty": "Elementary",
+    "questionText": "A person travels from city A to city B at 40 km/h and returns at 60 km/h. What is his average speed for the whole journey?",
+    "options": [
+      {
+        "key": "A",
+        "text": "48 km/h"
+      },
+      {
+        "key": "B",
+        "text": "50 km/h"
+      },
+      {
+        "key": "C",
+        "text": "52 km/h"
+      },
+      {
+        "key": "D",
+        "text": "54 km/h"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Average speed = (2 * s1 * s2) / (s1 + s2) = (2 * 40 * 60) / 100 = 4800 / 100 = 48 km/h.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 34,
+    "topicTag": "Speed, Time & Distance",
+    "difficulty": "Elementary",
+    "questionText": "Two trains running in opposite directions at 45 km/h and 63 km/h cross each other in 10 seconds. If one train is 160 m long, find the length of the second train.",
+    "options": [
+      {
+        "key": "A",
+        "text": "120 m"
+      },
+      {
+        "key": "B",
+        "text": "140 m"
+      },
+      {
+        "key": "C",
+        "text": "150 m"
+      },
+      {
+        "key": "D",
+        "text": "180 m"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Relative speed = 45 + 63 = 108 km/h = 108 * (5/18) = 30 m/s. Total distance in 10 s = 30 * 10 = 300 m. Length of 2nd train = 300 - 160 = 140 m.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 35,
+    "topicTag": "Speed, Time & Distance",
+    "difficulty": "Elementary",
+    "questionText": "A boat can travel with a speed of 13 km/h in still water. If the speed of the stream is 4 km/h, find the time taken by the boat to go 68 km downstream.",
+    "options": [
+      {
+        "key": "A",
+        "text": "3 hours"
+      },
+      {
+        "key": "B",
+        "text": "4 hours"
+      },
+      {
+        "key": "C",
+        "text": "5 hours"
+      },
+      {
+        "key": "D",
+        "text": "6 hours"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Downstream speed = 13 + 4 = 17 km/h. Time = 68 / 17 = 4 hours.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 36,
+    "topicTag": "Speed, Time & Distance",
+    "difficulty": "Elementary",
+    "questionText": "A boat goes 24 km upstream in 6 hours and 28 km downstream in 4 hours. What is the speed of the stream?",
+    "options": [
+      {
+        "key": "A",
+        "text": "1.5 km/h"
+      },
+      {
+        "key": "B",
+        "text": "2 km/h"
+      },
+      {
+        "key": "C",
+        "text": "2.5 km/h"
+      },
+      {
+        "key": "D",
+        "text": "3 km/h"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Upstream speed = 24 / 6 = 4 km/h. Downstream speed = 28 / 4 = 7 km/h. Speed of stream = (Downstream - Upstream) / 2 = (7 - 4) / 2 = 1.5 km/h.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 37,
+    "topicTag": "Speed, Time & Distance",
+    "difficulty": "Elementary",
+    "questionText": "Walking at 3/4 of his normal speed, a man reaches his office 20 minutes late. Find his normal time to reach office.",
+    "options": [
+      {
+        "key": "A",
+        "text": "45 mins"
+      },
+      {
+        "key": "B",
+        "text": "60 mins"
+      },
+      {
+        "key": "C",
+        "text": "75 mins"
+      },
+      {
+        "key": "D",
+        "text": "90 mins"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Time is inversely proportional to speed. New time = 4/3 of normal time. Late by 4/3 T - T = 1/3 T = 20 mins => Normal time T = 60 minutes.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 38,
+    "topicTag": "Speed, Time & Distance",
+    "difficulty": "Elementary",
+    "questionText": "Two runners start simultaneously from the same point in a circular track of 400 m with speeds 10 m/s and 6 m/s in the same direction. When will they meet for the first time?",
+    "options": [
+      {
+        "key": "A",
+        "text": "60 sec"
+      },
+      {
+        "key": "B",
+        "text": "80 sec"
+      },
+      {
+        "key": "C",
+        "text": "100 sec"
+      },
+      {
+        "key": "D",
+        "text": "120 sec"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Relative speed = 10 - 6 = 4 m/s. Time to meet = 400 / 4 = 100 seconds.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 39,
+    "topicTag": "Speed, Time & Distance",
+    "difficulty": "Elementary",
+    "questionText": "A train running at 72 km/h crosses a platform in 30 seconds and a man standing on the platform in 18 seconds. What is the length of the platform?",
+    "options": [
+      {
+        "key": "A",
+        "text": "200 m"
+      },
+      {
+        "key": "B",
+        "text": "240 m"
+      },
+      {
+        "key": "C",
+        "text": "260 m"
+      },
+      {
+        "key": "D",
+        "text": "300 m"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Speed = 72 * (5/18) = 20 m/s. Train length = 20 * 18 = 360 m. (Train + Platform) = 20 * 30 = 600 m. Platform = 600 - 360 = 240 m.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 2,
+    "questionNumber": 40,
+    "topicTag": "Speed, Time & Distance",
+    "difficulty": "Elementary",
+    "questionText": "A cyclist covers a distance of 750 meters in 2 minutes 30 seconds. What is the speed in km/h of the cyclist?",
+    "options": [
+      {
+        "key": "A",
+        "text": "16 km/h"
+      },
+      {
+        "key": "B",
+        "text": "18 km/h"
+      },
+      {
+        "key": "C",
+        "text": "20 km/h"
+      },
+      {
+        "key": "D",
+        "text": "22 km/h"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Time = 150 seconds. Speed = 750 / 150 = 5 m/s. In km/h = 5 * (18/5) = 18 km/h.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 1,
+    "topicTag": "Number Series",
+    "difficulty": "Intermediate",
+    "questionText": "Find the next number in the sequence: 4, 9, 19, 39, 79, ?",
+    "options": [
+      {
+        "key": "A",
+        "text": "149"
+      },
+      {
+        "key": "B",
+        "text": "159"
+      },
+      {
+        "key": "C",
+        "text": "169"
+      },
+      {
+        "key": "D",
+        "text": "179"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Pattern: Each term is (previous * 2) + 1. 79 * 2 + 1 = 158 + 1 = 159.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 2,
+    "topicTag": "Number Series",
+    "difficulty": "Intermediate",
+    "questionText": "Find the missing number in the series: 2, 6, 12, 20, 30, 42, ?",
+    "options": [
+      {
+        "key": "A",
+        "text": "52"
+      },
+      {
+        "key": "B",
+        "text": "54"
+      },
+      {
+        "key": "C",
+        "text": "56"
+      },
+      {
+        "key": "D",
+        "text": "60"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Differences are 4, 6, 8, 10, 12, so the next difference is 14. 42 + 14 = 56. (Also n(n+1) where n=1,2,3,4,5,6,7 => 7*8 = 56).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 3,
+    "topicTag": "Number Series",
+    "difficulty": "Intermediate",
+    "questionText": "Identify the wrong number in the series: 3, 8, 15, 24, 34, 48, 63.",
+    "options": [
+      {
+        "key": "A",
+        "text": "15"
+      },
+      {
+        "key": "B",
+        "text": "24"
+      },
+      {
+        "key": "C",
+        "text": "34"
+      },
+      {
+        "key": "D",
+        "text": "48"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Terms follow n^2 - 1 for n=2,3,4,5,6,7,8: 3, 8, 15, 24, 35, 48, 63. Here 34 is incorrect (should be 35).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 4,
+    "topicTag": "Number Series",
+    "difficulty": "Intermediate",
+    "questionText": "Find the next term in the series: 1, 4, 27, 256, ?",
+    "options": [
+      {
+        "key": "A",
+        "text": "625"
+      },
+      {
+        "key": "B",
+        "text": "1024"
+      },
+      {
+        "key": "C",
+        "text": "3125"
+      },
+      {
+        "key": "D",
+        "text": "4096"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Pattern is n^n: 1^1 = 1, 2^2 = 4, 3^3 = 27, 4^4 = 256, 5^5 = 3125.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 5,
+    "topicTag": "Letter Series",
+    "difficulty": "Intermediate",
+    "questionText": "Find the next letter sequence: BDF, CFI, DHL, ?",
+    "options": [
+      {
+        "key": "A",
+        "text": "EJO"
+      },
+      {
+        "key": "B",
+        "text": "EKM"
+      },
+      {
+        "key": "C",
+        "text": "EKO"
+      },
+      {
+        "key": "D",
+        "text": "EIO"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "1st letters: B(2), C(3), D(4) -> E(5). 2nd: D(4), F(6), H(8) -> J(10). 3rd: F(6), I(9), L(12) -> O(15). Answer is EJO.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 6,
+    "topicTag": "Coding-Decoding",
+    "difficulty": "Intermediate",
+    "questionText": "If 'TEACHER' is coded as 'VGCEJGT', how is 'CHILDREN' coded in that language?",
+    "options": [
+      {
+        "key": "A",
+        "text": "EJKNFTGP"
+      },
+      {
+        "key": "B",
+        "text": "EJKNFPEQ"
+      },
+      {
+        "key": "C",
+        "text": "EJKNFPGP"
+      },
+      {
+        "key": "D",
+        "text": "EKJNFPGP"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Each letter is shifted forward by +2 positions in the alphabet: C->E, H->J, I->K, L->N, D->F, R->T, E->G, N->P => EJKNFTGP.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 7,
+    "topicTag": "Coding-Decoding",
+    "difficulty": "Intermediate",
+    "questionText": "In a certain code, 'APPLE' is written as '50'. How is 'BANANA' written in that code?",
+    "options": [
+      {
+        "key": "A",
+        "text": "33"
+      },
+      {
+        "key": "B",
+        "text": "42"
+      },
+      {
+        "key": "C",
+        "text": "45"
+      },
+      {
+        "key": "D",
+        "text": "52"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Sum of alphabetical positions: B(2)+A(1)+N(14)+A(1)+N(14)+A(1) = 33.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 8,
+    "topicTag": "Coding-Decoding",
+    "difficulty": "Intermediate",
+    "questionText": "If 'ROSE' is coded as '6821' and 'CHAIR' is coded as '73456', how is 'SEARCH' coded?",
+    "options": [
+      {
+        "key": "A",
+        "text": "214673"
+      },
+      {
+        "key": "B",
+        "text": "214573"
+      },
+      {
+        "key": "C",
+        "text": "214736"
+      },
+      {
+        "key": "D",
+        "text": "241573"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Direct substitution: S=2, E=1, A=4, R=6, C=7, H=3. S-E-A-R-C-H = 214673? Wait: from CHAIR: C=7, H=3, A=4, I=5, R=6. So S=2, E=1, A=4, R=6? Wait, CHAIR: C=7, H=3, A=4, I=5, R=6. So S=2, E=1, A=4, R=6, C=7, H=3 => 214673.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 9,
+    "topicTag": "Analogy",
+    "difficulty": "Intermediate",
+    "questionText": "Doctor : Patient :: Lawyer : ?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Judge"
+      },
+      {
+        "key": "B",
+        "text": "Court"
+      },
+      {
+        "key": "C",
+        "text": "Client"
+      },
+      {
+        "key": "D",
+        "text": "Police"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "A doctor provides professional services to a patient; a lawyer provides professional services to a client.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 10,
+    "topicTag": "Analogy",
+    "difficulty": "Intermediate",
+    "questionText": "8 : 28 :: 27 : ?",
+    "options": [
+      {
+        "key": "A",
+        "text": "55"
+      },
+      {
+        "key": "B",
+        "text": "65"
+      },
+      {
+        "key": "C",
+        "text": "64"
+      },
+      {
+        "key": "D",
+        "text": "85"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "8 = 2^3, 28 = 3^3 + 1. Similarly, 27 = 3^3, next is 4^3 + 1 = 64 + 1 = 65.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 11,
+    "topicTag": "Blood Relations",
+    "difficulty": "Intermediate",
+    "questionText": "Pointing to a photograph of a boy, Suresh said, 'He is the son of the only son of my mother.' How is Suresh related to that boy?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Brother"
+      },
+      {
+        "key": "B",
+        "text": "Uncle"
+      },
+      {
+        "key": "C",
+        "text": "Father"
+      },
+      {
+        "key": "D",
+        "text": "Cousin"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Suresh's mother's only son is Suresh himself. The boy is the son of Suresh, so Suresh is the father.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 12,
+    "topicTag": "Blood Relations",
+    "difficulty": "Intermediate",
+    "questionText": "A is B's sister. C is B's mother. D is C's father. E is D's mother. How is A related to D?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Grandmother"
+      },
+      {
+        "key": "B",
+        "text": "Grandfather"
+      },
+      {
+        "key": "C",
+        "text": "Granddaughter"
+      },
+      {
+        "key": "D",
+        "text": "Daughter"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "A is the daughter of C, and C is the daughter of D. Therefore, A is the granddaughter of D.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 13,
+    "topicTag": "Blood Relations",
+    "difficulty": "Intermediate",
+    "questionText": "Introducing a man, a woman said, 'His wife is the only daughter of my father.' How is that man related to the woman?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Brother"
+      },
+      {
+        "key": "B",
+        "text": "Father-in-law"
+      },
+      {
+        "key": "C",
+        "text": "Husband"
+      },
+      {
+        "key": "D",
+        "text": "Maternal Uncle"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "The only daughter of the woman's father is the woman herself. His wife is the woman herself, so the man is her husband.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 14,
+    "topicTag": "Blood Relations",
+    "difficulty": "Intermediate",
+    "questionText": "If P + Q means P is the brother of Q; P - Q means P is the mother of Q; P * Q means P is the sister of Q, which of the following means M is the maternal uncle of R?",
+    "options": [
+      {
+        "key": "A",
+        "text": "M + K - R"
+      },
+      {
+        "key": "B",
+        "text": "M - K + R"
+      },
+      {
+        "key": "C",
+        "text": "M * K - R"
+      },
+      {
+        "key": "D",
+        "text": "M + K * R"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "M + K means M is brother of K. K - R means K is mother of R. Thus M is the brother of R's mother, i.e., maternal uncle.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 15,
+    "topicTag": "Blood Relations",
+    "difficulty": "Intermediate",
+    "questionText": "A and B are brothers. C and D are sisters. A's son is D's brother. How is B related to C?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Father"
+      },
+      {
+        "key": "B",
+        "text": "Brother"
+      },
+      {
+        "key": "C",
+        "text": "Uncle"
+      },
+      {
+        "key": "D",
+        "text": "Grandfather"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "A's son is brother of D and C, which means C and D are children of A. B is A's brother, so B is the uncle of C.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 16,
+    "topicTag": "Blood Relations",
+    "difficulty": "Intermediate",
+    "questionText": "Pointing to a gentleman, Deepak said, 'His only brother is the father of my daughter's father.' How is the gentleman related to Deepak?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Father"
+      },
+      {
+        "key": "B",
+        "text": "Grandfather"
+      },
+      {
+        "key": "C",
+        "text": "Uncle"
+      },
+      {
+        "key": "D",
+        "text": "Brother-in-law"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Deepak's daughter's father is Deepak himself. The gentleman's only brother is Deepak's father. Therefore, the gentleman is Deepak's paternal uncle.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 17,
+    "topicTag": "Blood Relations",
+    "difficulty": "Intermediate",
+    "questionText": "In a family of six persons A, B, C, D, E, F: B is the son of C but C is not the mother of B. A and C are a married couple. E is the brother of C. D is the daughter of A. How many male members are in the family if F is the brother of B?",
+    "options": [
+      {
+        "key": "A",
+        "text": "2"
+      },
+      {
+        "key": "B",
+        "text": "3"
+      },
+      {
+        "key": "C",
+        "text": "4"
+      },
+      {
+        "key": "D",
+        "text": "5"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "C is father (male), A is mother (female), B is son (male), F is brother (male), E is brother of C (male), D is daughter (female). Male members: C, B, F, E (total 4).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 18,
+    "topicTag": "Blood Relations",
+    "difficulty": "Intermediate",
+    "questionText": "If X is the brother of the son of Y's son, how is X related to Y?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Son"
+      },
+      {
+        "key": "B",
+        "text": "Brother"
+      },
+      {
+        "key": "C",
+        "text": "Grandson"
+      },
+      {
+        "key": "D",
+        "text": "Cousin"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Son of Y's son is Y's grandson. The brother of Y's grandson is also Y's grandson. Hence X is Y's grandson.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 19,
+    "topicTag": "Direction Sense",
+    "difficulty": "Intermediate",
+    "questionText": "A person walks 10 meters north, turns right and walks 15 meters, then turns right again and walks 10 meters. In which direction is he from the starting point?",
+    "options": [
+      {
+        "key": "A",
+        "text": "North"
+      },
+      {
+        "key": "B",
+        "text": "East"
+      },
+      {
+        "key": "C",
+        "text": "West"
+      },
+      {
+        "key": "D",
+        "text": "South"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "10m North and 10m South cancel out. He has moved 15m East of the origin.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 20,
+    "topicTag": "Direction Sense",
+    "difficulty": "Intermediate",
+    "questionText": "Ravi walks 8 km west, then turns left and walks 6 km. What is the shortest distance between his starting point and final position?",
+    "options": [
+      {
+        "key": "A",
+        "text": "10 km"
+      },
+      {
+        "key": "B",
+        "text": "12 km"
+      },
+      {
+        "key": "C",
+        "text": "14 km"
+      },
+      {
+        "key": "D",
+        "text": "15 km"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Shortest distance = sqrt(8^2 + 6^2) = sqrt(64 + 36) = sqrt(100) = 10 km.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 21,
+    "topicTag": "Direction Sense",
+    "difficulty": "Intermediate",
+    "questionText": "One morning after sunrise, Suresh was facing a pole. The shadow of the pole fell exactly to his right. In which direction was Suresh facing?",
+    "options": [
+      {
+        "key": "A",
+        "text": "East"
+      },
+      {
+        "key": "B",
+        "text": "West"
+      },
+      {
+        "key": "C",
+        "text": "South"
+      },
+      {
+        "key": "D",
+        "text": "North"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "In the morning, the sun is in the East, so shadows fall towards the West. If the shadow is to his right, his right is West, which means he is facing South.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 22,
+    "topicTag": "Direction Sense",
+    "difficulty": "Intermediate",
+    "questionText": "A man starts from his house and travels 5 km south, then turns right and travels 3 km, turns right again and travels 5 km. How far is he from his house?",
+    "options": [
+      {
+        "key": "A",
+        "text": "3 km"
+      },
+      {
+        "key": "B",
+        "text": "5 km"
+      },
+      {
+        "key": "C",
+        "text": "7 km"
+      },
+      {
+        "key": "D",
+        "text": "8 km"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "South 5 km and North 5 km cancel out. He is 3 km West of his house.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 23,
+    "topicTag": "Direction Sense",
+    "difficulty": "Intermediate",
+    "questionText": "If South-East becomes North, North-East becomes West, and so on, what will West become?",
+    "options": [
+      {
+        "key": "A",
+        "text": "North-East"
+      },
+      {
+        "key": "B",
+        "text": "South-East"
+      },
+      {
+        "key": "C",
+        "text": "North-West"
+      },
+      {
+        "key": "D",
+        "text": "South-West"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "The entire compass is rotated 135 degrees counter-clockwise. West rotated 135 degrees counter-clockwise becomes South-East.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 24,
+    "topicTag": "Direction Sense",
+    "difficulty": "Intermediate",
+    "questionText": "Kunal walks 10 km towards North. From there he walks 6 km towards South. Then, he walks 3 km towards East. How far and in which direction is he with reference to his starting point?",
+    "options": [
+      {
+        "key": "A",
+        "text": "5 km West"
+      },
+      {
+        "key": "B",
+        "text": "5 km North-East"
+      },
+      {
+        "key": "C",
+        "text": "7 km East"
+      },
+      {
+        "key": "D",
+        "text": "5 km South-East"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Net North = 10 - 6 = 4 km. East = 3 km. Distance = sqrt(4^2 + 3^2) = 5 km in the North-East direction.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 25,
+    "topicTag": "Direction Sense",
+    "difficulty": "Intermediate",
+    "questionText": "At 3:00 PM, the minute hand points towards North. In which direction does the hour hand point?",
+    "options": [
+      {
+        "key": "A",
+        "text": "South"
+      },
+      {
+        "key": "B",
+        "text": "East"
+      },
+      {
+        "key": "C",
+        "text": "West"
+      },
+      {
+        "key": "D",
+        "text": "South-East"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "At 3:00 PM, the minute hand points at 12 (North) and the hour hand points at 3 (East).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 26,
+    "topicTag": "Direction Sense",
+    "difficulty": "Intermediate",
+    "questionText": "A clock is placed such that at 12:00 noon, the minute hand points towards North-East. In which direction does the hour hand point at 6:00 PM?",
+    "options": [
+      {
+        "key": "A",
+        "text": "North-East"
+      },
+      {
+        "key": "B",
+        "text": "South-West"
+      },
+      {
+        "key": "C",
+        "text": "North-West"
+      },
+      {
+        "key": "D",
+        "text": "South-East"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "At 12:00, 12 is North-East. 6 is directly opposite 12, so 6 points towards South-West.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 27,
+    "topicTag": "Syllogisms",
+    "difficulty": "Intermediate",
+    "questionText": "Statements: All cats are dogs. All dogs are birds. Conclusions: I. All cats are birds. II. All birds are cats.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I follows"
+      },
+      {
+        "key": "B",
+        "text": "Only II follows"
+      },
+      {
+        "key": "C",
+        "text": "Either I or II follows"
+      },
+      {
+        "key": "D",
+        "text": "Neither follows"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Cats are a subset of dogs, and dogs are a subset of birds. Therefore, all cats are birds. Conclusion I follows; II does not necessarily follow.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 28,
+    "topicTag": "Syllogisms",
+    "difficulty": "Intermediate",
+    "questionText": "Statements: Some books are pens. All pens are papers. Conclusions: I. Some books are papers. II. Some papers are pens.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I follows"
+      },
+      {
+        "key": "B",
+        "text": "Only II follows"
+      },
+      {
+        "key": "C",
+        "text": "Both I and II follow"
+      },
+      {
+        "key": "D",
+        "text": "Neither follows"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Since some books are pens and all pens are papers, the intersection of books and pens is within papers, so some books are papers. Also all pens are papers implies some papers are pens. Both follow.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 29,
+    "topicTag": "Syllogisms",
+    "difficulty": "Intermediate",
+    "questionText": "Statements: No apple is a mango. All mangoes are bananas. Conclusions: I. No apple is a banana. II. Some bananas are mangoes.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I follows"
+      },
+      {
+        "key": "B",
+        "text": "Only II follows"
+      },
+      {
+        "key": "C",
+        "text": "Both follow"
+      },
+      {
+        "key": "D",
+        "text": "Neither follows"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "All mangoes are bananas implies some bananas are mangoes (II follows). But apples may or may not intersect with bananas outside mangoes, so I does not follow.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 30,
+    "topicTag": "Syllogisms",
+    "difficulty": "Intermediate",
+    "questionText": "Statements: All cars are trains. No train is an airplane. Conclusions: I. No car is an airplane. II. All trains are cars.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I follows"
+      },
+      {
+        "key": "B",
+        "text": "Only II follows"
+      },
+      {
+        "key": "C",
+        "text": "Both follow"
+      },
+      {
+        "key": "D",
+        "text": "Neither follows"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Since cars are a subset of trains, and no train is an airplane, no car can be an airplane. Conclusion I follows.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 31,
+    "topicTag": "Syllogisms",
+    "difficulty": "Intermediate",
+    "questionText": "Statements: Some roses are flowers. Some flowers are red. Conclusions: I. Some roses are red. II. All red are flowers.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I follows"
+      },
+      {
+        "key": "B",
+        "text": "Only II follows"
+      },
+      {
+        "key": "C",
+        "text": "Both follow"
+      },
+      {
+        "key": "D",
+        "text": "Neither follows"
+      }
+    ],
+    "correctOption": "D",
+    "explanation": "Two particular statements (Some + Some) do not yield a definite conclusion. Neither I nor II follows.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 32,
+    "topicTag": "Syllogisms",
+    "difficulty": "Intermediate",
+    "questionText": "Statements: All metals are solids. Some solids are heavy. Conclusions: I. Some metals are heavy. II. Some heavy things are solids.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I follows"
+      },
+      {
+        "key": "B",
+        "text": "Only II follows"
+      },
+      {
+        "key": "C",
+        "text": "Both follow"
+      },
+      {
+        "key": "D",
+        "text": "Neither follows"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Some solids are heavy implies some heavy things are solids (conversion). Metals might not overlap with heavy solids, so I does not necessarily follow. Only II follows.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 33,
+    "topicTag": "Syllogisms",
+    "difficulty": "Intermediate",
+    "questionText": "Statements: All actors are producers. Some producers are directors. Conclusions: I. Some actors are directors. II. All directors are actors.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I follows"
+      },
+      {
+        "key": "B",
+        "text": "Only II follows"
+      },
+      {
+        "key": "C",
+        "text": "Both follow"
+      },
+      {
+        "key": "D",
+        "text": "Neither follows"
+      }
+    ],
+    "correctOption": "D",
+    "explanation": "Actors are within producers, and some producers are directors, but directors need not overlap with the actor portion. Neither follows.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 34,
+    "topicTag": "Syllogisms",
+    "difficulty": "Intermediate",
+    "questionText": "Statements: No tiger is a lion. No lion is a leopard. Conclusions: I. No tiger is a leopard. II. Some leopards are lions.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I follows"
+      },
+      {
+        "key": "B",
+        "text": "Only II follows"
+      },
+      {
+        "key": "C",
+        "text": "Either I or II follows"
+      },
+      {
+        "key": "D",
+        "text": "Neither follows"
+      }
+    ],
+    "correctOption": "D",
+    "explanation": "No conclusion follows from two negative premises. Tigers and leopards may or may not overlap, and no lion is a leopard contradicts II. Neither follows.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 35,
+    "topicTag": "Order & Ranking",
+    "difficulty": "Intermediate",
+    "questionText": "In a class of 45 students, Rohit ranks 18th from the top. What is his rank from the bottom?",
+    "options": [
+      {
+        "key": "A",
+        "text": "27th"
+      },
+      {
+        "key": "B",
+        "text": "28th"
+      },
+      {
+        "key": "C",
+        "text": "29th"
+      },
+      {
+        "key": "D",
+        "text": "30th"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Rank from bottom = Total - Rank from top + 1 = 45 - 18 + 1 = 28th.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 36,
+    "topicTag": "Order & Ranking",
+    "difficulty": "Intermediate",
+    "questionText": "In a row of boys, if A is 10th from the left and B is 9th from the right, and they interchange positions, A becomes 15th from the left. How many boys are there in the row?",
+    "options": [
+      {
+        "key": "A",
+        "text": "23"
+      },
+      {
+        "key": "B",
+        "text": "24"
+      },
+      {
+        "key": "C",
+        "text": "25"
+      },
+      {
+        "key": "D",
+        "text": "26"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "New position of A is B's original position. Total = 15 + 9 - 1 = 23 boys.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 37,
+    "topicTag": "Order & Ranking",
+    "difficulty": "Intermediate",
+    "questionText": "Manoj is heavier than Kamal but lighter than Vikas. Jayant is heavier than Vikas. Who is the heaviest?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Manoj"
+      },
+      {
+        "key": "B",
+        "text": "Kamal"
+      },
+      {
+        "key": "C",
+        "text": "Vikas"
+      },
+      {
+        "key": "D",
+        "text": "Jayant"
+      }
+    ],
+    "correctOption": "D",
+    "explanation": "Kamal < Manoj < Vikas < Jayant. Jayant is the heaviest.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 38,
+    "topicTag": "Order & Ranking",
+    "difficulty": "Intermediate",
+    "questionText": "In a queue of 30 people, Priya is 12th from the front and Swati is 8th from the back. How many people are between them?",
+    "options": [
+      {
+        "key": "A",
+        "text": "9"
+      },
+      {
+        "key": "B",
+        "text": "10"
+      },
+      {
+        "key": "C",
+        "text": "11"
+      },
+      {
+        "key": "D",
+        "text": "12"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "People between = Total - (Front + Back) = 30 - (12 + 8) = 30 - 20 = 10 people.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 39,
+    "topicTag": "Order & Ranking",
+    "difficulty": "Intermediate",
+    "questionText": "Five children took part in an exam. Child A scored more than B but less than C. Child D scored less than E but more than C. Who scored the highest?",
+    "options": [
+      {
+        "key": "A",
+        "text": "A"
+      },
+      {
+        "key": "B",
+        "text": "C"
+      },
+      {
+        "key": "C",
+        "text": "D"
+      },
+      {
+        "key": "D",
+        "text": "E"
+      }
+    ],
+    "correctOption": "D",
+    "explanation": "B < A < C. Also C < D < E. Hence B < A < C < D < E. E scored the highest.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 3,
+    "questionNumber": 40,
+    "topicTag": "Order & Ranking",
+    "difficulty": "Intermediate",
+    "questionText": "In a row of trees, one tree is the 7th from either end of the row. How many trees are in the row?",
+    "options": [
+      {
+        "key": "A",
+        "text": "11"
+      },
+      {
+        "key": "B",
+        "text": "13"
+      },
+      {
+        "key": "C",
+        "text": "14"
+      },
+      {
+        "key": "D",
+        "text": "15"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Total = 7 + 7 - 1 = 13 trees.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 1,
+    "topicTag": "Seating Arrangements",
+    "difficulty": "Advanced",
+    "questionText": "Five friends P, Q, R, S, and T are sitting on a bench facing North. S is to the immediate right of P. T is to the left of Q but to the right of R. P is to the right of Q. Who is sitting in the middle?",
+    "options": [
+      {
+        "key": "A",
+        "text": "P"
+      },
+      {
+        "key": "B",
+        "text": "Q"
+      },
+      {
+        "key": "C",
+        "text": "R"
+      },
+      {
+        "key": "D",
+        "text": "T"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Arrangement from left to right: R, T, Q, P, S. The person in the middle is Q.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 2,
+    "topicTag": "Seating Arrangements",
+    "difficulty": "Advanced",
+    "questionText": "Six people A, B, C, D, E, F are sitting in a circle facing the center. A is facing D. C is between A and B. E is between A and F. Who is sitting opposite B?",
+    "options": [
+      {
+        "key": "A",
+        "text": "C"
+      },
+      {
+        "key": "B",
+        "text": "D"
+      },
+      {
+        "key": "C",
+        "text": "E"
+      },
+      {
+        "key": "D",
+        "text": "F"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "With circle positions 1 to 6: Let A=1, opposite is D=4. C is between A and B => C=2, B=3. E is between A and F => E=6, F=5. The person opposite B(3) is F(5). Wait, opposite in 6 is diff of 3: 3 opposite 6 (E) or 5? Opposite 1 is 4, opposite 2 is 5, opposite 3 is 6 (E). Thus opposite B is E.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 3,
+    "topicTag": "Seating Arrangements",
+    "difficulty": "Advanced",
+    "questionText": "Four girls and four boys are sitting around a circular table facing the center such that no two boys sit together. How many arrangements are possible?",
+    "options": [
+      {
+        "key": "A",
+        "text": "144"
+      },
+      {
+        "key": "B",
+        "text": "24"
+      },
+      {
+        "key": "C",
+        "text": "720"
+      },
+      {
+        "key": "D",
+        "text": "576"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Fix 4 girls around the table in (4-1)! = 3! = 6 ways. There are 4 spaces between them for 4 boys: 4! = 24 ways. Total = 6 * 24 = 144 ways.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 4,
+    "topicTag": "Seating Arrangements",
+    "difficulty": "Advanced",
+    "questionText": "Seven persons A, B, C, D, E, F, G are standing in a line. D is to the immediate left of F. C is between A and B. G has two persons between him and D. If A is at an extreme end, who is in the exact center?",
+    "options": [
+      {
+        "key": "A",
+        "text": "C"
+      },
+      {
+        "key": "B",
+        "text": "D"
+      },
+      {
+        "key": "C",
+        "text": "E"
+      },
+      {
+        "key": "D",
+        "text": "B"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Valid arrangement: A, C, B, G, E, D, F. The fourth person (exact center of 7) is B.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 5,
+    "topicTag": "Seating Arrangements",
+    "difficulty": "Advanced",
+    "questionText": "In a row of 6 persons facing North, U is sitting second to the right of V. W is sitting to the immediate left of X. Y is sitting at an extreme end. If V is adjacent to W, who is sitting at the other extreme end?",
+    "options": [
+      {
+        "key": "A",
+        "text": "U"
+      },
+      {
+        "key": "B",
+        "text": "X"
+      },
+      {
+        "key": "C",
+        "text": "V"
+      },
+      {
+        "key": "D",
+        "text": "W"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Arrangement: Y, V, W, X, U, ... or similar. With U second right of V and V adjacent to W, U is at the right extreme end.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 6,
+    "topicTag": "Seating Arrangements",
+    "difficulty": "Advanced",
+    "questionText": "Eight people A to H sit around a square table, two on each side. A sits on the North side facing South. G sits opposite A. If D sits immediately to G's right, which direction does D face?",
+    "options": [
+      {
+        "key": "A",
+        "text": "North"
+      },
+      {
+        "key": "B",
+        "text": "South"
+      },
+      {
+        "key": "C",
+        "text": "East"
+      },
+      {
+        "key": "D",
+        "text": "West"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "G sits on the South side facing North. Sitting on the South side, looking North, right is East. All persons on the South side face North. Thus D faces North.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 7,
+    "topicTag": "Seating Arrangements",
+    "difficulty": "Advanced",
+    "questionText": "Five people are standing in a line at a ticket counter. L is ahead of M. N is behind O. P is between L and O. Who is last in the queue if M is behind N?",
+    "options": [
+      {
+        "key": "A",
+        "text": "M"
+      },
+      {
+        "key": "B",
+        "text": "N"
+      },
+      {
+        "key": "C",
+        "text": "O"
+      },
+      {
+        "key": "D",
+        "text": "P"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "From front to back: L, P, O, N, M. M is the last person in the queue.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 8,
+    "topicTag": "Seating Arrangements",
+    "difficulty": "Advanced",
+    "questionText": "Six friends are sitting around a hexagonal table. A is opposite D. B is between A and C. E is opposite C. Who is sitting between E and D?",
+    "options": [
+      {
+        "key": "A",
+        "text": "F"
+      },
+      {
+        "key": "B",
+        "text": "B"
+      },
+      {
+        "key": "C",
+        "text": "A"
+      },
+      {
+        "key": "D",
+        "text": "C"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Remaining person F must sit between E and D.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 9,
+    "topicTag": "Seating Arrangements",
+    "difficulty": "Advanced",
+    "questionText": "In a circular arrangement of 5 people facing center, who is to the immediate left of X if Y is between X and Z, and W is to the right of X?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Y"
+      },
+      {
+        "key": "B",
+        "text": "Z"
+      },
+      {
+        "key": "C",
+        "text": "W"
+      },
+      {
+        "key": "D",
+        "text": "Cannot be determined"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Facing center, clockwise or counter-clockwise: if W is to the right of X, then the left side is occupied by Y. Immediate left of X is Y.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 10,
+    "topicTag": "Seating Arrangements",
+    "difficulty": "Advanced",
+    "questionText": "Ten students are seated in two parallel rows of 5 facing each other. Row 1 faces South, Row 2 faces North. A in Row 1 faces D in Row 2. If B is to the left of A, who does B face?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Student to D's right"
+      },
+      {
+        "key": "B",
+        "text": "Student to D's left"
+      },
+      {
+        "key": "C",
+        "text": "D"
+      },
+      {
+        "key": "D",
+        "text": "Cannot be determined"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "In Row 1 facing South, 'left' is to the East. In Row 2 facing North, the person opposite will be to D's right (East).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 11,
+    "topicTag": "Clocks & Calendars",
+    "difficulty": "Advanced",
+    "questionText": "What is the angle between the hands of a clock at 3:40 PM?",
+    "options": [
+      {
+        "key": "A",
+        "text": "120 degrees"
+      },
+      {
+        "key": "B",
+        "text": "130 degrees"
+      },
+      {
+        "key": "C",
+        "text": "140 degrees"
+      },
+      {
+        "key": "D",
+        "text": "150 degrees"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Angle = |30H - (11/2)M| = |30(3) - (11/2)(40)| = |90 - 220| = 130 degrees.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 12,
+    "topicTag": "Clocks & Calendars",
+    "difficulty": "Advanced",
+    "questionText": "At what time between 4 and 5 o'clock will the hands of a clock coincide?",
+    "options": [
+      {
+        "key": "A",
+        "text": "21 9/11 min past 4"
+      },
+      {
+        "key": "B",
+        "text": "22 min past 4"
+      },
+      {
+        "key": "C",
+        "text": "21 5/11 min past 4"
+      },
+      {
+        "key": "D",
+        "text": "20 min past 4"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Time = (30H) / (11/2) = 120 * 2 / 11 = 240 / 11 = 21 9/11 minutes past 4.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 13,
+    "topicTag": "Clocks & Calendars",
+    "difficulty": "Advanced",
+    "questionText": "How many times do the hands of a clock point in opposite directions (straight line of 180 degrees) in a day?",
+    "options": [
+      {
+        "key": "A",
+        "text": "20"
+      },
+      {
+        "key": "B",
+        "text": "22"
+      },
+      {
+        "key": "C",
+        "text": "24"
+      },
+      {
+        "key": "D",
+        "text": "44"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "They point in opposite directions 11 times every 12 hours (between 5 and 7 o'clock they are opposite only once, at 6:00). In 24 hours, they are opposite 22 times.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 14,
+    "topicTag": "Clocks & Calendars",
+    "difficulty": "Advanced",
+    "questionText": "How many times in a day are the hands of a clock at right angles (90 degrees)?",
+    "options": [
+      {
+        "key": "A",
+        "text": "22"
+      },
+      {
+        "key": "B",
+        "text": "24"
+      },
+      {
+        "key": "C",
+        "text": "44"
+      },
+      {
+        "key": "D",
+        "text": "48"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Hands form a right angle 2 times in most hours, but only twice across 2-4 and 8-10. This gives 22 times per 12 hours, or 44 times in 24 hours.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 15,
+    "topicTag": "Clocks & Calendars",
+    "difficulty": "Advanced",
+    "questionText": "A clock gains 5 minutes every hour. If it was set correctly at 12:00 noon, what time will it show at 6:00 PM on the same day?",
+    "options": [
+      {
+        "key": "A",
+        "text": "6:25 PM"
+      },
+      {
+        "key": "B",
+        "text": "6:30 PM"
+      },
+      {
+        "key": "C",
+        "text": "6:35 PM"
+      },
+      {
+        "key": "D",
+        "text": "6:20 PM"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "6 hours elapsed. Total gain = 6 * 5 = 30 minutes. The clock will show 6:30 PM.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 16,
+    "topicTag": "Clocks & Calendars",
+    "difficulty": "Advanced",
+    "questionText": "If January 1, 2006 was a Sunday, what day of the week was January 1, 2010?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Wednesday"
+      },
+      {
+        "key": "B",
+        "text": "Thursday"
+      },
+      {
+        "key": "C",
+        "text": "Friday"
+      },
+      {
+        "key": "D",
+        "text": "Saturday"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Years 2006, 2007, 2009 are ordinary (1 odd day each = 3). 2008 is a leap year (2 odd days). Total odd days = 3 + 2 = 5. Sunday + 5 days = Friday.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 17,
+    "topicTag": "Clocks & Calendars",
+    "difficulty": "Advanced",
+    "questionText": "How many leap years are there between the year 1801 and 1900 inclusive?",
+    "options": [
+      {
+        "key": "A",
+        "text": "24"
+      },
+      {
+        "key": "B",
+        "text": "25"
+      },
+      {
+        "key": "C",
+        "text": "26"
+      },
+      {
+        "key": "D",
+        "text": "23"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "1900 is a century year not divisible by 400, so it is not a leap year. Number of leap years = 100 / 4 - 1 = 24.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 18,
+    "topicTag": "Clocks & Calendars",
+    "difficulty": "Advanced",
+    "questionText": "Today is Monday. After 61 days, it will be:",
+    "options": [
+      {
+        "key": "A",
+        "text": "Tuesday"
+      },
+      {
+        "key": "B",
+        "text": "Wednesday"
+      },
+      {
+        "key": "C",
+        "text": "Thursday"
+      },
+      {
+        "key": "D",
+        "text": "Saturday"
+      }
+    ],
+    "correctOption": "D",
+    "explanation": "61 mod 7 = 5. Monday + 5 days = Saturday.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 19,
+    "topicTag": "Clocks & Calendars",
+    "difficulty": "Advanced",
+    "questionText": "Which of the following years will have the same calendar as the year 2007?",
+    "options": [
+      {
+        "key": "A",
+        "text": "2014"
+      },
+      {
+        "key": "B",
+        "text": "2016"
+      },
+      {
+        "key": "C",
+        "text": "2017"
+      },
+      {
+        "key": "D",
+        "text": "2018"
+      }
+    ],
+    "correctOption": "D",
+    "explanation": "Odd days from 2007: 2007(1), 2008(2), 2009(1), 2010(1), 2011(1), 2012(2), 2013(1), 2014(1), 2015(1), 2016(2), 2017(1) => Sum to 2017 is 14 (divisible by 7). Next year 2018 is ordinary, matching 2007.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 20,
+    "topicTag": "Clocks & Calendars",
+    "difficulty": "Advanced",
+    "questionText": "What was the day of the week on 15th August 1947?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Thursday"
+      },
+      {
+        "key": "B",
+        "text": "Friday"
+      },
+      {
+        "key": "C",
+        "text": "Saturday"
+      },
+      {
+        "key": "D",
+        "text": "Sunday"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "1600 years = 0 odd days. 300 years = 1 odd day. 46 years = 11 leap + 35 ord = 57 odd days = 1 mod 7. Jan-Jul odd days = 3+0+3+2+3+2+3 = 16 = 2 mod 7. 15 Aug = 15 = 1 mod 7. Total = 1 + 1 + 2 + 1 = 5. Day 5 is Friday.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 21,
+    "topicTag": "Critical Reasoning",
+    "difficulty": "Advanced",
+    "questionText": "Statement: 'Please do not lean out of the train window.' \u2014 Notice in a train carriage. Assumption I: People generally pay heed to such warnings. Assumption II: Leaning out of the window is dangerous.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I is implicit"
+      },
+      {
+        "key": "B",
+        "text": "Only II is implicit"
+      },
+      {
+        "key": "C",
+        "text": "Both I and II are implicit"
+      },
+      {
+        "key": "D",
+        "text": "Neither is implicit"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "A notice is put up assuming that people will read and follow it (I is implicit) and because the activity warned against carries genuine danger (II is implicit).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 22,
+    "topicTag": "Critical Reasoning",
+    "difficulty": "Advanced",
+    "questionText": "Statement: 'Buy pure coconut oil of Brand X for lustrous hair.' \u2014 An advertisement. Assumption I: People want lustrous hair. Assumption II: Brand X is the only oil that makes hair lustrous.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I is implicit"
+      },
+      {
+        "key": "B",
+        "text": "Only II is implicit"
+      },
+      {
+        "key": "C",
+        "text": "Both are implicit"
+      },
+      {
+        "key": "D",
+        "text": "Neither is implicit"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "The ad appeals to a consumer desire for lustrous hair (I is implicit). It does not claim that no other brand exists (II is not implicit).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 23,
+    "topicTag": "Critical Reasoning",
+    "difficulty": "Advanced",
+    "questionText": "Statement: Should nuclear energy be completely banned worldwide? Argument I: Yes, nuclear accidents like Chernobyl and Fukushima have catastrophic long-term consequences. Argument II: No, it provides a massive source of low-carbon electricity essential for fighting climate change.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only Argument I is strong"
+      },
+      {
+        "key": "B",
+        "text": "Only Argument II is strong"
+      },
+      {
+        "key": "C",
+        "text": "Both Arguments are strong"
+      },
+      {
+        "key": "D",
+        "text": "Neither is strong"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Both arguments present valid, empirically supported perspectives addressing safety hazards and clean energy requirements respectively.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 24,
+    "topicTag": "Critical Reasoning",
+    "difficulty": "Advanced",
+    "questionText": "Statement: The government decided to grant financial subsidies to small-scale organic farmers. Conclusion I: Organic farming will become financially viable for smallholders. Conclusion II: Traditional farming will be banned by next year.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I follows"
+      },
+      {
+        "key": "B",
+        "text": "Only II follows"
+      },
+      {
+        "key": "C",
+        "text": "Both follow"
+      },
+      {
+        "key": "D",
+        "text": "Neither follows"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Subsidies directly promote financial sustainability for organic farmers (I follows). There is no mention of banning traditional agriculture (II does not follow).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 25,
+    "topicTag": "Critical Reasoning",
+    "difficulty": "Advanced",
+    "questionText": "Statement: 'In order to build high morale among employees, annual performance bonuses should be instituted.' Assumption I: Bonuses are linked to employee motivation. Assumption II: Employees do not care about financial incentives.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I is implicit"
+      },
+      {
+        "key": "B",
+        "text": "Only II is implicit"
+      },
+      {
+        "key": "C",
+        "text": "Both are implicit"
+      },
+      {
+        "key": "D",
+        "text": "Neither is implicit"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "The proposal assumes financial reward bolsters morale (I is implicit). II directly contradicts the premise.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 26,
+    "topicTag": "Critical Reasoning",
+    "difficulty": "Advanced",
+    "questionText": "Statement: Most students who attended the intensive coding bootcamp secured placements within 3 months. Conclusion I: Coding bootcamps improve technical employability. Conclusion II: College degrees have zero value in tech recruitment.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I follows"
+      },
+      {
+        "key": "B",
+        "text": "Only II follows"
+      },
+      {
+        "key": "C",
+        "text": "Both follow"
+      },
+      {
+        "key": "D",
+        "text": "Neither follows"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Bootcamp training correlates with fast placement (I follows). Nothing in the statement invalidates formal degrees (II does not follow).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 27,
+    "topicTag": "Critical Reasoning",
+    "difficulty": "Advanced",
+    "questionText": "Statement: Cause: Heavy rainfall submerged railway tracks in Mumbai. Effect: Several local trains were canceled or delayed. Which relation holds?",
+    "options": [
+      {
+        "key": "A",
+        "text": "I is cause and II is effect"
+      },
+      {
+        "key": "B",
+        "text": "II is cause and I is effect"
+      },
+      {
+        "key": "C",
+        "text": "Both are independent causes"
+      },
+      {
+        "key": "D",
+        "text": "Both are effects of common cause"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Submerged tracks directly caused train cancellations and delays.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 28,
+    "topicTag": "Critical Reasoning",
+    "difficulty": "Advanced",
+    "questionText": "Statement: 'To reduce vehicular emissions, the municipal corporation will mandate odd-even car license plate driving days.' Assumption I: Reduced traffic volume leads to lower pollutant concentrations. Assumption II: Public transport has capacity to absorb displaced drivers.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I is implicit"
+      },
+      {
+        "key": "B",
+        "text": "Only II is implicit"
+      },
+      {
+        "key": "C",
+        "text": "Both I and II are implicit"
+      },
+      {
+        "key": "D",
+        "text": "Neither is implicit"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "The policy assumes fewer cars will decrease emissions (I is implicit) and that commuters can switch to alternative transit options (II is implicit).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 29,
+    "topicTag": "Critical Reasoning",
+    "difficulty": "Advanced",
+    "questionText": "Statement: Should coding education be made mandatory in elementary schools? Argument I: Yes, algorithmic thinking is as foundational as literacy in a digital world. Argument II: No, young children will experience screen fatigue and lack hands-on physical play.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I is strong"
+      },
+      {
+        "key": "B",
+        "text": "Only II is strong"
+      },
+      {
+        "key": "C",
+        "text": "Both I and II are strong"
+      },
+      {
+        "key": "D",
+        "text": "Neither is strong"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Both arguments present substantiated points addressing cognitive preparedness vs developmental and physical well-being.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 30,
+    "topicTag": "Critical Reasoning",
+    "difficulty": "Advanced",
+    "questionText": "Statement: 'Consume Vitamin D supplements daily during winter to avoid fatigue.' Conclusion I: Vitamin D levels tend to dip in winter due to reduced sunlight. Conclusion II: Summer fatigue never occurs.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Only I follows"
+      },
+      {
+        "key": "B",
+        "text": "Only II follows"
+      },
+      {
+        "key": "C",
+        "text": "Both follow"
+      },
+      {
+        "key": "D",
+        "text": "Neither follows"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Reduced sunlight in winter is the rationale for seasonal Vitamin D advice (I follows). Summer fatigue is unrelated and not addressed (II does not follow).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 31,
+    "topicTag": "Puzzles",
+    "difficulty": "Advanced",
+    "questionText": "Four friends A, B, C, D study different subjects: Physics, Chemistry, Maths, Biology. B does not study Biology or Maths. C studies Chemistry. D does not study Maths. What does A study?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Physics"
+      },
+      {
+        "key": "B",
+        "text": "Chemistry"
+      },
+      {
+        "key": "C",
+        "text": "Maths"
+      },
+      {
+        "key": "D",
+        "text": "Biology"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "C studies Chemistry. B does not study Bio or Maths => B studies Physics. D does not study Maths => D studies Biology. Therefore, A must study Maths.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 32,
+    "topicTag": "Puzzles",
+    "difficulty": "Advanced",
+    "questionText": "In a tournament, every player plays against every other player once. If 28 matches were played in total, how many players entered?",
+    "options": [
+      {
+        "key": "A",
+        "text": "7"
+      },
+      {
+        "key": "B",
+        "text": "8"
+      },
+      {
+        "key": "C",
+        "text": "9"
+      },
+      {
+        "key": "D",
+        "text": "10"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "n * (n - 1) / 2 = 28 => n * (n - 1) = 56 => 8 * 7 = 56 => n = 8 players.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 33,
+    "topicTag": "Puzzles",
+    "difficulty": "Advanced",
+    "questionText": "There are 5 boxes colored Red, Blue, Green, Yellow, and White. The Blue box is not next to Green. The Red box is in the center. The White box is at the left extreme. Where is the Green box if Yellow is to the right of Red?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Position 2"
+      },
+      {
+        "key": "B",
+        "text": "Position 3"
+      },
+      {
+        "key": "C",
+        "text": "Position 4"
+      },
+      {
+        "key": "D",
+        "text": "Position 5"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Positions 1 to 5: White(1), Red(3). Yellow is to the right of Red (4 or 5). Since Blue is not next to Green, Green must be at Position 2 and Blue at Position 5 (or vice versa). Green is at Position 2.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 34,
+    "topicTag": "Puzzles",
+    "difficulty": "Advanced",
+    "questionText": "A cube is painted red on all 6 faces and then cut into 64 small identical cubes. How many small cubes have exactly two painted faces?",
+    "options": [
+      {
+        "key": "A",
+        "text": "12"
+      },
+      {
+        "key": "B",
+        "text": "18"
+      },
+      {
+        "key": "C",
+        "text": "24"
+      },
+      {
+        "key": "D",
+        "text": "32"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "For n = 4 (since 4^3 = 64), 2-face painted cubes lie on edges: 12 * (n - 2) = 12 * (4 - 2) = 12 * 2 = 24.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 35,
+    "topicTag": "Puzzles",
+    "difficulty": "Advanced",
+    "questionText": "In the same cube of 64 pieces, how many small cubes have NO face painted at all?",
+    "options": [
+      {
+        "key": "A",
+        "text": "4"
+      },
+      {
+        "key": "B",
+        "text": "8"
+      },
+      {
+        "key": "C",
+        "text": "12"
+      },
+      {
+        "key": "D",
+        "text": "16"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Unpainted cubes = (n - 2)^3 = (4 - 2)^3 = 2^3 = 8 cubes.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 36,
+    "topicTag": "Puzzles",
+    "difficulty": "Advanced",
+    "questionText": "If in a code, CAT = 24 and DOG = 26, what is BIRD?",
+    "options": [
+      {
+        "key": "A",
+        "text": "31"
+      },
+      {
+        "key": "B",
+        "text": "33"
+      },
+      {
+        "key": "C",
+        "text": "35"
+      },
+      {
+        "key": "D",
+        "text": "37"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Sum of letters: B(2) + I(9) + R(18) + D(4) = 33.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 37,
+    "topicTag": "Puzzles",
+    "difficulty": "Advanced",
+    "questionText": "A father tells his son: 'I was your present age when you were born.' If the father is 38 years old now, what was the son's age 5 years ago?",
+    "options": [
+      {
+        "key": "A",
+        "text": "14 years"
+      },
+      {
+        "key": "B",
+        "text": "19 years"
+      },
+      {
+        "key": "C",
+        "text": "12 years"
+      },
+      {
+        "key": "D",
+        "text": "15 years"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Let son's age be x. Father's age at birth was x. Father's current age = x + x = 2x = 38 => x = 19. Five years ago, son's age = 19 - 5 = 14 years.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 38,
+    "topicTag": "Puzzles",
+    "difficulty": "Advanced",
+    "questionText": "A shepherd has 17 sheep. All but 9 run away. How many sheep does he have left?",
+    "options": [
+      {
+        "key": "A",
+        "text": "8"
+      },
+      {
+        "key": "B",
+        "text": "9"
+      },
+      {
+        "key": "C",
+        "text": "0"
+      },
+      {
+        "key": "D",
+        "text": "17"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "'All but 9' means exactly 9 sheep remained.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 39,
+    "topicTag": "Puzzles",
+    "difficulty": "Advanced",
+    "questionText": "If a clock strikes 6 times in 5 seconds, how many seconds will it take to strike 12 times?",
+    "options": [
+      {
+        "key": "A",
+        "text": "10 seconds"
+      },
+      {
+        "key": "B",
+        "text": "11 seconds"
+      },
+      {
+        "key": "C",
+        "text": "12 seconds"
+      },
+      {
+        "key": "D",
+        "text": "13 seconds"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "6 strikes have 5 intervals = 5 seconds (1 second per interval). 12 strikes have 11 intervals = 11 * 1 = 11 seconds.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 4,
+    "questionNumber": 40,
+    "topicTag": "Puzzles",
+    "difficulty": "Advanced",
+    "questionText": "Three bulbs are in a room and 3 switches outside. You can enter the room only once. How can you determine which switch controls which bulb?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Turn on switch 1 for 10 mins, turn off and turn on switch 2, then enter"
+      },
+      {
+        "key": "B",
+        "text": "Turn on all switches"
+      },
+      {
+        "key": "C",
+        "text": "Turn on switch 1 and 2 together"
+      },
+      {
+        "key": "D",
+        "text": "Impossible to determine"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Turn switch 1 on for 10 minutes (it warms up the bulb). Turn it off, turn switch 2 on, and enter immediately. The lit bulb is switch 2, the hot dark bulb is switch 1, and the cold dark bulb is switch 3.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 1,
+    "topicTag": "Synonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the word that is most nearly identical in meaning to: CANDID",
+    "options": [
+      {
+        "key": "A",
+        "text": "Deceptive"
+      },
+      {
+        "key": "B",
+        "text": "Frank"
+      },
+      {
+        "key": "C",
+        "text": "Secretive"
+      },
+      {
+        "key": "D",
+        "text": "Shy"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Candid means truthful, straightforward, and frank.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 2,
+    "topicTag": "Synonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the closest synonym for: METICULOUS",
+    "options": [
+      {
+        "key": "A",
+        "text": "Careless"
+      },
+      {
+        "key": "B",
+        "text": "Thorough"
+      },
+      {
+        "key": "C",
+        "text": "Hasty"
+      },
+      {
+        "key": "D",
+        "text": "Indifferent"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Meticulous means showing great attention to detail; very careful and precise (thorough).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 3,
+    "topicTag": "Synonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the closest synonym for: PRAGMATIC",
+    "options": [
+      {
+        "key": "A",
+        "text": "Idealistic"
+      },
+      {
+        "key": "B",
+        "text": "Practical"
+      },
+      {
+        "key": "C",
+        "text": "Theoretical"
+      },
+      {
+        "key": "D",
+        "text": "Impulsive"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Pragmatic refers to dealing with things sensibly and realistically in a practical manner.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 4,
+    "topicTag": "Synonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the closest synonym for: MITIGATE",
+    "options": [
+      {
+        "key": "A",
+        "text": "Aggravate"
+      },
+      {
+        "key": "B",
+        "text": "Alleviate"
+      },
+      {
+        "key": "C",
+        "text": "Intensify"
+      },
+      {
+        "key": "D",
+        "text": "Ignore"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "To mitigate means to make less severe, serious, or painful (alleviate).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 5,
+    "topicTag": "Synonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the closest synonym for: EPHEMERAL",
+    "options": [
+      {
+        "key": "A",
+        "text": "Eternal"
+      },
+      {
+        "key": "B",
+        "text": "Transient"
+      },
+      {
+        "key": "C",
+        "text": "Substantial"
+      },
+      {
+        "key": "D",
+        "text": "Constant"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Ephemeral describes something lasting for a very short time (transient).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 6,
+    "topicTag": "Synonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the closest synonym for: RESILIENT",
+    "options": [
+      {
+        "key": "A",
+        "text": "Fragile"
+      },
+      {
+        "key": "B",
+        "text": "Buoyant"
+      },
+      {
+        "key": "C",
+        "text": "Rigid"
+      },
+      {
+        "key": "D",
+        "text": "Vulnerable"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Resilient means able to withstand or recover quickly from difficult conditions (buoyant/rebounding).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 7,
+    "topicTag": "Synonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the closest synonym for: UBIQUITOUS",
+    "options": [
+      {
+        "key": "A",
+        "text": "Omnipresent"
+      },
+      {
+        "key": "B",
+        "text": "Rare"
+      },
+      {
+        "key": "C",
+        "text": "Localized"
+      },
+      {
+        "key": "D",
+        "text": "Obscure"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Ubiquitous means present, appearing, or found everywhere (omnipresent).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 8,
+    "topicTag": "Synonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the closest synonym for: LUCID",
+    "options": [
+      {
+        "key": "A",
+        "text": "Ambiguous"
+      },
+      {
+        "key": "B",
+        "text": "Clear"
+      },
+      {
+        "key": "C",
+        "text": "Murky"
+      },
+      {
+        "key": "D",
+        "text": "Confusing"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Lucid means expressed clearly and easy to understand.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 9,
+    "topicTag": "Antonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the word that is opposite in meaning to: BENEVOLENT",
+    "options": [
+      {
+        "key": "A",
+        "text": "Kind"
+      },
+      {
+        "key": "B",
+        "text": "Malevolent"
+      },
+      {
+        "key": "C",
+        "text": "Generous"
+      },
+      {
+        "key": "D",
+        "text": "Helpful"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Benevolent means well-meaning and kindly; its opposite is malevolent (hostile/ill-intentioned).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 10,
+    "topicTag": "Antonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the antonym for: AUDACIOUS",
+    "options": [
+      {
+        "key": "A",
+        "text": "Bold"
+      },
+      {
+        "key": "B",
+        "text": "Timid"
+      },
+      {
+        "key": "C",
+        "text": "Daring"
+      },
+      {
+        "key": "D",
+        "text": "Courageous"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Audacious means showing a willingness to take bold risks; the opposite is timid.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 11,
+    "topicTag": "Antonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the antonym for: DILIGENT",
+    "options": [
+      {
+        "key": "A",
+        "text": "Hardworking"
+      },
+      {
+        "key": "B",
+        "text": "Lazy"
+      },
+      {
+        "key": "C",
+        "text": "Attentive"
+      },
+      {
+        "key": "D",
+        "text": "Careful"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Diligent means having or showing care and conscientiousness in one's work; opposite is lazy/slothful.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 12,
+    "topicTag": "Antonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the antonym for: VOLATILE",
+    "options": [
+      {
+        "key": "A",
+        "text": "Unstable"
+      },
+      {
+        "key": "B",
+        "text": "Predictable"
+      },
+      {
+        "key": "C",
+        "text": "Explosive"
+      },
+      {
+        "key": "D",
+        "text": "Erratic"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Volatile refers to unpredictable or rapid change; the antonym is stable or predictable.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 13,
+    "topicTag": "Antonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the antonym for: OBSOLETE",
+    "options": [
+      {
+        "key": "A",
+        "text": "Outdated"
+      },
+      {
+        "key": "B",
+        "text": "Contemporary"
+      },
+      {
+        "key": "C",
+        "text": "Archaic"
+      },
+      {
+        "key": "D",
+        "text": "Extinct"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Obsolete means no longer produced or used; opposite is contemporary or modern.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 14,
+    "topicTag": "Antonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the antonym for: GREGARIOUS",
+    "options": [
+      {
+        "key": "A",
+        "text": "Sociable"
+      },
+      {
+        "key": "B",
+        "text": "Introverted"
+      },
+      {
+        "key": "C",
+        "text": "Talkative"
+      },
+      {
+        "key": "D",
+        "text": "Outgoing"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Gregarious refers to enjoying the company of others; opposite is introverted or solitary.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 15,
+    "topicTag": "Antonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the antonym for: FECUND",
+    "options": [
+      {
+        "key": "A",
+        "text": "Fertile"
+      },
+      {
+        "key": "B",
+        "text": "Sterile"
+      },
+      {
+        "key": "C",
+        "text": "Productive"
+      },
+      {
+        "key": "D",
+        "text": "Abundant"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Fecund means fertile or highly productive; its opposite is sterile or barren.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 16,
+    "topicTag": "Antonyms",
+    "difficulty": "Expert",
+    "questionText": "Select the antonym for: TACITURN",
+    "options": [
+      {
+        "key": "A",
+        "text": "Silent"
+      },
+      {
+        "key": "B",
+        "text": "Loquacious"
+      },
+      {
+        "key": "C",
+        "text": "Reserved"
+      },
+      {
+        "key": "D",
+        "text": "Quiet"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Taciturn describes someone reserved or uncommunicative; opposite is loquacious (talkative).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 17,
+    "topicTag": "Sentence Correction",
+    "difficulty": "Expert",
+    "questionText": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "key": "A",
+        "text": "Neither of the candidates have submitted their resume."
+      },
+      {
+        "key": "B",
+        "text": "Neither of the candidates has submitted his or her resume."
+      },
+      {
+        "key": "C",
+        "text": "Neither of the candidates are submitting their resume."
+      },
+      {
+        "key": "D",
+        "text": "Neither of the candidate have submitted their resume."
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "'Neither' takes a singular verb ('has') and singular pronoun ('his or her').",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 18,
+    "topicTag": "Sentence Correction",
+    "difficulty": "Expert",
+    "questionText": "Choose the correct option: 'The jury _____ divided in their verdict.'",
+    "options": [
+      {
+        "key": "A",
+        "text": "was"
+      },
+      {
+        "key": "B",
+        "text": "were"
+      },
+      {
+        "key": "C",
+        "text": "is"
+      },
+      {
+        "key": "D",
+        "text": "have"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "When members of a collective noun act individually or disagree, plural verb 'were' is used.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 19,
+    "topicTag": "Sentence Correction",
+    "difficulty": "Expert",
+    "questionText": "Fill in the blank: 'Scarcely had she finished speaking _____ the audience erupted into applause.'",
+    "options": [
+      {
+        "key": "A",
+        "text": "than"
+      },
+      {
+        "key": "B",
+        "text": "when"
+      },
+      {
+        "key": "C",
+        "text": "then"
+      },
+      {
+        "key": "D",
+        "text": "while"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "The correlative conjunction for 'Scarcely had...' is 'when', not 'than' (No sooner... than).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 20,
+    "topicTag": "Sentence Correction",
+    "difficulty": "Expert",
+    "questionText": "Spot the error: 'One of the boys (A) / who is playing in the garden (B) / have won the scholarship (C) / No error (D)'",
+    "options": [
+      {
+        "key": "A",
+        "text": "A"
+      },
+      {
+        "key": "B",
+        "text": "B"
+      },
+      {
+        "key": "C",
+        "text": "C"
+      },
+      {
+        "key": "D",
+        "text": "D"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "The subject is 'One', which is singular. It should be 'has won the scholarship', not 'have won'.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 21,
+    "topicTag": "Sentence Correction",
+    "difficulty": "Expert",
+    "questionText": "Select the correct preposition: 'He is proficient _____ algorithmic programming.'",
+    "options": [
+      {
+        "key": "A",
+        "text": "in"
+      },
+      {
+        "key": "B",
+        "text": "at"
+      },
+      {
+        "key": "C",
+        "text": "with"
+      },
+      {
+        "key": "D",
+        "text": "on"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "The standard idiomatic idiom is 'proficient in' an academic subject, language, or field.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 22,
+    "topicTag": "Sentence Correction",
+    "difficulty": "Expert",
+    "questionText": "Choose the correct conditional sentence:",
+    "options": [
+      {
+        "key": "A",
+        "text": "If I had known about the seminar, I would attend it."
+      },
+      {
+        "key": "B",
+        "text": "If I had known about the seminar, I would have attended it."
+      },
+      {
+        "key": "C",
+        "text": "If I knew about the seminar, I will attend it."
+      },
+      {
+        "key": "D",
+        "text": "If I have known about the seminar, I would attend it."
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Third conditional form: If + past perfect (had known) ... would have + past participle (would have attended).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 23,
+    "topicTag": "Sentence Correction",
+    "difficulty": "Expert",
+    "questionText": "Select the correct form: 'Each of the students _____ given a certificate.'",
+    "options": [
+      {
+        "key": "A",
+        "text": "was"
+      },
+      {
+        "key": "B",
+        "text": "were"
+      },
+      {
+        "key": "C",
+        "text": "are"
+      },
+      {
+        "key": "D",
+        "text": "have been"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "'Each' is grammatically singular and requires the singular auxiliary verb 'was'.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 24,
+    "topicTag": "Sentence Correction",
+    "difficulty": "Expert",
+    "questionText": "Identify the correct passive voice: 'The team will complete the milestone tomorrow.'",
+    "options": [
+      {
+        "key": "A",
+        "text": "The milestone will complete by the team tomorrow."
+      },
+      {
+        "key": "B",
+        "text": "The milestone will be completed by the team tomorrow."
+      },
+      {
+        "key": "C",
+        "text": "The milestone is completed by the team tomorrow."
+      },
+      {
+        "key": "D",
+        "text": "The milestone would be completed by the team tomorrow."
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Future simple passive: 'will be' + past participle ('completed').",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 25,
+    "topicTag": "Idioms & Phrases",
+    "difficulty": "Expert",
+    "questionText": "What is the meaning of the idiom: 'Bite the bullet'?",
+    "options": [
+      {
+        "key": "A",
+        "text": "To eat greedily"
+      },
+      {
+        "key": "B",
+        "text": "To endure a painful situation courageously"
+      },
+      {
+        "key": "C",
+        "text": "To shoot accurately"
+      },
+      {
+        "key": "D",
+        "text": "To waste ammunition"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "'Bite the bullet' means to face a difficult or unpleasant situation with fortitude.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 26,
+    "topicTag": "Idioms & Phrases",
+    "difficulty": "Expert",
+    "questionText": "What does 'Burn the midnight oil' mean?",
+    "options": [
+      {
+        "key": "A",
+        "text": "To waste energy"
+      },
+      {
+        "key": "B",
+        "text": "To work or study late into the night"
+      },
+      {
+        "key": "C",
+        "text": "To light an oil lamp"
+      },
+      {
+        "key": "D",
+        "text": "To start a fire"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "'Burn the midnight oil' means to read, study, or work late at night.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 27,
+    "topicTag": "Idioms & Phrases",
+    "difficulty": "Expert",
+    "questionText": "What does 'A blessing in disguise' signify?",
+    "options": [
+      {
+        "key": "A",
+        "text": "A religious curse"
+      },
+      {
+        "key": "B",
+        "text": "An apparent misfortune that leads to a positive outcome"
+      },
+      {
+        "key": "C",
+        "text": "A hidden enemy"
+      },
+      {
+        "key": "D",
+        "text": "A false friend"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "An apparent misfortune that turns out to have beneficial results is a blessing in disguise.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 28,
+    "topicTag": "Idioms & Phrases",
+    "difficulty": "Expert",
+    "questionText": "The phrase 'Hit the nail on the head' means:",
+    "options": [
+      {
+        "key": "A",
+        "text": "To damage a wall"
+      },
+      {
+        "key": "B",
+        "text": "To describe exactly what is causing a situation or problem"
+      },
+      {
+        "key": "C",
+        "text": "To cause an accident"
+      },
+      {
+        "key": "D",
+        "text": "To build furniture"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "To state something with exact accuracy.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 29,
+    "topicTag": "Idioms & Phrases",
+    "difficulty": "Expert",
+    "questionText": "What does 'Spill the beans' mean?",
+    "options": [
+      {
+        "key": "A",
+        "text": "To cook dinner"
+      },
+      {
+        "key": "B",
+        "text": "To reveal a secret prematurely"
+      },
+      {
+        "key": "C",
+        "text": "To drop groceries"
+      },
+      {
+        "key": "D",
+        "text": "To make a mess"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "To reveal confidential information carelessly or prematurely.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 30,
+    "topicTag": "Idioms & Phrases",
+    "difficulty": "Expert",
+    "questionText": "What does 'Piece of cake' describe?",
+    "options": [
+      {
+        "key": "A",
+        "text": "A delicious dessert"
+      },
+      {
+        "key": "B",
+        "text": "A very easy task"
+      },
+      {
+        "key": "C",
+        "text": "A small fraction of a whole"
+      },
+      {
+        "key": "D",
+        "text": "A generous gift"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "'A piece of cake' refers to something easily accomplished.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 31,
+    "topicTag": "Idioms & Phrases",
+    "difficulty": "Expert",
+    "questionText": "What does 'Take with a grain of salt' mean?",
+    "options": [
+      {
+        "key": "A",
+        "text": "To season food well"
+      },
+      {
+        "key": "B",
+        "text": "To view information with skepticism"
+      },
+      {
+        "key": "C",
+        "text": "To reject completely"
+      },
+      {
+        "key": "D",
+        "text": "To accept blindly"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "To maintain skepticism and not take information as wholly true.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 32,
+    "topicTag": "Idioms & Phrases",
+    "difficulty": "Expert",
+    "questionText": "The idiom 'Through thick and thin' means:",
+    "options": [
+      {
+        "key": "A",
+        "text": "Under all conditions, no matter how difficult"
+      },
+      {
+        "key": "B",
+        "text": "Passing through dense fog"
+      },
+      {
+        "key": "C",
+        "text": "Alternating between fat and lean"
+      },
+      {
+        "key": "D",
+        "text": "With minimal effort"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Supporting someone through both good times and bad times.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 33,
+    "topicTag": "Para Jumbles",
+    "difficulty": "Expert",
+    "questionText": "Rearrange the sentences into a coherent paragraph:\n(P) Artificial intelligence has rapidly transitioned from theoretical lab prototypes into everyday systems.\n(Q) Consequently, policymakers must balance technological innovation with ethical safety standards.\n(R) As autonomous agents take on high-stakes tasks, the need for transparency becomes paramount.\n(S) These systems now diagnose illnesses, execute financial trades, and generate creative text.",
+    "options": [
+      {
+        "key": "A",
+        "text": "P - S - R - Q"
+      },
+      {
+        "key": "B",
+        "text": "P - R - S - Q"
+      },
+      {
+        "key": "C",
+        "text": "S - P - R - Q"
+      },
+      {
+        "key": "D",
+        "text": "Q - P - S - R"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "P introduces the theme, S provides concrete examples of current systems, R highlights the resulting challenge, and Q draws the policy conclusion.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 34,
+    "topicTag": "Para Jumbles",
+    "difficulty": "Expert",
+    "questionText": "Rearrange into a logical order:\n(P) Therefore, diversifying energy sources protects national sovereignty.\n(Q) Heavy dependence on foreign petroleum exposes economies to global price volatility.\n(R) Renewable infrastructure such as solar and wind provides domestic resiliency.",
+    "options": [
+      {
+        "key": "A",
+        "text": "Q - P - R"
+      },
+      {
+        "key": "B",
+        "text": "Q - R - P"
+      },
+      {
+        "key": "C",
+        "text": "R - Q - P"
+      },
+      {
+        "key": "D",
+        "text": "P - Q - R"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Q states the core problem (oil vulnerability), R proposes the solution (renewables), and P concludes with the sovereign benefit.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 35,
+    "topicTag": "Reading Comprehension",
+    "difficulty": "Expert",
+    "questionText": "Passage: 'Quantum computing leverages superposition and entanglement to perform calculations exponentially faster than classical computers for specific problem spaces such as Shor's algorithm for prime factorization.' What is the primary advantage highlighted in the text?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Quantum computers consume less electricity than classical computers"
+      },
+      {
+        "key": "B",
+        "text": "Quantum computers offer exponential acceleration on specific algorithms like factorization"
+      },
+      {
+        "key": "C",
+        "text": "Quantum computers will immediately replace all smartphones"
+      },
+      {
+        "key": "D",
+        "text": "Quantum computers do not require cooling infrastructure"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "The passage specifically mentions exponential calculation speedup for specific domains like prime factorization.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 36,
+    "topicTag": "Reading Comprehension",
+    "difficulty": "Expert",
+    "questionText": "Based on the passage in Q35, which two quantum mechanics principles enable this acceleration?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Gravity and magnetism"
+      },
+      {
+        "key": "B",
+        "text": "Superposition and entanglement"
+      },
+      {
+        "key": "C",
+        "text": "Fission and fusion"
+      },
+      {
+        "key": "D",
+        "text": "Relativity and inertia"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "The text explicitly names superposition and entanglement.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 37,
+    "topicTag": "Reading Comprehension",
+    "difficulty": "Expert",
+    "questionText": "Passage: 'Microservices architecture decomposes monolithic applications into independently deployable, modular services. While this decentralization enhances developer velocity and fault isolation, it introduces complexities in distributed network observability and eventual consistency.' According to the passage, what is a tradeoff of microservices?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Reduced modularity"
+      },
+      {
+        "key": "B",
+        "text": "Slower developer velocity"
+      },
+      {
+        "key": "C",
+        "text": "Complexities in network observability and data consistency"
+      },
+      {
+        "key": "D",
+        "text": "Complete absence of fault isolation"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "The author explicitly notes complexities in distributed observability and eventual consistency as tradeoffs.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 38,
+    "topicTag": "Reading Comprehension",
+    "difficulty": "Expert",
+    "questionText": "In the passage from Q37, what does 'fault isolation' imply?",
+    "options": [
+      {
+        "key": "A",
+        "text": "A failure in one service does not necessarily crash the entire application"
+      },
+      {
+        "key": "B",
+        "text": "Software errors are completely eliminated"
+      },
+      {
+        "key": "C",
+        "text": "Monoliths are inherently more stable than microservices"
+      },
+      {
+        "key": "D",
+        "text": "Developers no longer write test suites"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Fault isolation means a crash in an isolated microservice is contained rather than bringing down the whole system.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 39,
+    "topicTag": "Vocabulary",
+    "difficulty": "Expert",
+    "questionText": "Choose the correct word to complete the sentence: 'The CEO's speech was so _____ that even complex corporate restructuring seemed clear and intuitive.'",
+    "options": [
+      {
+        "key": "A",
+        "text": "convoluted"
+      },
+      {
+        "key": "B",
+        "text": "lucid"
+      },
+      {
+        "key": "C",
+        "text": "ambivalent"
+      },
+      {
+        "key": "D",
+        "text": "tenuous"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "'Lucid' means expressed clearly and easy to understand.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 5,
+    "questionNumber": 40,
+    "topicTag": "Vocabulary",
+    "difficulty": "Expert",
+    "questionText": "Choose the word that fits: 'The scientist offered an _____ argument supported by irrefutable empirical evidence.'",
+    "options": [
+      {
+        "key": "A",
+        "text": "incoherent"
+      },
+      {
+        "key": "B",
+        "text": "untenable"
+      },
+      {
+        "key": "C",
+        "text": "impeccable"
+      },
+      {
+        "key": "D",
+        "text": "specious"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "'Impeccable' means flawless, fitting an argument backed by irrefutable proof.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 1,
+    "topicTag": "Permutations & Combinations",
+    "difficulty": "Master",
+    "questionText": "In how many different ways can the letters of the word 'LEADING' be arranged so that the vowels always come together?",
+    "options": [
+      {
+        "key": "A",
+        "text": "360"
+      },
+      {
+        "key": "B",
+        "text": "480"
+      },
+      {
+        "key": "C",
+        "text": "720"
+      },
+      {
+        "key": "D",
+        "text": "5,040"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Vowels in LEADING are E, A, I (3 vowels). Consonants are L, D, N, G (4 consonants). Treat (E,A,I) as 1 unit: 5 units arrange in 5! = 120 ways. The 3 vowels arrange internally in 3! = 6 ways. Total = 120 * 6 = 720 ways.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 2,
+    "topicTag": "Permutations & Combinations",
+    "difficulty": "Master",
+    "questionText": "How many 4-digit numbers can be formed using digits 1, 2, 3, 4, 5 without repetition?",
+    "options": [
+      {
+        "key": "A",
+        "text": "60"
+      },
+      {
+        "key": "B",
+        "text": "120"
+      },
+      {
+        "key": "C",
+        "text": "24"
+      },
+      {
+        "key": "D",
+        "text": "125"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "5P4 = 5 * 4 * 3 * 2 = 120.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 3,
+    "topicTag": "Permutations & Combinations",
+    "difficulty": "Master",
+    "questionText": "From a group of 7 men and 6 women, 5 persons are to be selected to form a committee so that at least 3 men are there on the committee. In how many ways can it be done?",
+    "options": [
+      {
+        "key": "A",
+        "text": "564"
+      },
+      {
+        "key": "B",
+        "text": "645"
+      },
+      {
+        "key": "C",
+        "text": "735"
+      },
+      {
+        "key": "D",
+        "text": "756"
+      }
+    ],
+    "correctOption": "D",
+    "explanation": "Cases: (3M, 2W) = 7C3 * 6C2 = 35 * 15 = 525. (4M, 1W) = 7C4 * 6C1 = 35 * 6 = 210. (5M, 0W) = 7C5 * 6C0 = 21 * 1 = 21. Total = 525 + 210 + 21 = 756.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 4,
+    "topicTag": "Permutations & Combinations",
+    "difficulty": "Master",
+    "questionText": "In how many ways can 6 people be seated around a circular table?",
+    "options": [
+      {
+        "key": "A",
+        "text": "120"
+      },
+      {
+        "key": "B",
+        "text": "720"
+      },
+      {
+        "key": "C",
+        "text": "60"
+      },
+      {
+        "key": "D",
+        "text": "24"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Circular permutation of n objects = (n - 1)! = (6 - 1)! = 5! = 120 ways.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 5,
+    "topicTag": "Permutations & Combinations",
+    "difficulty": "Master",
+    "questionText": "How many diagonals does a regular polygon with 10 sides have?",
+    "options": [
+      {
+        "key": "A",
+        "text": "25"
+      },
+      {
+        "key": "B",
+        "text": "30"
+      },
+      {
+        "key": "C",
+        "text": "35"
+      },
+      {
+        "key": "D",
+        "text": "45"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Formula for number of diagonals = n(n - 3) / 2 = 10(7) / 2 = 35.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 6,
+    "topicTag": "Permutations & Combinations",
+    "difficulty": "Master",
+    "questionText": "In how many ways can a cricket eleven be chosen out of 14 players if 2 particular players must always be included?",
+    "options": [
+      {
+        "key": "A",
+        "text": "220"
+      },
+      {
+        "key": "B",
+        "text": "165"
+      },
+      {
+        "key": "C",
+        "text": "286"
+      },
+      {
+        "key": "D",
+        "text": "330"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Since 2 players are fixed, we choose remaining 9 players from 12 available: 12C9 = 12C3 = (12 * 11 * 10) / (3 * 2 * 1) = 220.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 7,
+    "topicTag": "Permutations & Combinations",
+    "difficulty": "Master",
+    "questionText": "How many distinct signals can be given using 5 flags of different colors, using any number of them at a time?",
+    "options": [
+      {
+        "key": "A",
+        "text": "320"
+      },
+      {
+        "key": "B",
+        "text": "325"
+      },
+      {
+        "key": "C",
+        "text": "240"
+      },
+      {
+        "key": "D",
+        "text": "120"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "5P1 + 5P2 + 5P3 + 5P4 + 5P5 = 5 + 20 + 60 + 120 + 120 = 325.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 8,
+    "topicTag": "Permutations & Combinations",
+    "difficulty": "Master",
+    "questionText": "In how many ways can 4 prizes be given to 3 boys when each boy is eligible for any number of prizes?",
+    "options": [
+      {
+        "key": "A",
+        "text": "12"
+      },
+      {
+        "key": "B",
+        "text": "64"
+      },
+      {
+        "key": "C",
+        "text": "81"
+      },
+      {
+        "key": "D",
+        "text": "24"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Each of the 4 prizes can be awarded to any of the 3 boys. Total ways = 3 * 3 * 3 * 3 = 3^4 = 81.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 9,
+    "topicTag": "Probability",
+    "difficulty": "Master",
+    "questionText": "Two fair dice are thrown simultaneously. What is the probability of getting a sum of 8?",
+    "options": [
+      {
+        "key": "A",
+        "text": "1/6"
+      },
+      {
+        "key": "B",
+        "text": "5/36"
+      },
+      {
+        "key": "C",
+        "text": "7/36"
+      },
+      {
+        "key": "D",
+        "text": "1/9"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Total outcomes = 36. Favorable sums of 8: (2,6), (3,5), (4,4), (5,3), (6,2) -> 5 outcomes. Probability = 5/36.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 10,
+    "topicTag": "Probability",
+    "difficulty": "Master",
+    "questionText": "A bag contains 6 black and 8 white balls. One ball is drawn at random. What is the probability that the ball drawn is white?",
+    "options": [
+      {
+        "key": "A",
+        "text": "3/7"
+      },
+      {
+        "key": "B",
+        "text": "4/7"
+      },
+      {
+        "key": "C",
+        "text": "3/4"
+      },
+      {
+        "key": "D",
+        "text": "1/2"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Total balls = 14. White balls = 8. Probability = 8/14 = 4/7.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 11,
+    "topicTag": "Probability",
+    "difficulty": "Master",
+    "questionText": "From a pack of 52 playing cards, two cards are drawn together at random. What is the probability of both being kings?",
+    "options": [
+      {
+        "key": "A",
+        "text": "1/15"
+      },
+      {
+        "key": "B",
+        "text": "1/221"
+      },
+      {
+        "key": "C",
+        "text": "2/221"
+      },
+      {
+        "key": "D",
+        "text": "4/663"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "4C2 / 52C2 = 6 / 1326 = 1 / 221.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 12,
+    "topicTag": "Probability",
+    "difficulty": "Master",
+    "questionText": "Three unbiased coins are tossed. What is the probability of getting at least 2 heads?",
+    "options": [
+      {
+        "key": "A",
+        "text": "1/4"
+      },
+      {
+        "key": "B",
+        "text": "3/8"
+      },
+      {
+        "key": "C",
+        "text": "1/2"
+      },
+      {
+        "key": "D",
+        "text": "5/8"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Total outcomes = 8. Favorable (at least 2 heads): HHT, HTH, THH, HHH (4 outcomes). Probability = 4/8 = 1/2.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 13,
+    "topicTag": "Probability",
+    "difficulty": "Master",
+    "questionText": "The probability that A can solve a problem is 2/3 and that B can solve it is 3/4. If both try, what is the probability that the problem is solved?",
+    "options": [
+      {
+        "key": "A",
+        "text": "1/12"
+      },
+      {
+        "key": "B",
+        "text": "5/12"
+      },
+      {
+        "key": "C",
+        "text": "11/12"
+      },
+      {
+        "key": "D",
+        "text": "1/2"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "P(problem solved) = 1 - P(neither solves) = 1 - (1 - 2/3)(1 - 3/4) = 1 - (1/3)(1/4) = 1 - 1/12 = 11/12.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 14,
+    "topicTag": "Probability",
+    "difficulty": "Master",
+    "questionText": "In a single throw of two dice, what is the probability of getting a doublet (both dice showing the same number)?",
+    "options": [
+      {
+        "key": "A",
+        "text": "1/6"
+      },
+      {
+        "key": "B",
+        "text": "1/12"
+      },
+      {
+        "key": "C",
+        "text": "1/36"
+      },
+      {
+        "key": "D",
+        "text": "5/36"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Favorable pairs: (1,1), (2,2), (3,3), (4,4), (5,5), (6,6) = 6 outcomes. 6 / 36 = 1/6.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 15,
+    "topicTag": "Probability",
+    "difficulty": "Master",
+    "questionText": "A card is drawn from a pack of 52 cards. What is the probability of getting a queen of club or a king of heart?",
+    "options": [
+      {
+        "key": "A",
+        "text": "1/13"
+      },
+      {
+        "key": "B",
+        "text": "2/13"
+      },
+      {
+        "key": "C",
+        "text": "1/26"
+      },
+      {
+        "key": "D",
+        "text": "1/52"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "There is 1 queen of clubs and 1 king of hearts. Total favorable = 2. Probability = 2/52 = 1/26.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 16,
+    "topicTag": "Probability",
+    "difficulty": "Master",
+    "questionText": "What is the probability that a leap year selected at random will contain 53 Sundays?",
+    "options": [
+      {
+        "key": "A",
+        "text": "1/7"
+      },
+      {
+        "key": "B",
+        "text": "2/7"
+      },
+      {
+        "key": "C",
+        "text": "3/7"
+      },
+      {
+        "key": "D",
+        "text": "5/7"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "A leap year has 366 days = 52 weeks + 2 odd days. The 2 extra days can be (Sun,Mon), (Mon,Tue), (Tue,Wed), (Wed,Thu), (Thu,Fri), (Fri,Sat), (Sat,Sun) -> 7 combinations. Favorable containing Sunday = 2. Probability = 2/7.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 17,
+    "topicTag": "Probability",
+    "difficulty": "Master",
+    "questionText": "Box A contains 2 red and 3 green balls. Box B contains 4 red and 1 green ball. A box is chosen at random and a ball drawn. Find the probability of drawing a red ball.",
+    "options": [
+      {
+        "key": "A",
+        "text": "1/2"
+      },
+      {
+        "key": "B",
+        "text": "3/5"
+      },
+      {
+        "key": "C",
+        "text": "7/10"
+      },
+      {
+        "key": "D",
+        "text": "4/5"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "P(Red) = (1/2)*(2/5) + (1/2)*(4/5) = 2/10 + 4/10 = 6/10 = 3/5? Wait, (2/5 + 4/5)/2 = 6/10 = 3/5. Let's fix correct option to B (3/5).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 18,
+    "topicTag": "Probability",
+    "difficulty": "Master",
+    "questionText": "A speak truth in 75% of cases and B in 80% of cases. In what percentage of cases are they likely to contradict each other in narrating the same event?",
+    "options": [
+      {
+        "key": "A",
+        "text": "30%"
+      },
+      {
+        "key": "B",
+        "text": "35%"
+      },
+      {
+        "key": "C",
+        "text": "40%"
+      },
+      {
+        "key": "D",
+        "text": "45%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "P(contradict) = P(A)*P(not B) + P(not A)*P(B) = (0.75)*(0.20) + (0.25)*(0.80) = 0.15 + 0.20 = 0.35 = 35%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 19,
+    "topicTag": "Mensuration",
+    "difficulty": "Master",
+    "questionText": "The area of a rectangular field is 460 m^2. If the length is 15% more than the breadth, what is the breadth of the field?",
+    "options": [
+      {
+        "key": "A",
+        "text": "15 m"
+      },
+      {
+        "key": "B",
+        "text": "20 m"
+      },
+      {
+        "key": "C",
+        "text": "25 m"
+      },
+      {
+        "key": "D",
+        "text": "22 m"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "L = 1.15 B. Area = 1.15 B^2 = 460 => B^2 = 460 / 1.15 = 400 => B = 20 m.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 20,
+    "topicTag": "Mensuration",
+    "difficulty": "Master",
+    "questionText": "The perimeter of a square is equal to the perimeter of a rectangle with length 16 cm and breadth 12 cm. Find the area of the square.",
+    "options": [
+      {
+        "key": "A",
+        "text": "144 cm^2"
+      },
+      {
+        "key": "B",
+        "text": "196 cm^2"
+      },
+      {
+        "key": "C",
+        "text": "169 cm^2"
+      },
+      {
+        "key": "D",
+        "text": "225 cm^2"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Perimeter of rectangle = 2(16 + 12) = 56 cm. Side of square = 56 / 4 = 14 cm. Area of square = 14^2 = 196 cm^2.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 21,
+    "topicTag": "Mensuration",
+    "difficulty": "Master",
+    "questionText": "The diagonal of a cube is 6 * sqrt(3) cm. Find its volume.",
+    "options": [
+      {
+        "key": "A",
+        "text": "108 cm^3"
+      },
+      {
+        "key": "B",
+        "text": "216 cm^3"
+      },
+      {
+        "key": "C",
+        "text": "144 cm^3"
+      },
+      {
+        "key": "D",
+        "text": "256 cm^3"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Diagonal of cube = a * sqrt(3) => a = 6 cm. Volume = a^3 = 6^3 = 216 cm^3.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 22,
+    "topicTag": "Mensuration",
+    "difficulty": "Master",
+    "questionText": "Find the surface area of a sphere of radius 7 cm (use pi = 22/7).",
+    "options": [
+      {
+        "key": "A",
+        "text": "576 cm^2"
+      },
+      {
+        "key": "B",
+        "text": "616 cm^2"
+      },
+      {
+        "key": "C",
+        "text": "644 cm^2"
+      },
+      {
+        "key": "D",
+        "text": "686 cm^2"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Surface area = 4 * pi * r^2 = 4 * (22/7) * 7 * 7 = 4 * 22 * 7 = 616 cm^2.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 23,
+    "topicTag": "Mensuration",
+    "difficulty": "Master",
+    "questionText": "A cylinder and a cone have the same base radius and height. What is the ratio of their volumes?",
+    "options": [
+      {
+        "key": "A",
+        "text": "2 : 1"
+      },
+      {
+        "key": "B",
+        "text": "3 : 1"
+      },
+      {
+        "key": "C",
+        "text": "3 : 2"
+      },
+      {
+        "key": "D",
+        "text": "4 : 1"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Volume of cylinder = pi * r^2 * h. Volume of cone = (1/3) * pi * r^2 * h. Ratio = 1 : (1/3) = 3 : 1.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 24,
+    "topicTag": "Mensuration",
+    "difficulty": "Master",
+    "questionText": "How many spherical bullets of radius 3 cm can be made from a solid metallic sphere of radius 12 cm?",
+    "options": [
+      {
+        "key": "A",
+        "text": "16"
+      },
+      {
+        "key": "B",
+        "text": "32"
+      },
+      {
+        "key": "C",
+        "text": "64"
+      },
+      {
+        "key": "D",
+        "text": "128"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Number of bullets = (R / r)^3 = (12 / 3)^3 = 4^3 = 64.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 25,
+    "topicTag": "Mensuration",
+    "difficulty": "Master",
+    "questionText": "The length of the longest rod that can be placed in a room of dimensions 10m x 10m x 5m is:",
+    "options": [
+      {
+        "key": "A",
+        "text": "15 m"
+      },
+      {
+        "key": "B",
+        "text": "16 m"
+      },
+      {
+        "key": "C",
+        "text": "17 m"
+      },
+      {
+        "key": "D",
+        "text": "18 m"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Diagonal = sqrt(L^2 + W^2 + H^2) = sqrt(100 + 100 + 25) = sqrt(225) = 15 m.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 26,
+    "topicTag": "Mensuration",
+    "difficulty": "Master",
+    "questionText": "If the radius of a sphere is doubled, by what factor does its volume increase?",
+    "options": [
+      {
+        "key": "A",
+        "text": "2 times"
+      },
+      {
+        "key": "B",
+        "text": "4 times"
+      },
+      {
+        "key": "C",
+        "text": "8 times"
+      },
+      {
+        "key": "D",
+        "text": "16 times"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Volume proportional to r^3. (2r)^3 = 8 * r^3 (increases by a factor of 8).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 27,
+    "topicTag": "Data Interpretation",
+    "difficulty": "Master",
+    "questionText": "In a company of 500 employees, a pie chart shows: Engineering 40%, Sales 25%, Marketing 20%, HR 15%. How many more employees are in Engineering than Marketing?",
+    "options": [
+      {
+        "key": "A",
+        "text": "80"
+      },
+      {
+        "key": "B",
+        "text": "100"
+      },
+      {
+        "key": "C",
+        "text": "120"
+      },
+      {
+        "key": "D",
+        "text": "150"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Difference = 40% - 20% = 20%. 20% of 500 = 0.20 * 500 = 100 employees.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 28,
+    "topicTag": "Data Interpretation",
+    "difficulty": "Master",
+    "questionText": "A bar chart shows annual revenues of a startup: Year 1: $120k, Year 2: $180k, Year 3: $270k. What is the percentage growth in revenue from Year 1 to Year 3?",
+    "options": [
+      {
+        "key": "A",
+        "text": "100%"
+      },
+      {
+        "key": "B",
+        "text": "125%"
+      },
+      {
+        "key": "C",
+        "text": "150%"
+      },
+      {
+        "key": "D",
+        "text": "175%"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Growth = (270 - 120) / 120 * 100 = (150 / 120) * 100 = 125%.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 29,
+    "topicTag": "Data Interpretation",
+    "difficulty": "Master",
+    "questionText": "A table lists quarterly production units: Q1: 4,000, Q2: 5,500, Q3: 6,000, Q4: 4,500. What is the average quarterly production?",
+    "options": [
+      {
+        "key": "A",
+        "text": "4,800"
+      },
+      {
+        "key": "B",
+        "text": "5,000"
+      },
+      {
+        "key": "C",
+        "text": "5,200"
+      },
+      {
+        "key": "D",
+        "text": "5,500"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Sum = 4000 + 5500 + 6000 + 4500 = 20,000. Average = 20000 / 4 = 5,000 units.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 30,
+    "topicTag": "Data Interpretation",
+    "difficulty": "Master",
+    "questionText": "In a pie chart, what central angle corresponds to an expenditure slice of 35%?",
+    "options": [
+      {
+        "key": "A",
+        "text": "108 degrees"
+      },
+      {
+        "key": "B",
+        "text": "120 degrees"
+      },
+      {
+        "key": "C",
+        "text": "126 degrees"
+      },
+      {
+        "key": "D",
+        "text": "135 degrees"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Angle = 0.35 * 360 degrees = 126 degrees.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 31,
+    "topicTag": "Data Interpretation",
+    "difficulty": "Master",
+    "questionText": "A factory produces two types of items X and Y in the ratio 3 : 2. If 1,200 items of type X were produced in a month, find the total production (X + Y).",
+    "options": [
+      {
+        "key": "A",
+        "text": "1,800"
+      },
+      {
+        "key": "B",
+        "text": "2,000"
+      },
+      {
+        "key": "C",
+        "text": "2,200"
+      },
+      {
+        "key": "D",
+        "text": "2,400"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "3 parts = 1200 => 1 part = 400. Total parts = 3 + 2 = 5 parts = 5 * 400 = 2,000 items.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 32,
+    "topicTag": "Data Interpretation",
+    "difficulty": "Master",
+    "questionText": "A line graph shows fuel consumption over 5 days: Day 1: 15L, Day 2: 20L, Day 3: 25L, Day 4: 18L, Day 5: 22L. On which day was the percentage increase in consumption highest over the previous day?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Day 2"
+      },
+      {
+        "key": "B",
+        "text": "Day 3"
+      },
+      {
+        "key": "C",
+        "text": "Day 4"
+      },
+      {
+        "key": "D",
+        "text": "Day 5"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Day 1 to 2: (20 - 15)/15 = 5/15 = 33.33%. Day 2 to 3: (25 - 20)/20 = 5/20 = 25%. Day 4 to 5: (22 - 18)/18 = 4/18 = 22.2%. Highest increase was on Day 2 (33.33%).",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 33,
+    "topicTag": "Data Interpretation",
+    "difficulty": "Master",
+    "questionText": "In an examination, 70% candidates passed in English, 80% passed in Mathematics, and 10% failed in both. If 144 candidates passed in both subjects, find the total candidates.",
+    "options": [
+      {
+        "key": "A",
+        "text": "200"
+      },
+      {
+        "key": "B",
+        "text": "240"
+      },
+      {
+        "key": "C",
+        "text": "250"
+      },
+      {
+        "key": "D",
+        "text": "300"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Passed in at least one = 100% - 10% = 90%. Passed in both = 70% + 80% - 90% = 60%. 60% of Total = 144 => Total = 144 / 0.60 = 240.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 34,
+    "topicTag": "Data Interpretation",
+    "difficulty": "Master",
+    "questionText": "A chart depicts expenditures: Rent 25%, Food 30%, Travel 15%, Savings 30%. If the person spends $600 on Rent, how much does he spend on Food?",
+    "options": [
+      {
+        "key": "A",
+        "text": "$680"
+      },
+      {
+        "key": "B",
+        "text": "$720"
+      },
+      {
+        "key": "C",
+        "text": "$750"
+      },
+      {
+        "key": "D",
+        "text": "$800"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "25% = $600 => 1% = $24. Food (30%) = 30 * $24 = $720.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 35,
+    "topicTag": "Mixtures & Alligations",
+    "difficulty": "Master",
+    "questionText": "In what ratio must tea worth $60 per kg be mixed with tea worth $65 per kg so that the mixture is worth $62 per kg?",
+    "options": [
+      {
+        "key": "A",
+        "text": "3 : 2"
+      },
+      {
+        "key": "B",
+        "text": "2 : 3"
+      },
+      {
+        "key": "C",
+        "text": "1 : 2"
+      },
+      {
+        "key": "D",
+        "text": "4 : 3"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "By alligation: (65 - 62) : (62 - 60) = 3 : 2.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 36,
+    "topicTag": "Mixtures & Alligations",
+    "difficulty": "Master",
+    "questionText": "A container contains 40 liters of milk. From this container, 4 liters of milk was taken out and replaced by water. This process was repeated further two times. How much milk is now contained by the container?",
+    "options": [
+      {
+        "key": "A",
+        "text": "26.34 L"
+      },
+      {
+        "key": "B",
+        "text": "27.36 L"
+      },
+      {
+        "key": "C",
+        "text": "28 L"
+      },
+      {
+        "key": "D",
+        "text": "29.16 L"
+      }
+    ],
+    "correctOption": "D",
+    "explanation": "Formula: Amount = Initial * (1 - x/C)^n = 40 * (1 - 4/40)^3 = 40 * (0.9)^3 = 40 * 0.729 = 29.16 liters.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 37,
+    "topicTag": "Mixtures & Alligations",
+    "difficulty": "Master",
+    "questionText": "In a 60-liter mixture of milk and water, the ratio of milk to water is 2 : 1. How much water must be added to make the ratio 1 : 2?",
+    "options": [
+      {
+        "key": "A",
+        "text": "40 L"
+      },
+      {
+        "key": "B",
+        "text": "50 L"
+      },
+      {
+        "key": "C",
+        "text": "60 L"
+      },
+      {
+        "key": "D",
+        "text": "80 L"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Milk = (2/3)*60 = 40 L, Water = 20 L. For ratio 1 : 2, Water = 2 * Milk = 2 * 40 = 80 L. Water to add = 80 - 20 = 60 liters.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 38,
+    "topicTag": "Mixtures & Alligations",
+    "difficulty": "Master",
+    "questionText": "A merchant has 1,000 kg of sugar, part of which he sells at 8% profit and the rest at 18% profit. He gains 14% on the whole. The quantity sold at 18% profit is:",
+    "options": [
+      {
+        "key": "A",
+        "text": "400 kg"
+      },
+      {
+        "key": "B",
+        "text": "500 kg"
+      },
+      {
+        "key": "C",
+        "text": "600 kg"
+      },
+      {
+        "key": "D",
+        "text": "700 kg"
+      }
+    ],
+    "correctOption": "C",
+    "explanation": "Alligation: (18 - 14) : (14 - 8) = 4 : 6 = 2 : 3. Ratio = 2 : 3. Quantity at 18% = [3 / (2 + 3)] * 1000 = (3/5) * 1000 = 600 kg.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 39,
+    "topicTag": "Mixtures & Alligations",
+    "difficulty": "Master",
+    "questionText": "Two vessels A and B contain milk and water in the ratio 5 : 2 and 8 : 5 respectively. In what ratio should these mixtures be mixed to get a new mixture containing milk and water in the ratio 9 : 4?",
+    "options": [
+      {
+        "key": "A",
+        "text": "7 : 2"
+      },
+      {
+        "key": "B",
+        "text": "5 : 3"
+      },
+      {
+        "key": "C",
+        "text": "2 : 3"
+      },
+      {
+        "key": "D",
+        "text": "3 : 5"
+      }
+    ],
+    "correctOption": "A",
+    "explanation": "Fraction of milk in A = 5/7, in B = 8/13, in target = 9/13. By alligation: (9/13 - 8/13) : (5/7 - 9/13) = (1/13) : (65 - 63)/91 = (1/13) : (2/91) = 7 : 2.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  },
+  {
+    "levelNumber": 6,
+    "questionNumber": 40,
+    "topicTag": "Mixtures & Alligations",
+    "difficulty": "Master",
+    "questionText": "How many kilograms of rice costing $9 per kg must be mixed with 27 kg of rice costing $7 per kg so that there may be a gain of 10% by selling the mixture at $9.24 per kg?",
+    "options": [
+      {
+        "key": "A",
+        "text": "54 kg"
+      },
+      {
+        "key": "B",
+        "text": "63 kg"
+      },
+      {
+        "key": "C",
+        "text": "45 kg"
+      },
+      {
+        "key": "D",
+        "text": "36 kg"
+      }
+    ],
+    "correctOption": "B",
+    "explanation": "Mean cost price = 9.24 / 1.10 = $8.40. Alligation: (8.40 - 7) / (9 - 8.40) = 1.40 / 0.60 = 7 / 3. Rice at $9 / Rice at $7 = 7 / 3. x / 27 = 7 / 3 => x = 63 kg.",
+    "marks": 1.0,
+    "negativeMarks": 0.25
+  }
+]

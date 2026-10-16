@@ -7,6 +7,7 @@ import {
   Coffee, 
   Terminal, 
   Braces, 
+  BrainCircuit,
   ArrowRight, 
   Award, 
   RefreshCw,
@@ -16,7 +17,7 @@ import {
 interface CourseItem {
   id: string;
   name: string;
-  language: 'c' | 'cpp' | 'java' | 'python' | 'javascript';
+  language: 'c' | 'cpp' | 'java' | 'python' | 'javascript' | 'aptitude' | string;
   description: string;
   icon: string;
   totalLevels: number;
@@ -62,6 +63,7 @@ export const Courses: React.FC = () => {
       case 'java': return <Coffee className="h-6 w-6 text-amber-400" />;
       case 'python': return <Terminal className="h-6 w-6 text-emerald-400" />;
       case 'javascript': return <Braces className="h-6 w-6 text-yellow-400" />;
+      case 'aptitude': return <BrainCircuit className="h-6 w-6 text-purple-400" />;
       default: return <Code2 className="h-6 w-6 text-brand-400" />;
     }
   };
@@ -80,10 +82,10 @@ export const Courses: React.FC = () => {
       {/* Catalog Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          Programming Course Catalog
+          Assessment Course Catalog
         </h1>
         <p className="text-xs sm:text-sm text-surface-400 mt-1 max-w-3xl">
-          Select a programming language to view the four difficulty tiers: Beginner, Intermediate, Advanced, and Expert. Complete each level with a perfect 100/100 score to unlock the next challenge.
+          Select a course curriculum to view difficulty tiers and syllabus. Clear each level to unlock advanced tiers and earn verified credentials.
         </p>
       </div>
 
@@ -97,7 +99,8 @@ export const Courses: React.FC = () => {
       {/* Course Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course) => {
-          const completionPct = Math.round((course.completedLevels.length / course.totalLevels) * 100);
+          const numLevels = course.totalLevels || 4;
+          const completionPct = Math.round((course.completedLevels.length / numLevels) * 100);
 
           return (
             <div
@@ -111,7 +114,7 @@ export const Courses: React.FC = () => {
                     {getLanguageIcon(course.language)}
                   </div>
                   <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-surface-800 text-surface-300 border border-surface-700">
-                    4 Levels
+                    {numLevels} Levels
                   </span>
                 </div>
 
@@ -128,7 +131,7 @@ export const Courses: React.FC = () => {
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-surface-400">Current Level</span>
                     <span className="font-semibold text-white">
-                      Level {course.currentUnlockedLevel} of 4
+                      Level {course.currentUnlockedLevel} of {numLevels}
                     </span>
                   </div>
                   <div className="w-full bg-surface-950 rounded-full h-2 overflow-hidden border border-surface-800">

@@ -11,12 +11,23 @@ export interface ITestResult {
 export interface IQuestionSubmission {
   questionId: mongoose.Types.ObjectId;
   questionNumber: number;
-  code: string;
-  language: string;
-  sampleTestPassed: boolean;
+  questionType?: 'coding' | 'mcq';
+  
+  // For coding questions
+  code?: string;
+  language?: string;
+  sampleTestPassed?: boolean;
   sampleExecutionOutput?: string;
-  testResults: ITestResult[];
-  questionScore: number; // 0 to 50
+  testResults?: ITestResult[];
+
+  // For MCQ / Aptitude questions
+  selectedOption?: string; // 'A' | 'B' | 'C' | 'D' or empty/null
+  correctOption?: string;  // Included in results
+  isCorrect?: boolean;
+  isNegativeMarked?: boolean;
+  explanation?: string;
+
+  questionScore: number; // Can be decimal for aptitude (-0.25, 0, 1.0) or 0-50 for coding
   submittedAt?: Date;
 }
 
@@ -25,10 +36,17 @@ export interface IAssessmentAttempt extends Document {
   courseId: mongoose.Types.ObjectId;
   levelId: mongoose.Types.ObjectId;
   levelNumber: number;
+  assessmentType: 'coding' | 'aptitude';
   bookingId?: mongoose.Types.ObjectId;
   questionSubmissions: IQuestionSubmission[];
-  totalScore: number; // 0 to 100
-  passed: boolean; // true only if totalScore === 100
+  totalScore: number; // float/number
+  maxScore: number; // 40 for aptitude, 100 for coding
+  passingScore: number; // 24 for aptitude, 100 for coding
+  passed: boolean;
+  correctCount?: number;
+  wrongCount?: number;
+  unattemptedCount?: number;
+  negativePenalty?: number;
   status: 'IN_PROGRESS' | 'SUBMITTED' | 'AWAITING_EXIT_VERIFICATION' | 'EXIT_VERIFIED' | 'COMPLETED' | 'EXPIRED';
   startedAt: Date;
   completedAt?: Date;
@@ -62,14 +80,20 @@ const testResultSchema = new Schema<ITestResult>(
 
 const questionSubmissionSchema = new Schema<IQuestionSubmission>(
   {
-    questionId: { type: Schema.Types.ObjectId, ref: 'CodingQuestion', required: true },
+    questionId: { type: Schema.Types.ObjectId, required: true },
     questionNumber: { type: Number, required: true },
+    questionType: { type: String, enum: ['coding', 'mcq'], default: 'coding' },
     code: { type: String, default: '' },
-    language: { type: String, required: true },
+    language: { type: String },
     sampleTestPassed: { type: Boolean, default: false },
     sampleExecutionOutput: { type: String },
     testResults: [testResultSchema],
-    questionScore: { type: Number, default: 0, min: 0, max: 50 },
+    selectedOption: { type: String, default: '' },
+    correctOption: { type: String },
+    isCorrect: { type: Boolean },
+    isNegativeMarked: { type: Boolean },
+    explanation: { type: String },
+    questionScore: { type: Number, default: 0 },
     submittedAt: { type: Date },
   },
   { _id: false }
@@ -99,6 +123,11 @@ const assessmentAttemptSchema = new Schema<IAssessmentAttempt>(
       type: Number,
       required: true,
     },
+    assessmentType: {
+      type: String,
+      enum: ['coding', 'aptitude'],
+      default: 'coding',
+    },
     bookingId: {
       type: Schema.Types.ObjectId,
       ref: 'Booking',
@@ -107,12 +136,34 @@ const assessmentAttemptSchema = new Schema<IAssessmentAttempt>(
     totalScore: {
       type: Number,
       default: 0,
-      min: 0,
-      max: 100,
+    },
+    maxScore: {
+      type: Number,
+      default: 100,
+    },
+    passingScore: {
+      type: Number,
+      default: 100,
     },
     passed: {
       type: Boolean,
       default: false,
+    },
+    correctCount: {
+      type: Number,
+      default: 0,
+    },
+    wrongCount: {
+      type: Number,
+      default: 0,
+    },
+    unattemptedCount: {
+      type: Number,
+      default: 0,
+    },
+    negativePenalty: {
+      type: Number,
+      default: 0,
     },
     status: {
       type: String,
@@ -136,7 +187,7 @@ const assessmentAttemptSchema = new Schema<IAssessmentAttempt>(
     },
     otpHash: {
       type: String,
-      select: false, // Never return OTP hash in default queries
+      select: false,
     },
     otpGeneratedAt: {
       type: Date,

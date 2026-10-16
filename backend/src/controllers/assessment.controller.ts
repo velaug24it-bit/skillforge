@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import {
   AssessmentAttempt,
   CodingQuestion,
+  AptitudeQuestion,
   Course,
   AssessmentLevel,
   StudentProgress,
@@ -54,9 +55,10 @@ export const startAssessment = async (
     }
 
     if (level.levelNumber > progress.currentUnlockedLevel) {
+      const passRequirement = course.language === 'aptitude' ? '24/40' : '100/100';
       return next(
         new AppError(
-          `Level ${level.levelNumber} is locked. You must clear Level ${progress.currentUnlockedLevel} with 100/100 to unlock it.`,
+          `Level ${level.levelNumber} is locked. You must clear Level ${progress.currentUnlockedLevel} with ${passRequirement} to unlock it.`,
           403
         )
       );
@@ -73,6 +75,7 @@ export const startAssessment = async (
     });
 
     let bookingToUse: any = null;
+    const isAptitude = course.language === 'aptitude' || level.assessmentType === 'aptitude';
 
     // If no active non-expired attempt, verify booking and create a new attempt
     if (!attempt) {
@@ -139,14 +142,50 @@ export const startAssessment = async (
       // 60 minutes duration
       const expiresAt = new Date(Date.now() + (level.durationMinutes || 60) * 60 * 1000);
 
-      // Find the 2 questions for this level
-      const questions = await CodingQuestion.find({
-        courseId: course._id,
-        levelNumber: level.levelNumber,
-      }).sort({ questionNumber: 1 });
+      let questionSubmissions: any[] = [];
 
-      if (questions.length < 2) {
-        return next(new AppError('This level does not have the required 2 coding questions configured yet.', 500));
+      if (isAptitude) {
+        const aptQuestions = await AptitudeQuestion.find({
+          courseId: course._id,
+          levelNumber: level.levelNumber,
+        }).sort({ questionNumber: 1 });
+
+        if (aptQuestions.length < 40) {
+          return next(
+            new AppError(
+              `This level does not have the required 40 aptitude questions configured yet. Found ${aptQuestions.length}.`,
+              500
+            )
+          );
+        }
+
+        questionSubmissions = aptQuestions.map((q) => ({
+          questionId: q._id,
+          questionNumber: q.questionNumber,
+          questionType: 'mcq',
+          selectedOption: '',
+          questionScore: 0,
+        }));
+      } else {
+        const questions = await CodingQuestion.find({
+          courseId: course._id,
+          levelNumber: level.levelNumber,
+        }).sort({ questionNumber: 1 });
+
+        if (questions.length < 2) {
+          return next(new AppError('This level does not have the required 2 coding questions configured yet.', 500));
+        }
+
+        questionSubmissions = questions.map((q) => ({
+          questionId: q._id,
+          questionNumber: q.questionNumber,
+          questionType: 'coding',
+          code: (q.starterCode instanceof Map ? (q.starterCode as any).get(course.language) : (q.starterCode as any)?.[course.language]) || '',
+          language: course.language,
+          sampleTestPassed: false,
+          testResults: [],
+          questionScore: 0,
+        }));
       }
 
       attempt = await AssessmentAttempt.create({
@@ -154,19 +193,15 @@ export const startAssessment = async (
         courseId: course._id,
         levelId: level._id,
         levelNumber: level.levelNumber,
+        assessmentType: isAptitude ? 'aptitude' : 'coding',
+        totalScore: 0,
+        maxScore: isAptitude ? 40 : 100,
+        passingScore: isAptitude ? 24 : 100,
         bookingId: bookingToUse ? bookingToUse._id : (bookingId ? new mongoose.Types.ObjectId(bookingId) : undefined),
         status: 'IN_PROGRESS',
         startedAt: now,
         expiresAt,
-        questionSubmissions: questions.map((q) => ({
-          questionId: q._id,
-          questionNumber: q.questionNumber,
-          code: (q.starterCode instanceof Map ? (q.starterCode as any).get(course.language) : (q.starterCode as any)?.[course.language]) || '',
-          language: course.language,
-          sampleTestPassed: false,
-          testResults: [],
-          questionScore: 0,
-        })),
+        questionSubmissions,
       });
 
       // Increment attempt counter in progress
@@ -175,13 +210,23 @@ export const startAssessment = async (
       await progress.save();
     }
 
-    // Fetch questions and omit referenceSolution
-    const rawQuestions = await CodingQuestion.find({
-      courseId: course._id,
-      levelNumber: level.levelNumber,
-    })
-      .select('-referenceSolution')
-      .sort({ questionNumber: 1 });
+    // Fetch questions: For aptitude, omit correctOption and explanation during exam
+    let rawQuestions: any[] = [];
+    if (isAptitude || attempt.assessmentType === 'aptitude') {
+      rawQuestions = await AptitudeQuestion.find({
+        courseId: course._id,
+        levelNumber: level.levelNumber,
+      })
+        .select('-correctOption -explanation')
+        .sort({ questionNumber: 1 });
+    } else {
+      rawQuestions = await CodingQuestion.find({
+        courseId: course._id,
+        levelNumber: level.levelNumber,
+      })
+        .select('-referenceSolution')
+        .sort({ questionNumber: 1 });
+    }
 
     res.status(200).json({
       success: true,
@@ -193,10 +238,23 @@ export const startAssessment = async (
         levelId: attempt.levelId,
         levelNumber: attempt.levelNumber,
         levelTitle: level.title,
+        assessmentType: attempt.assessmentType || (isAptitude ? 'aptitude' : 'coding'),
+        totalScore: attempt.totalScore,
+        maxScore: attempt.maxScore || (isAptitude ? 40 : 100),
+        passingScore: attempt.passingScore || (isAptitude ? 24 : 100),
+        negativeMarking: isAptitude ? 0.25 : 0,
         status: attempt.status,
         startedAt: attempt.startedAt,
         expiresAt: attempt.expiresAt,
-        questionSubmissions: attempt.questionSubmissions,
+        questionSubmissions: attempt.questionSubmissions.map((s) => ({
+          questionId: s.questionId,
+          questionNumber: s.questionNumber,
+          questionType: s.questionType,
+          selectedOption: s.selectedOption || '',
+          code: s.code || '',
+          language: s.language,
+          questionScore: s.questionScore || 0,
+        })),
       },
       questions: rawQuestions,
     });
@@ -564,55 +622,101 @@ export const getAssessmentAttemptById = async (
       await attempt.save();
     }
 
-    // Fetch questions and omit referenceSolution
-    const questions = await CodingQuestion.find({
-      courseId: (attempt.courseId as any)._id,
-      levelNumber: attempt.levelNumber,
-    })
-      .select('-referenceSolution')
-      .sort({ questionNumber: 1 });
-
+    const isAptitude = attempt.assessmentType === 'aptitude' || (attempt.courseId as any)?.language === 'aptitude';
     const isSubmitted = ['SUBMITTED', 'AWAITING_EXIT_VERIFICATION', 'EXIT_VERIFIED', 'COMPLETED', 'EXPIRED'].includes(attempt.status);
+
+    let questions: any[] = [];
+    if (isAptitude) {
+      if (isSubmitted) {
+        questions = await AptitudeQuestion.find({
+          courseId: (attempt.courseId as any)._id,
+          levelNumber: attempt.levelNumber,
+        }).sort({ questionNumber: 1 });
+      } else {
+        questions = await AptitudeQuestion.find({
+          courseId: (attempt.courseId as any)._id,
+          levelNumber: attempt.levelNumber,
+        })
+          .select('-correctOption -explanation')
+          .sort({ questionNumber: 1 });
+      }
+    } else {
+      questions = await CodingQuestion.find({
+        courseId: (attempt.courseId as any)._id,
+        levelNumber: attempt.levelNumber,
+      })
+        .select('-referenceSolution')
+        .sort({ questionNumber: 1 });
+    }
 
     let result = null;
     if (isSubmitted) {
-      let passedTestCasesCount = 0;
-      let totalTestCasesCount = 0;
-
-      const questionBreakdown = attempt.questionSubmissions.map((sub) => {
-        const passedTests = sub.testResults?.filter((t) => t.passed).length || 0;
-        const totalTests = 5;
-        passedTestCasesCount += passedTests;
-        totalTestCasesCount += totalTests;
-
-        return {
-          questionNumber: sub.questionNumber,
-          score: sub.questionScore,
-          maxScore: 50,
-          passedTests,
-          totalTests,
-          testResults: sub.testResults?.map((t) => ({
-            testCaseIndex: t.testCaseIndex,
-            passed: t.passed,
-            marksEarned: t.marksEarned,
-            statusDescription: t.statusDescription,
-          })) || [],
+      if (isAptitude) {
+        result = {
+          attemptId: attempt._id,
+          levelNumber: attempt.levelNumber,
+          assessmentType: 'aptitude',
+          totalScore: attempt.totalScore,
+          maxScore: attempt.maxScore || 40,
+          passingScore: attempt.passingScore || 24,
+          passed: attempt.passed,
+          correctCount: attempt.correctCount || 0,
+          wrongCount: attempt.wrongCount || 0,
+          unattemptedCount: attempt.unattemptedCount || 0,
+          negativePenalty: attempt.negativePenalty || 0,
+          levelCompletionStatus: attempt.passed ? 'COMPLETED' : 'RETRY_REQUIRED',
+          status: attempt.status,
+          isExitVerified: !!attempt.isExitVerified,
+          questionBreakdown: attempt.questionSubmissions.map((sub) => ({
+            questionNumber: sub.questionNumber,
+            questionId: sub.questionId,
+            selectedOption: sub.selectedOption || '',
+            correctOption: sub.correctOption || '',
+            isCorrect: sub.isCorrect,
+            isNegativeMarked: sub.isNegativeMarked,
+            questionScore: sub.questionScore,
+            explanation: sub.explanation || '',
+          })),
         };
-      });
+      } else {
+        let passedTestCasesCount = 0;
+        let totalTestCasesCount = 0;
 
-      result = {
-        attemptId: attempt._id,
-        levelNumber: attempt.levelNumber,
-        totalScore: attempt.totalScore,
-        maxScore: 100,
-        passed: attempt.passed,
-        passedTestCasesCount,
-        failedTestCasesCount: totalTestCasesCount - passedTestCasesCount,
-        levelCompletionStatus: attempt.passed ? 'COMPLETED' : 'RETRY_REQUIRED',
-        status: attempt.status,
-        isExitVerified: !!attempt.isExitVerified,
-        questionBreakdown,
-      };
+        const questionBreakdown = attempt.questionSubmissions.map((sub) => {
+          const passedTests = sub.testResults?.filter((t) => t.passed).length || 0;
+          const totalTests = 5;
+          passedTestCasesCount += passedTests;
+          totalTestCasesCount += totalTests;
+
+          return {
+            questionNumber: sub.questionNumber,
+            score: sub.questionScore,
+            maxScore: 50,
+            passedTests,
+            totalTests,
+            testResults: sub.testResults?.map((t) => ({
+              testCaseIndex: t.testCaseIndex,
+              passed: t.passed,
+              marksEarned: t.marksEarned,
+              statusDescription: t.statusDescription,
+            })) || [],
+          };
+        });
+
+        result = {
+          attemptId: attempt._id,
+          levelNumber: attempt.levelNumber,
+          totalScore: attempt.totalScore,
+          maxScore: 100,
+          passed: attempt.passed,
+          passedTestCasesCount,
+          failedTestCasesCount: totalTestCasesCount - passedTestCasesCount,
+          levelCompletionStatus: attempt.passed ? 'COMPLETED' : 'RETRY_REQUIRED',
+          status: attempt.status,
+          isExitVerified: !!attempt.isExitVerified,
+          questionBreakdown,
+        };
+      }
     }
 
     res.status(200).json({
@@ -625,13 +729,26 @@ export const getAssessmentAttemptById = async (
         levelId: (attempt.levelId as any)._id,
         levelNumber: attempt.levelNumber,
         levelTitle: (attempt.levelId as any).title,
+        assessmentType: attempt.assessmentType || (isAptitude ? 'aptitude' : 'coding'),
+        totalScore: attempt.totalScore,
+        maxScore: attempt.maxScore || (isAptitude ? 40 : 100),
+        passingScore: attempt.passingScore || (isAptitude ? 24 : 100),
+        negativeMarking: isAptitude ? 0.25 : 0,
         status: attempt.status,
         isSubmitted,
         isExitVerified: !!attempt.isExitVerified,
         startedAt: attempt.startedAt,
         expiresAt: attempt.expiresAt,
         finalSubmittedAt: attempt.finalSubmittedAt,
-        questionSubmissions: attempt.questionSubmissions,
+        questionSubmissions: isAptitude && !isSubmitted
+          ? attempt.questionSubmissions.map((s) => ({
+              questionId: s.questionId,
+              questionNumber: s.questionNumber,
+              questionType: s.questionType,
+              selectedOption: s.selectedOption || '',
+              questionScore: 0,
+            }))
+          : attempt.questionSubmissions,
       },
       questions,
       result,
@@ -661,6 +778,40 @@ export const submitOverallAssessment = async (
 
     // Idempotent handling: If already finalized, return current authoritative breakdown so candidate sees OTP screen
     if (['SUBMITTED', 'AWAITING_EXIT_VERIFICATION', 'EXIT_VERIFIED', 'COMPLETED'].includes(attempt.status)) {
+      if (attempt.assessmentType === 'aptitude') {
+        res.status(200).json({
+          success: true,
+          message: 'Assessment is already finalized. Ready for administrator exit OTP verification.',
+          result: {
+            attemptId: attempt._id,
+            levelNumber: attempt.levelNumber,
+            assessmentType: 'aptitude',
+            totalScore: attempt.totalScore,
+            maxScore: attempt.maxScore || 40,
+            passingScore: attempt.passingScore || 24,
+            passed: attempt.passed,
+            correctCount: attempt.correctCount || 0,
+            wrongCount: attempt.wrongCount || 0,
+            unattemptedCount: attempt.unattemptedCount || 0,
+            negativePenalty: attempt.negativePenalty || 0,
+            levelCompletionStatus: attempt.passed ? 'COMPLETED' : 'RETRY_REQUIRED',
+            status: attempt.status,
+            isExitVerified: !!attempt.isExitVerified,
+            questionBreakdown: attempt.questionSubmissions.map((sub) => ({
+              questionNumber: sub.questionNumber,
+              questionId: sub.questionId,
+              selectedOption: sub.selectedOption || '',
+              correctOption: sub.correctOption || '',
+              isCorrect: sub.isCorrect,
+              isNegativeMarked: sub.isNegativeMarked,
+              questionScore: sub.questionScore,
+              explanation: sub.explanation || '',
+            })),
+          },
+        });
+        return;
+      }
+
       let passedTestCasesCount = 0;
       let totalTestCasesCount = 0;
 
@@ -705,8 +856,165 @@ export const submitOverallAssessment = async (
       return;
     }
 
-    // Auto-submission on time expiry is accepted and evaluated against official test cases
+    // Auto-submission on time expiry is accepted and evaluated
+    // Check if this is an Aptitude Assessment
+    if (attempt.assessmentType === 'aptitude') {
+      if (Array.isArray(submissions)) {
+        submissions.forEach((draft: any) => {
+          const sub = attempt.questionSubmissions.find(
+            (s) => s.questionId.toString() === String(draft.questionId)
+          );
+          if (sub && typeof draft.selectedOption === 'string') {
+            sub.selectedOption = draft.selectedOption.trim().toUpperCase();
+          }
+        });
+      }
 
+      const aptQuestions = await AptitudeQuestion.find({
+        courseId: attempt.courseId,
+        levelNumber: attempt.levelNumber,
+      });
+
+      const qMap = new Map<string, any>();
+      aptQuestions.forEach((q) => {
+        qMap.set(q._id.toString(), q);
+      });
+
+      let correctCount = 0;
+      let wrongCount = 0;
+      let unattemptedCount = 0;
+      const questionBreakdown: any[] = [];
+      const now = new Date();
+
+      for (const sub of attempt.questionSubmissions) {
+        const q = qMap.get(sub.questionId.toString());
+        if (!q) continue;
+
+        const selected = (sub.selectedOption || '').trim().toUpperCase();
+        let questionScore = 0;
+        let isCorrect = false;
+        let isNegativeMarked = false;
+
+        if (!selected) {
+          isCorrect = false;
+          isNegativeMarked = false;
+          questionScore = 0;
+          unattemptedCount += 1;
+        } else if (selected === q.correctOption) {
+          isCorrect = true;
+          isNegativeMarked = false;
+          questionScore = 1.0;
+          correctCount += 1;
+        } else {
+          isCorrect = false;
+          isNegativeMarked = true;
+          questionScore = -0.25;
+          wrongCount += 1;
+        }
+
+        sub.selectedOption = selected;
+        sub.correctOption = q.correctOption;
+        sub.explanation = q.explanation;
+        sub.isCorrect = isCorrect;
+        sub.isNegativeMarked = isNegativeMarked;
+        sub.questionScore = questionScore;
+        sub.submittedAt = now;
+
+        questionBreakdown.push({
+          questionNumber: sub.questionNumber,
+          questionId: sub.questionId,
+          selectedOption: selected,
+          correctOption: q.correctOption,
+          isCorrect,
+          isNegativeMarked,
+          questionScore,
+          explanation: q.explanation,
+        });
+      }
+
+      const negativePenalty = Math.round(wrongCount * 0.25 * 100) / 100;
+      const rawScore = correctCount * 1.0 - negativePenalty;
+      const totalScore = Math.max(0, Math.round(rawScore * 100) / 100);
+      const passingScore = 24;
+      const passed = totalScore >= passingScore;
+
+      attempt.totalScore = totalScore;
+      attempt.maxScore = 40;
+      attempt.passingScore = passingScore;
+      attempt.correctCount = correctCount;
+      attempt.wrongCount = wrongCount;
+      attempt.unattemptedCount = unattemptedCount;
+      attempt.negativePenalty = negativePenalty;
+      attempt.passed = passed;
+      attempt.status = 'AWAITING_EXIT_VERIFICATION';
+      attempt.finalSubmittedAt = now;
+      attempt.completedAt = now;
+      attempt.otpStatus = 'NOT_GENERATED';
+      attempt.isExitVerified = false;
+      await attempt.save();
+
+      if (attempt.bookingId) {
+        await Booking.findByIdAndUpdate(attempt.bookingId, { status: 'COMPLETED' });
+      }
+
+      const progress = await StudentProgress.findOne({
+        studentId: req.user?._id,
+        courseId: attempt.courseId,
+      });
+
+      let nextLevelUnlocked = false;
+      let nextLevelNumber: number | null = null;
+
+      if (progress) {
+        if (passed) {
+          if (!progress.completedLevels.includes(attempt.levelNumber)) {
+            progress.completedLevels.push(attempt.levelNumber);
+            progress.completedLevels.sort((a, b) => a - b);
+          }
+
+          if (progress.currentUnlockedLevel === attempt.levelNumber && attempt.levelNumber < 6) {
+            progress.currentUnlockedLevel = attempt.levelNumber + 1;
+            nextLevelUnlocked = true;
+            nextLevelNumber = attempt.levelNumber + 1;
+          }
+        }
+
+        const currentHighest = progress.highestScores.get(String(attempt.levelNumber)) || 0;
+        if (totalScore > currentHighest) {
+          progress.highestScores.set(String(attempt.levelNumber), totalScore);
+        }
+
+        await progress.save();
+      }
+
+      res.status(200).json({
+        success: true,
+        message: passed
+          ? `Assessment submitted successfully! You scored ${totalScore}/40 and passed Level ${attempt.levelNumber} (Passing score: 24/40).`
+          : `Assessment submitted. You scored ${totalScore}/40. A score of at least 24/40 is required to clear Level ${attempt.levelNumber}.`,
+        result: {
+          attemptId: attempt._id,
+          levelNumber: attempt.levelNumber,
+          assessmentType: 'aptitude',
+          totalScore,
+          maxScore: 40,
+          passingScore: 24,
+          passed,
+          correctCount,
+          wrongCount,
+          unattemptedCount,
+          negativePenalty,
+          levelCompletionStatus: passed ? 'COMPLETED' : 'RETRY_REQUIRED',
+          status: attempt.status,
+          nextLevelUnlocked,
+          nextLevelNumber,
+          questionBreakdown,
+        },
+      });
+      return;
+    }
+
+    // Coding Assessment Evaluation
     // Update in-memory draft code if provided
     if (Array.isArray(submissions)) {
       submissions.forEach((draft: any) => {
@@ -736,7 +1044,7 @@ export const submitOverallAssessment = async (
       const testResults = await Promise.all(
         question.mainTestCases.map(async (tc, index) => {
           const execution = await CodeExecutionService.execute(
-            sub.code,
+            sub.code || '',
             sub.language || question.language,
             tc.input,
             question.timeLimitMs,
@@ -1096,6 +1404,53 @@ export const reportSecurityViolation = async (
       message: 'Exam terminated due to Safe Exam security violation (tab switch/external navigation).',
       attemptId: attempt._id,
       status: attempt.status,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const saveAptitudeAnswer = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { attemptId } = req.params;
+    const { questionId, selectedOption } = req.body;
+
+    const attempt = await AssessmentAttempt.findOne({
+      _id: attemptId,
+      studentId: req.user?._id,
+    });
+
+    if (!attempt) return next(new AppError('Assessment attempt not found', 404));
+
+    if (attempt.status !== 'IN_PROGRESS' || new Date() > attempt.expiresAt) {
+      return next(new AppError('Assessment is not currently active or time has expired', 400));
+    }
+
+    const cleanOption = typeof selectedOption === 'string' ? selectedOption.trim().toUpperCase() : '';
+    if (cleanOption && !['A', 'B', 'C', 'D'].includes(cleanOption)) {
+      return next(new AppError('Invalid option selected. Must be A, B, C, D, or empty', 400));
+    }
+
+    const sub = attempt.questionSubmissions.find(
+      (s) => s.questionId.toString() === String(questionId)
+    );
+
+    if (!sub) {
+      return next(new AppError('Question not found in this assessment attempt', 404));
+    }
+
+    sub.selectedOption = cleanOption;
+    sub.submittedAt = new Date();
+    await attempt.save();
+
+    res.status(200).json({
+      success: true,
+      questionId,
+      selectedOption: cleanOption,
     });
   } catch (error: any) {
     next(error);

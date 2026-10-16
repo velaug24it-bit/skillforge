@@ -40,6 +40,10 @@ interface LevelDetail {
   topics: string[];
   passingScore: number;
   durationMinutes: number;
+  totalMarks?: number;
+  assessmentType?: string;
+  negativeMarking?: number;
+  marksPerQuestion?: number;
   isUnlocked: boolean;
   isCompleted: boolean;
   attemptsCount?: number;
@@ -250,7 +254,7 @@ export const CourseDetails: React.FC = () => {
                           </span>
                           <span className="text-[10px] text-surface-400 font-medium">
                             {typeof level.attemptsCount === 'number' && level.attemptsCount > 0
-                              ? `${level.attemptsCount} attempt${level.attemptsCount === 1 ? '' : 's'} made (Best: ${level.highestScore || 0}/100)`
+                              ? `${level.attemptsCount} attempt${level.attemptsCount === 1 ? '' : 's'} made (Best: ${level.highestScore || 0}/${level.totalMarks || (course.language === 'aptitude' ? 40 : 100)})`
                               : '0 attempts made'}
                           </span>
                         </div>
@@ -275,7 +279,11 @@ export const CourseDetails: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-1.5 text-surface-400">
                       <Award className="h-3.5 w-3.5 text-surface-500" />
-                      <span>2 Qs (100 pts)</span>
+                      <span>
+                        {course.language === 'aptitude' || level.assessmentType === 'aptitude'
+                          ? '40 MCQs (40 pts)'
+                          : '2 Qs (100 pts)'}
+                      </span>
                     </div>
                     <div className="flex items-center space-x-1.5 text-surface-400">
                       <RotateCcw className="h-3.5 w-3.5 text-surface-500" />
@@ -286,6 +294,14 @@ export const CourseDetails: React.FC = () => {
                       </span>
                     </div>
                   </div>
+
+                  {/* Aptitude Scoring Rule Pill */}
+                  {(course.language === 'aptitude' || level.assessmentType === 'aptitude') && (
+                    <div className="px-3 py-1.5 rounded-lg bg-purple-950/40 border border-purple-800/60 text-[10.5px] text-purple-300 flex items-center justify-between">
+                      <span className="font-semibold">Passing Mark: 24 / 40</span>
+                      <span className="text-purple-400 font-mono">+1.0 Correct &bull; -0.25 Wrong</span>
+                    </div>
+                  )}
 
                   {/* Topics List */}
                   <div>
@@ -332,7 +348,9 @@ export const CourseDetails: React.FC = () => {
                   {!isUnlocked ? (
                     <div className="p-2.5 rounded-xl bg-surface-950/60 border border-surface-800/80 text-center text-xs text-surface-400 flex items-center justify-center space-x-1.5">
                       <Lock className="h-3.5 w-3.5 text-surface-500" />
-                      <span>Score 100/100 on Level {level.levelNumber - 1} to unlock</span>
+                      <span>
+                        Score {course.language === 'aptitude' ? '24/40' : '100/100'} on Level {level.levelNumber - 1} to unlock
+                      </span>
                     </div>
                   ) : level.hasActiveAttempt && level.activeAttemptId ? (
                     <div className="space-y-2">

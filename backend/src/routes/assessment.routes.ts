@@ -11,6 +11,7 @@ import {
   exitAssessment,
   getMyResults,
   reportSecurityViolation,
+  saveAptitudeAnswer,
 } from '../controllers/assessment.controller';
 import { protect } from '../middlewares/auth';
 import { env } from '../config/env';
@@ -47,6 +48,7 @@ router.post('/start', startAssessment);
 router.get('/my-results', getMyResults);
 
 router.get('/:attemptId', getAssessmentAttemptById);
+router.post('/:attemptId/answer', saveAptitudeAnswer);
 router.post('/:attemptId/run-sample', codeExecutionLimiter, runSampleTest);
 router.post('/:attemptId/submit-question', codeExecutionLimiter, submitQuestion);
 router.post('/:attemptId/submit-overall', codeExecutionLimiter, submitOverallAssessment);

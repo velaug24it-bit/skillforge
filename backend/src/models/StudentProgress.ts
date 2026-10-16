@@ -4,7 +4,7 @@ export interface IStudentProgress extends Document {
   studentId: mongoose.Types.ObjectId;
   courseId: mongoose.Types.ObjectId;
   language: string;
-  currentUnlockedLevel: number; // 1, 2, 3, or 4
+  currentUnlockedLevel: number; // 1 to 6
   completedLevels: number[]; // Array of completed levels e.g. [1, 2]
   highestScores: Map<string, number>; // levelNumber -> score
   totalAttempts: number;
@@ -36,7 +36,7 @@ const studentProgressSchema = new Schema<IStudentProgress>(
       type: Number,
       default: 1, // Everyone starts at Level 1
       min: 1,
-      max: 4,
+      max: 6,
     },
     completedLevels: {
       type: [Number],

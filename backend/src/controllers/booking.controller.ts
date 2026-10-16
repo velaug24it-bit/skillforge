@@ -109,7 +109,8 @@ export const createBooking = async (
 
     const currentUnlockedLevel = progress ? progress.currentUnlockedLevel : 1;
     if (level.levelNumber > currentUnlockedLevel) {
-      return next(new AppError(`Level ${level.levelNumber} is locked. You must clear Level ${currentUnlockedLevel} with 100/100 first.`, 403));
+      const passRequirement = course.language === 'aptitude' ? '24/40' : '100/100';
+      return next(new AppError(`Level ${level.levelNumber} is locked. You must clear Level ${currentUnlockedLevel} with ${passRequirement} first.`, 403));
     }
 
     // Match valid predefined slot

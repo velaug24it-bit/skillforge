@@ -2,7 +2,7 @@ import mongoose, { Document, Schema, Model } from 'mongoose';
 
 export interface ICourse extends Document {
   name: string;
-  language: 'c' | 'cpp' | 'java' | 'python' | 'javascript';
+  language: 'c' | 'cpp' | 'java' | 'python' | 'javascript' | 'aptitude';
   description: string;
   icon: string;
   totalLevels: number;
@@ -28,7 +28,7 @@ const courseSchema = new Schema<ICourse>(
     language: {
       type: String,
       required: [true, 'Programming language is required'],
-      enum: ['c', 'cpp', 'java', 'python', 'javascript'],
+      enum: ['c', 'cpp', 'java', 'python', 'javascript', 'aptitude'],
       lowercase: true,
       trim: true,
     },
@@ -61,3 +61,4 @@ const courseSchema = new Schema<ICourse>(
 );
 
 export const Course: Model<ICourse> = mongoose.models.Course || mongoose.model<ICourse>('Course', courseSchema);
+

@@ -793,14 +793,18 @@ export const adminBookSlot = async (
     });
 
     if (!level) {
+      const isAptitude = course.language === 'aptitude';
       level = await AssessmentLevel.create({
         courseId: course._id,
         levelNumber: targetLevelNumber,
         title: `Level ${targetLevelNumber} Assessment`,
         description: `Level ${targetLevelNumber} evaluation for ${course.name}`,
-        passingScore: 100,
-        timeLimitMinutes: 60,
-        totalQuestions: 2,
+        passingScore: isAptitude ? 24 : 100,
+        totalMarks: isAptitude ? 40 : 100,
+        assessmentType: isAptitude ? 'aptitude' : 'coding',
+        negativeMarking: isAptitude ? 0.25 : 0,
+        marksPerQuestion: isAptitude ? 1 : 50,
+        durationMinutes: 60,
       });
     }
 

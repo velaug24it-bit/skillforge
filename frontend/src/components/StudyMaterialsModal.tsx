@@ -47,6 +47,17 @@ export const StudyMaterialsModal: React.FC<StudyMaterialsModalProps> = ({
     setSelectedAnswers((prev) => ({ ...prev, [qIdx]: optIdx }));
   };
 
+  const getYouTubeWatchUrl = (embedUrl: string): string => {
+    const match = embedUrl.match(/embed\/([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+      const videoId = match[1];
+      const timeMatch = embedUrl.match(/start=(\d+)/);
+      const timeParam = timeMatch ? `&t=${timeMatch[1]}s` : '';
+      return `https://www.youtube.com/watch?v=${videoId}${timeParam}`;
+    }
+    return embedUrl;
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
       <div className="bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-700 rounded-3xl max-w-4xl w-full p-5 sm:p-7 shadow-2xl space-y-6 my-6 max-h-[92vh] flex flex-col overflow-hidden transition-colors">
@@ -155,9 +166,27 @@ export const StudyMaterialsModal: React.FC<StudyMaterialsModalProps> = ({
                   src={material.video.embedUrl}
                   title={material.video.title}
                   className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
+                  referrerPolicy="strict-origin-when-cross-origin"
                 />
+              </div>
+
+              {/* Direct Watch Link / Fallback Banner */}
+              <div className="p-3.5 rounded-2xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-300/40 dark:border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-center space-x-2.5 text-slate-800 dark:text-amber-200 font-medium">
+                  <Video className="h-4 w-4 text-red-500 flex-shrink-0" />
+                  <span>Having trouble viewing the embedded video or prefer full-screen?</span>
+                </div>
+                <a
+                  href={getYouTubeWatchUrl(material.video.embedUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition flex-shrink-0 cursor-pointer shadow-sm shadow-red-600/20"
+                >
+                  <span>Watch on YouTube</span>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
               </div>
 
               {/* Video Meta Information */}

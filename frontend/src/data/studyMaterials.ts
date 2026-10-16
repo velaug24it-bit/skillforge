@@ -1440,6 +1440,140 @@ export function getStudyMaterial(language: string, levelNumber: number, levelTit
     return STUDY_MATERIALS[langKey][levelNumber];
   }
 
+  // Specialized Aptitude Curriculum Study Materials (Levels 1 to 6)
+  if (langKey === 'aptitude') {
+    const aptitudeLevelTitles: Record<number, string> = {
+      1: 'Level 1 — Arithmetic Fundamentals: Percentages, Ratios & Averages',
+      2: 'Level 2 — Commercial Mathematics: Profit/Loss, Interest & Work-Speed',
+      3: 'Level 3 — Logical Deduction: Series, Coding-Decoding & Syllogisms',
+      4: 'Level 4 — Analytical Puzzles: Seating, Clocks, Calendars & Assumptions',
+      5: 'Level 5 — Verbal Ability: Reading Comprehension, Grammar & Vocabulary',
+      6: 'Level 6 — Advanced Quantitative: Permutations, Probability & Data Interpretation',
+    };
+
+    const aptitudeVideos: Record<number, { title: string; embedUrl: string; duration: string; instructor: string; summary: string }> = {
+      1: {
+        title: 'Quantitative Aptitude Level 1: Fractions, Decimals & Speed Math Tricks',
+        embedUrl: 'https://www.youtube.com/embed/tnc9ojITRg4',
+        duration: '35 mins',
+        instructor: 'CareerRide Placement Preparation',
+        summary: 'Learn lightning-fast shortcuts for percentages, ratio proportionality, average adjustments, and simplification tricks for campus placements.',
+      },
+      2: {
+        title: 'Commercial Mathematics Level 2: Simple & Compound Interest Shortcuts',
+        embedUrl: 'https://www.youtube.com/embed/B7VqoXjoHPk',
+        duration: '28 mins',
+        instructor: 'Feel Free to Learn',
+        summary: 'Master fundamental formulas, effective percentage rate methods, and difference shortcuts for simple and compound interest.',
+      },
+      3: {
+        title: 'Logical Reasoning Level 3: Blood Relations & Direction Sense Shortcuts',
+        embedUrl: 'https://www.youtube.com/embed/LRdLhfDupMU',
+        duration: '32 mins',
+        instructor: 'CareerRide Placement Preparation',
+        summary: 'Master family tree diagrams for blood relations, coded relations, and Pythagoras theorem applied to 8 cardinal directions.',
+      },
+      4: {
+        title: 'Analytical Reasoning Level 4: Seating Arrangements & Puzzles',
+        embedUrl: 'https://www.youtube.com/embed/GYe98jwCn7g',
+        duration: '38 mins',
+        instructor: 'CareerRide Placement Preparation',
+        summary: 'Circular and linear seating arrangement strategies, inward/outward facing configurations, and elimination algorithms.',
+      },
+      5: {
+        title: 'Verbal Ability Level 5: Articles, Grammar & Reading Comprehension',
+        embedUrl: 'https://www.youtube.com/embed/TNkq01wrqUg',
+        duration: '26 mins',
+        instructor: 'CareerRide Placement Preparation',
+        summary: 'Techniques for spotting subject-verb agreement errors, tackling sentence correction, and scoring maximum marks in reading comprehension.',
+      },
+      6: {
+        title: 'Advanced Quantitative Level 6: Permutation, Combination & Probability',
+        embedUrl: 'https://www.youtube.com/embed/ETiRE7N7pEI',
+        duration: '42 mins',
+        instructor: 'CareerRide Placement Preparation',
+        summary: 'Master combinatorics nCr/nPr selections, independent & dependent events, coin/dice probability, and rapid data interpretation calculations.',
+      },
+    };
+
+    const videoInfo = aptitudeVideos[levelNumber] || aptitudeVideos[1];
+
+    return {
+      language: 'Quantitative & Logical Aptitude',
+      levelNumber,
+      levelTitle: levelTitle || aptitudeLevelTitles[levelNumber] || `Level ${levelNumber} — Aptitude Preparation`,
+      overview: `Strategic study material for Aptitude Level ${levelNumber}. Includes essential mathematical formulas, deduction frameworks, shortcut tricks, and negative marking caution (-0.25 penalty).`,
+      video: {
+        title: videoInfo.title,
+        embedUrl: videoInfo.embedUrl,
+        duration: videoInfo.duration,
+        instructor: videoInfo.instructor,
+        summary: videoInfo.summary,
+        timestamps: [
+          { time: '00:00', label: 'Fundamental Formulas & Theory' },
+          { time: '10:15', label: 'Speed Math Shortcuts & Mental Calculation' },
+          { time: '22:30', label: 'Step-by-Step Problem Solving & Model Questions' },
+          { time: '34:00', label: 'Negative Marking (-0.25) Management & Exam Strategy' },
+        ],
+      },
+      keyConcepts: [
+        {
+          title: `Level ${levelNumber} Examination Specifications`,
+          points: [
+            'Total marks: 40 marks across 40 multiple-choice questions (1 mark each)',
+            'Passing score: 24 marks (60% accuracy threshold required to clear and unlock the next level)',
+            'Negative marking: -0.25 mark penalty for each incorrect answer. Unattempted questions incur 0 penalty.',
+            'Strategy: Avoid blind guessing; only attempt questions where you can eliminate at least two options.',
+          ],
+        },
+        {
+          title: 'Core Topics & Quick Review',
+          points: topics.length > 0
+            ? topics.map((t) => `Concept mastery in ${t}`)
+            : ['Accurate arithmetic reasoning', 'Logical elimination of incorrect options', 'Time management: ~90 seconds per question'],
+        },
+      ],
+      codeExamples: [
+        {
+          title: `Level ${levelNumber} Key Formula Sheet`,
+          language: 'markdown',
+          code: `# Key Formulas & Shortcuts for Level ${levelNumber}\n# Passing Score: 24 / 40 Marks | Negative Penalty: -0.25\n\n- Accuracy is rewarded over blind volume.\n- Verify calculations before confirming selection.`,
+          explanation: 'Essential formulas and quick-reference points to remember before entering the exam.',
+        },
+      ],
+      commonPitfalls: [
+        {
+          problem: 'Guessing blindly on uncertain questions and accumulating negative marks',
+          solution: 'Remember each wrong answer deducts 0.25 marks. With 24 marks needed to pass, 4 wrong answers cancel out 1 correct answer. Skip questions you have no clue about.',
+        },
+        {
+          problem: 'Spending more than 2 minutes on a single puzzle or word problem',
+          solution: 'Mark the question and move forward. All 40 questions carry equal weight (1 mark each). Secure the easier questions first.',
+        },
+      ],
+      referenceLinks: [
+        {
+          title: 'Official Aptitude Formula Handbook',
+          url: 'https://en.wikipedia.org/wiki/Aptitude',
+          description: 'Comprehensive compendium of quantitative and logical problem-solving frameworks.',
+        },
+      ],
+      quickQuiz: [
+        {
+          question: `What is the passing mark and negative marking scheme for Aptitude Level ${levelNumber}?`,
+          options: [
+            'Pass: 20 marks, No negative marking',
+            'Pass: 24 marks, -0.25 negative mark per wrong answer (+1 for correct)',
+            'Pass: 30 marks, -0.5 negative mark per wrong answer',
+            'Pass: 40 marks, -1.0 negative mark per wrong answer',
+          ],
+          answerIndex: 1,
+          explanation: 'Each Aptitude level contains 40 marks with 1 mark per correct answer and -0.25 mark penalty for wrong answers. The passing threshold is strictly 24 marks.',
+        },
+      ],
+    };
+  }
+
   // Fallback generation for custom courses
   const capitalizedLang = language.charAt(0).toUpperCase() + language.slice(1);
   const topicsText = topics.length > 0 ? topics.join(', ') : 'Syntax, Logic, Algorithms and Best Practices';

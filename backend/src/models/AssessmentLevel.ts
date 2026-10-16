@@ -3,12 +3,16 @@ import mongoose, { Document, Schema, Model } from 'mongoose';
 export interface IAssessmentLevel extends Document {
   courseId: mongoose.Types.ObjectId;
   language: string;
-  levelNumber: number; // 1, 2, 3, 4
+  levelNumber: number; // 1 to 6
   title: string;
-  category: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+  category: 'Beginner' | 'Elementary' | 'Intermediate' | 'Advanced' | 'Expert' | 'Master' | string;
   description: string;
   topics: string[];
   passingScore: number;
+  totalMarks?: number;
+  assessmentType?: 'coding' | 'aptitude';
+  negativeMarking?: number;
+  marksPerQuestion?: number;
   durationMinutes: number;
   createdAt: Date;
   updatedAt: Date;
@@ -31,7 +35,7 @@ const assessmentLevelSchema = new Schema<IAssessmentLevel>(
       type: Number,
       required: true,
       min: 1,
-      max: 4,
+      max: 6,
     },
     title: {
       type: String,
@@ -39,7 +43,6 @@ const assessmentLevelSchema = new Schema<IAssessmentLevel>(
     },
     category: {
       type: String,
-      enum: ['Beginner', 'Intermediate', 'Advanced', 'Expert'],
       required: true,
     },
     description: {
@@ -47,9 +50,26 @@ const assessmentLevelSchema = new Schema<IAssessmentLevel>(
       required: true,
     },
     topics: [{ type: String }],
+    totalMarks: {
+      type: Number,
+      default: 100,
+    },
+    assessmentType: {
+      type: String,
+      enum: ['coding', 'aptitude'],
+      default: 'coding',
+    },
+    negativeMarking: {
+      type: Number,
+      default: 0,
+    },
+    marksPerQuestion: {
+      type: Number,
+      default: 50,
+    },
     passingScore: {
       type: Number,
-      default: 100, // 100/100 required
+      default: 100,
     },
     durationMinutes: {
       type: Number,

@@ -18,6 +18,7 @@ interface CourseOption {
   id: string;
   name: string;
   language: string;
+  totalLevels?: number;
   currentUnlockedLevel: number;
 }
 
@@ -353,8 +354,8 @@ export const BookExam: React.FC = () => {
               <label className="block text-xs font-medium text-surface-300 mb-1.5">
                 Assessment Level
               </label>
-              <div className="grid grid-cols-4 gap-2">
-                {[1, 2, 3, 4].map((lvl) => {
+              <div className={`grid gap-2 ${(selectedCourse?.totalLevels || 4) > 4 ? 'grid-cols-6' : 'grid-cols-4'}`}>
+                {Array.from({ length: selectedCourse?.totalLevels || 4 }, (_, i) => i + 1).map((lvl) => {
                   const isUnlocked = lvl <= maxUnlockedLevel;
                   const isSelected = selectedLevelNumber === lvl;
 

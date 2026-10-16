@@ -6,3 +6,5 @@ export * from './Booking';
 export * from './AssessmentAttempt';
 export * from './StudentProgress';
 export * from './GlobalExitOtp';
+
+export * from './AptitudeQuestion';
