@@ -1014,10 +1014,10 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Main Tab Controls */}
-      <div className="border-b border-surface-800 flex space-x-8 text-sm">
+      <div className="border-b border-surface-800 flex space-x-4 sm:space-x-8 text-xs sm:text-sm overflow-x-auto no-scrollbar whitespace-nowrap">
         <button
           onClick={() => setActiveTab('slots')}
-          className={`pb-3 font-semibold transition border-b-2 flex items-center space-x-2 ${
+          className={`pb-3 font-semibold transition border-b-2 flex items-center space-x-2 flex-shrink-0 ${
             activeTab === 'slots'
               ? 'border-brand-500 text-brand-400'
               : 'border-transparent text-surface-400 hover:text-white'
@@ -1029,7 +1029,7 @@ export const AdminDashboard: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('students')}
-          className={`pb-3 font-semibold transition border-b-2 flex items-center space-x-2 ${
+          className={`pb-3 font-semibold transition border-b-2 flex items-center space-x-2 flex-shrink-0 ${
             activeTab === 'students'
               ? 'border-brand-500 text-brand-400'
               : 'border-transparent text-surface-400 hover:text-white'
@@ -1041,7 +1041,7 @@ export const AdminDashboard: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('courses')}
-          className={`pb-3 font-semibold transition border-b-2 flex items-center space-x-2 ${
+          className={`pb-3 font-semibold transition border-b-2 flex items-center space-x-2 flex-shrink-0 ${
             activeTab === 'courses'
               ? 'border-brand-500 text-brand-400'
               : 'border-transparent text-surface-400 hover:text-white'
@@ -1057,7 +1057,7 @@ export const AdminDashboard: React.FC = () => {
             fetchAssessmentSessions();
             fetchGlobalOtpStatus();
           }}
-          className={`pb-3 font-semibold transition border-b-2 flex items-center space-x-2 ${
+          className={`pb-3 font-semibold transition border-b-2 flex items-center space-x-2 flex-shrink-0 ${
             activeTab === 'sessions'
               ? 'border-brand-500 text-brand-400'
               : 'border-transparent text-surface-400 hover:text-white'
@@ -1086,7 +1086,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={() => {
                   setSelectedQuickBookStudent(null);

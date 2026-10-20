@@ -298,43 +298,45 @@ export const MyAssessments: React.FC = () => {
             Booking History
           </h2>
           <div className="bg-surface-900 border border-surface-800 rounded-2xl overflow-hidden shadow-sm">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-surface-950/60 border-b border-surface-800 text-surface-400">
-                <tr>
-                  <th className="px-5 py-3 font-medium">Slot Reference</th>
-                  <th className="px-5 py-3 font-medium">Course / Level</th>
-                  <th className="px-5 py-3 font-medium">Date & Time</th>
-                  <th className="px-5 py-3 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-surface-800/60">
-                {pastBookings.map((b) => (
-                  <tr key={b.id} className="hover:bg-surface-800/30 transition">
-                    <td className="px-5 py-3.5 font-mono text-surface-300">{b.slotReference}</td>
-                    <td className="px-5 py-3.5 text-white">
-                      <span>{b.courseName}</span>
-                      <p className="text-[11px] text-surface-400">{b.levelTitle}</p>
-                    </td>
-                    <td className="px-5 py-3.5 text-surface-300">
-                      {b.date} ({b.startTime} - {b.endTime})
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
-                          b.status === 'COMPLETED'
-                            ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                            : b.status === 'CANCELLED'
-                            ? 'bg-surface-800 text-surface-400 border border-surface-700'
-                            : 'bg-amber-950 text-amber-300 border border-amber-800'
-                        }`}
-                      >
-                        {b.status}
-                      </span>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs min-w-[500px]">
+                <thead className="bg-surface-950/60 border-b border-surface-800 text-surface-400">
+                  <tr>
+                    <th className="px-5 py-3 font-medium">Slot Reference</th>
+                    <th className="px-5 py-3 font-medium">Course / Level</th>
+                    <th className="px-5 py-3 font-medium">Date & Time</th>
+                    <th className="px-5 py-3 font-medium">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-surface-800/60">
+                  {pastBookings.map((b) => (
+                    <tr key={b.id} className="hover:bg-surface-800/30 transition">
+                      <td className="px-5 py-3.5 font-mono text-surface-300">{b.slotReference}</td>
+                      <td className="px-5 py-3.5 text-white">
+                        <span>{b.courseName}</span>
+                        <p className="text-[11px] text-surface-400">{b.levelTitle}</p>
+                      </td>
+                      <td className="px-5 py-3.5 text-surface-300">
+                        {b.date} ({b.startTime} - {b.endTime})
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                            b.status === 'COMPLETED'
+                              ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                              : b.status === 'CANCELLED'
+                              ? 'bg-surface-800 text-surface-400 border border-surface-700'
+                              : 'bg-amber-950 text-amber-300 border border-amber-800'
+                          }`}
+                        >
+                          {b.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

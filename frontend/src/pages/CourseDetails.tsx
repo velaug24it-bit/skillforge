@@ -175,16 +175,18 @@ export const CourseDetails: React.FC = () => {
         </p>
 
         {/* Course Progress Summary */}
-        <div className="pt-4 border-t border-surface-800 flex flex-wrap items-center gap-6 text-xs text-surface-400">
+        <div className="pt-4 border-t border-surface-800 flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-surface-400">
           <div>
             <span>Curriculum Progress: </span>
             <span className="font-semibold text-white">
-              {course.studentProgress.completedLevels.length} / 4 Levels Cleared ({course.studentProgress.completionPercentage}%)
+              {course.studentProgress.completedLevels.length} / {course.totalLevels || course.levels.length} Levels Cleared ({course.studentProgress.completionPercentage}%)
             </span>
           </div>
           <div>
             <span>Passing Condition: </span>
-            <span className="font-semibold text-emerald-400">100 / 100 Marks (All 10 test cases must pass)</span>
+            <span className="font-semibold text-emerald-400">
+              {course.language === 'aptitude' ? '24 / 40 Marks (-0.25 Negative Marking)' : '100 / 100 Marks (All 10 test cases must pass)'}
+            </span>
           </div>
         </div>
       </div>
@@ -200,10 +202,10 @@ export const CourseDetails: React.FC = () => {
       <div className="space-y-4">
         <h2 className="text-lg font-bold text-white flex items-center space-x-2">
           <Award className="h-5 w-5 text-brand-400" />
-          <span>Assessment Levels (1 through 4)</span>
+          <span>Assessment Levels (1 through {course.totalLevels || course.levels.length})</span>
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
           {course.levels.map((level) => {
             const isUnlocked = level.isUnlocked;
             const isCompleted = level.isCompleted;
@@ -211,7 +213,7 @@ export const CourseDetails: React.FC = () => {
             return (
               <div
                 key={level.id}
-                className={`rounded-2xl border p-6 flex flex-col justify-between transition-all ${
+                className={`rounded-2xl border p-4 sm:p-6 flex flex-col justify-between transition-all ${
                   isUnlocked
                     ? isCompleted
                       ? 'bg-emerald-950/10 border-emerald-800/60 shadow-lg'

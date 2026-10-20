@@ -254,12 +254,16 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && !isAssessmentWorkspace && (
-        <div className="md:hidden border-b border-surface-800 bg-surface-900/95 px-4 pt-2 pb-4 space-y-1">
+        <div className={`md:hidden border-b px-4 pt-2 pb-5 space-y-1.5 transition-colors shadow-2xl ${
+          isLight ? 'border-slate-200 bg-white/98 text-slate-800' : 'border-surface-800 bg-surface-900/98 text-white'
+        }`}>
           {user ? (
             <>
-              <div className="px-3 py-2 border-b border-surface-800 mb-2">
-                <p className="text-sm font-semibold text-white">{user.name}</p>
-                <p className="text-xs text-surface-400 truncate">{user.email}</p>
+              <div className={`px-3 py-2.5 border-b mb-2 rounded-xl ${
+                isLight ? 'border-slate-200 bg-slate-50' : 'border-surface-800 bg-surface-950/60'
+              }`}>
+                <p className={`text-sm font-bold ${isLight ? 'text-slate-900' : 'text-white'}`}>{user.name}</p>
+                <p className={`text-xs truncate ${isLight ? 'text-slate-500' : 'text-surface-400'}`}>{user.email}</p>
               </div>
               {navLinks.map((link) => {
                 const Icon = link.icon;
@@ -269,11 +273,15 @@ export const Navbar: React.FC = () => {
                     key={link.path}
                     to={link.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${
-                      isActive ? 'bg-brand-600 text-white' : 'text-surface-300 hover:bg-surface-800'
+                    className={`flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition ${
+                      isActive
+                        ? 'bg-brand-600 text-white shadow-sm'
+                        : isLight
+                        ? 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                        : 'text-surface-300 hover:text-white hover:bg-surface-800'
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4 flex-shrink-0" />
                     <span>{link.name}</span>
                   </Link>
                 );
@@ -281,9 +289,11 @@ export const Navbar: React.FC = () => {
               <Link
                 to="/profile"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-surface-300 hover:bg-surface-800"
+                className={`flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition ${
+                  isLight ? 'text-slate-700 hover:bg-slate-100' : 'text-surface-300 hover:bg-surface-800'
+                }`}
               >
-                <UserIcon className="h-4 w-4 text-brand-400" />
+                <UserIcon className="h-4 w-4 text-brand-400 flex-shrink-0" />
                 <span>My Profile</span>
               </Link>
               <button
@@ -291,9 +301,11 @@ export const Navbar: React.FC = () => {
                   setMobileMenuOpen(false);
                   handleLogout();
                 }}
-                className="w-full flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-rose-400 hover:bg-rose-950/20"
+                className={`w-full flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer ${
+                  isLight ? 'text-rose-600 hover:bg-rose-50' : 'text-rose-400 hover:bg-rose-950/20'
+                }`}
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-4 w-4 flex-shrink-0" />
                 <span>Sign Out</span>
               </button>
             </>
@@ -302,14 +314,16 @@ export const Navbar: React.FC = () => {
               <Link
                 to="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block w-full text-center py-2 rounded-lg bg-surface-800 text-sm font-medium text-white"
+                className={`block w-full text-center py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition ${
+                  isLight ? 'bg-slate-100 text-slate-800 hover:bg-slate-200' : 'bg-surface-800 text-white hover:bg-surface-700'
+                }`}
               >
                 Sign In
               </Link>
               <Link
                 to="/register"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block w-full text-center py-2 rounded-lg bg-brand-600 text-sm font-semibold text-white"
+                className="block w-full text-center py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs sm:text-sm font-semibold text-white shadow-md shadow-brand-600/30 transition"
               >
                 Create Account
               </Link>

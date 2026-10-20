@@ -92,10 +92,10 @@ export const StudyMaterialsModal: React.FC<StudyMaterialsModalProps> = ({
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center space-x-2 border-b border-slate-200 dark:border-surface-800 overflow-x-auto pb-1 text-xs">
+        <div className="flex items-center space-x-1.5 sm:space-x-2 border-b border-slate-200 dark:border-surface-800 overflow-x-auto no-scrollbar pb-2 text-xs">
           <button
             onClick={() => setActiveTab('video')}
-            className={`px-3 py-2 rounded-xl font-bold transition flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-2 rounded-xl font-bold transition flex items-center space-x-1.5 cursor-pointer whitespace-nowrap flex-shrink-0 ${
               activeTab === 'video'
                 ? 'bg-brand-600 text-white shadow-sm'
                 : 'text-slate-600 dark:text-surface-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-800'
@@ -107,7 +107,7 @@ export const StudyMaterialsModal: React.FC<StudyMaterialsModalProps> = ({
 
           <button
             onClick={() => setActiveTab('concepts')}
-            className={`px-3 py-2 rounded-xl font-bold transition flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-2 rounded-xl font-bold transition flex items-center space-x-1.5 cursor-pointer whitespace-nowrap flex-shrink-0 ${
               activeTab === 'concepts'
                 ? 'bg-brand-600 text-white shadow-sm'
                 : 'text-slate-600 dark:text-surface-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-800'
@@ -119,7 +119,7 @@ export const StudyMaterialsModal: React.FC<StudyMaterialsModalProps> = ({
 
           <button
             onClick={() => setActiveTab('code')}
-            className={`px-3 py-2 rounded-xl font-bold transition flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-2 rounded-xl font-bold transition flex items-center space-x-1.5 cursor-pointer whitespace-nowrap flex-shrink-0 ${
               activeTab === 'code'
                 ? 'bg-brand-600 text-white shadow-sm'
                 : 'text-slate-600 dark:text-surface-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-800'
@@ -131,7 +131,7 @@ export const StudyMaterialsModal: React.FC<StudyMaterialsModalProps> = ({
 
           <button
             onClick={() => setActiveTab('pitfalls')}
-            className={`px-3 py-2 rounded-xl font-bold transition flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-2 rounded-xl font-bold transition flex items-center space-x-1.5 cursor-pointer whitespace-nowrap flex-shrink-0 ${
               activeTab === 'pitfalls'
                 ? 'bg-brand-600 text-white shadow-sm'
                 : 'text-slate-600 dark:text-surface-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-800'
@@ -143,7 +143,7 @@ export const StudyMaterialsModal: React.FC<StudyMaterialsModalProps> = ({
 
           <button
             onClick={() => setActiveTab('quiz')}
-            className={`px-3 py-2 rounded-xl font-bold transition flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-2 rounded-xl font-bold transition flex items-center space-x-1.5 cursor-pointer whitespace-nowrap flex-shrink-0 ${
               activeTab === 'quiz'
                 ? 'bg-brand-600 text-white shadow-sm'
                 : 'text-slate-600 dark:text-surface-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-800'

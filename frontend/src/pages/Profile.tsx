@@ -37,7 +37,7 @@ export const Profile: React.FC = () => {
               <p className="text-xs text-surface-400 mt-0.5">{user.email}</p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-brand-950 text-brand-300 border border-brand-800 capitalize flex items-center space-x-1.5">
               <Shield className="h-3.5 w-3.5 text-brand-400" />
               <span>{user.role} Candidate</span>

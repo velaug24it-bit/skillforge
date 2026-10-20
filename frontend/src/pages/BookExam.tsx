@@ -354,7 +354,7 @@ export const BookExam: React.FC = () => {
               <label className="block text-xs font-medium text-surface-300 mb-1.5">
                 Assessment Level
               </label>
-              <div className={`grid gap-2 ${(selectedCourse?.totalLevels || 4) > 4 ? 'grid-cols-6' : 'grid-cols-4'}`}>
+              <div className={`grid gap-2 ${(selectedCourse?.totalLevels || 4) > 4 ? 'grid-cols-3 sm:grid-cols-6' : 'grid-cols-2 sm:grid-cols-4'}`}>
                 {Array.from({ length: selectedCourse?.totalLevels || 4 }, (_, i) => i + 1).map((lvl) => {
                   const isUnlocked = lvl <= maxUnlockedLevel;
                   const isSelected = selectedLevelNumber === lvl;

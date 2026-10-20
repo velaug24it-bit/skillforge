@@ -148,7 +148,7 @@ export const MyResults: React.FC = () => {
                 </span>
               </div>
               <div className="flex items-center space-x-1.5 pt-1">
-                {[1, 2, 3, 4].map((lvl) => {
+                {Array.from({ length: cp.totalLevels || 4 }, (_, i) => i + 1).map((lvl) => {
                   const isCleared = cp.completedLevels.includes(lvl);
                   return (
                     <div

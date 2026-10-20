@@ -22,7 +22,11 @@ import {
   ChevronRight,
   BrainCircuit,
   RotateCcw,
-  ListFilter
+  ListFilter,
+  FileText,
+  Code2,
+  Terminal as TerminalIcon,
+  X
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
@@ -143,6 +147,8 @@ export const AssessmentWorkspace: React.FC = () => {
   const [sampleOutput, setSampleOutput] = useState<any | null>(null);
   const [submittingQuestion, setSubmittingQuestion] = useState(false);
   const [consoleTab, setConsoleTab] = useState<'sample' | 'evaluation'>('sample');
+  const [mobilePaletteOpen, setMobilePaletteOpen] = useState(false);
+  const [mobileCodingTab, setMobileCodingTab] = useState<'problem' | 'code' | 'console'>('problem');
 
   // Final Overall Submission states
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
@@ -381,6 +387,7 @@ export const AssessmentWorkspace: React.FC = () => {
       if (response.data.success) {
         setSampleOutput(response.data.sampleTest);
         setConsoleTab('sample');
+        setMobileCodingTab('console');
       }
     } catch (err: any) {
       alert(err?.response?.data?.message || 'Error running sample test');
@@ -395,6 +402,7 @@ export const AssessmentWorkspace: React.FC = () => {
     if (!targetAttemptId || !currentQuestion || !currentSub || isSubmitted) return;
     setSubmittingQuestion(true);
     setConsoleTab('evaluation');
+    setMobileCodingTab('console');
     try {
       const response = await api.post<{
         success: boolean;
@@ -592,20 +600,20 @@ export const AssessmentWorkspace: React.FC = () => {
   return (
     <div className={`h-[calc(100vh-4rem)] flex flex-col ${isLight ? 'bg-slate-100 text-slate-900' : 'bg-surface-950 text-surface-100'} overflow-hidden relative transition-colors duration-200`}>
       {/* Top Assessment Header */}
-      <div className={`h-14 border-b ${isLight ? 'border-slate-200 bg-white text-slate-900 shadow-sm' : 'border-surface-800 bg-surface-900 text-white'} px-4 sm:px-6 flex items-center justify-between flex-shrink-0 transition-colors`}>
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-2">
-            <span className="text-xs font-semibold uppercase px-2 py-0.5 rounded bg-brand-950 text-brand-300 border border-brand-800">
-              {attempt?.courseName || (isAptitude ? 'Quantitative & Logical Aptitude' : 'Programming Exam')}
+      <div className={`h-14 border-b ${isLight ? 'border-slate-200 bg-white text-slate-900 shadow-sm' : 'border-surface-800 bg-surface-900 text-white'} px-3 sm:px-6 flex items-center justify-between flex-shrink-0 transition-colors`}>
+        <div className="flex items-center space-x-2 sm:space-x-3 overflow-hidden">
+          <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
+            <span className="text-[10px] sm:text-xs font-semibold uppercase px-2 py-0.5 rounded bg-brand-950 text-brand-300 border border-brand-800 truncate max-w-[120px] sm:max-w-none">
+              {attempt?.courseName || (isAptitude ? 'Quantitative Aptitude' : 'Programming')}
             </span>
-            <span className={`text-sm font-bold ${isLight ? 'text-slate-900' : 'text-white'}`}>
-              Level {attempt?.levelNumber} {isAptitude ? 'MCQ Assessment' : 'Assessment'}
+            <span className={`text-xs sm:text-sm font-bold whitespace-nowrap ${isLight ? 'text-slate-900' : 'text-white'}`}>
+              L{attempt?.levelNumber}
             </span>
           </div>
 
           {/* Non-Aptitude Coding Question Nav Pills */}
           {!isAptitude && (
-            <div className={`flex items-center space-x-1.5 ml-4 pl-4 border-l ${isLight ? 'border-slate-200' : 'border-surface-800'}`}>
+            <div className={`hidden sm:flex items-center space-x-1.5 ml-2 pl-2 sm:ml-4 sm:pl-4 border-l ${isLight ? 'border-slate-200' : 'border-surface-800'}`}>
               {questions.map((q, idx) => {
                 const sub = submissions[q._id];
                 const isSelected = activeQuestionIndex === idx;
@@ -615,7 +623,7 @@ export const AssessmentWorkspace: React.FC = () => {
                   <button
                     key={q._id}
                     onClick={() => setActiveQuestionIndex(idx)}
-                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1 cursor-pointer ${
                       isSelected
                         ? 'bg-brand-600 text-white shadow-sm'
                         : isLight
@@ -637,7 +645,7 @@ export const AssessmentWorkspace: React.FC = () => {
 
           {/* Aptitude Question Status Pill in Header */}
           {isAptitude && (
-            <div className="hidden md:flex items-center space-x-2 ml-4 pl-4 border-l border-surface-800 text-xs">
+            <div className="hidden lg:flex items-center space-x-2 ml-4 pl-4 border-l border-surface-800 text-xs">
               <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800 font-mono font-semibold">
                 Answered: {answeredCount} / {questions.length}
               </span>
@@ -650,11 +658,11 @@ export const AssessmentWorkspace: React.FC = () => {
         </div>
 
         {/* Right Section: White BG Toggle, Safe Exam Badge, Timer & Overall Submit Button */}
-        <div className="flex items-center space-x-2.5 sm:space-x-3">
+        <div className="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0">
           {/* White / Dark Background Toggle Button */}
           <button
             onClick={toggleTheme}
-            className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer ${
+            className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer ${
               isLight
                 ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-sm'
                 : 'bg-surface-800 hover:bg-surface-700 border-surface-700 text-amber-300'
@@ -678,41 +686,41 @@ export const AssessmentWorkspace: React.FC = () => {
           {/* Safe Exam Proctoring Badge */}
           <div 
             title="Safe Exam Browser Active: Switching tabs or minimizing this window will instantly terminate your exam and log you out."
-            className="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-rose-950/50 border border-rose-800/80 text-[11px] text-rose-300 font-semibold shadow-inner"
+            className="flex items-center space-x-1 px-2 py-1.5 sm:px-3 rounded-lg bg-rose-950/50 border border-rose-800/80 text-[11px] text-rose-300 font-semibold shadow-inner"
           >
             <ShieldAlert className="h-3.5 w-3.5 text-rose-400 animate-pulse flex-shrink-0" />
-            <span>Safe Exam Active:</span>
-            <span className="text-rose-400 font-mono text-[10px]">Tab Switching Locked</span>
+            <span className="hidden md:inline">Safe Exam:</span>
+            <span className="text-rose-400 font-mono text-[10px] hidden sm:inline">Locked</span>
           </div>
 
           {/* Timer */}
-          <div className={`flex items-center space-x-2 text-xs font-mono px-3 py-1.5 rounded-lg border ${
+          <div className={`flex items-center space-x-1 sm:space-x-2 text-[11px] sm:text-xs font-mono px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg border ${
             secondsRemaining < 300 
               ? 'bg-rose-950/60 text-rose-300 border-rose-800 animate-pulse' 
               : isLight
               ? 'bg-slate-100 text-slate-800 border-slate-300 font-bold'
               : 'bg-surface-950 text-surface-200 border-surface-800'
           }`}>
-            <Clock className="h-3.5 w-3.5 text-surface-400" />
+            <Clock className="h-3.5 w-3.5 text-surface-400 flex-shrink-0" />
             <span>{formatTime(secondsRemaining)}</span>
           </div>
 
-          {/* Submit Overall Assessment Button */}
+          {/* Submit Button */}
           {!isSubmitted && (
             <button
               onClick={() => setIsSubmitModalOpen(true)}
               disabled={submittingOverall}
-              className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center space-x-1.5 shadow-sm shadow-emerald-600/30 disabled:opacity-50 cursor-pointer"
+              className="px-2.5 py-1.5 sm:px-4 sm:py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center space-x-1 sm:space-x-1.5 shadow-sm shadow-emerald-600/30 disabled:opacity-50 cursor-pointer"
             >
               {submittingOverall ? (
                 <>
                   <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                  <span>Evaluating...</span>
+                  <span className="hidden sm:inline">Evaluating...</span>
                 </>
               ) : (
                 <>
                   <Send className="h-3.5 w-3.5" />
-                  <span>{isAptitude ? 'Submit Exam' : 'Submit Overall Assessment'}</span>
+                  <span className="hidden sm:inline">{isAptitude ? 'Submit Exam' : 'Submit'}</span>
                 </>
               )}
             </button>
@@ -723,9 +731,9 @@ export const AssessmentWorkspace: React.FC = () => {
       {/* Main Workspace Body */}
       {isAptitude ? (
         /* APTITUDE MCQ WORKSPACE */
-        <div className="flex-1 flex overflow-hidden">
-          {/* Left: 40 Question Palette Sidebar */}
-          <div className={`w-72 sm:w-80 border-r flex flex-col flex-shrink-0 transition-colors ${
+        <div className="flex-1 flex overflow-hidden relative">
+          {/* Left: 40 Question Palette Sidebar (Desktop) */}
+          <div className={`hidden lg:flex w-72 sm:w-80 border-r flex-col flex-shrink-0 transition-colors ${
             isLight ? 'border-slate-200 bg-white' : 'border-surface-800 bg-surface-900/80'
           }`}>
             <div className={`p-4 border-b ${isLight ? 'border-slate-200 bg-slate-50' : 'border-surface-800 bg-surface-950/60'}`}>
@@ -809,10 +817,124 @@ export const AssessmentWorkspace: React.FC = () => {
             </div>
           </div>
 
+          {/* Mobile Question Palette Modal Drawer */}
+          {mobilePaletteOpen && (
+            <div className="lg:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-2 sm:p-4">
+              <div className={`w-full max-w-lg rounded-2xl border p-4 sm:p-6 shadow-2xl flex flex-col max-h-[85vh] transition-colors ${
+                isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-surface-900 border-surface-700 text-white'
+              }`}>
+                <div className="flex items-center justify-between pb-3 border-b border-surface-800">
+                  <div>
+                    <h3 className="text-sm font-bold flex items-center space-x-1.5">
+                      <ListFilter className="h-4 w-4 text-brand-400" />
+                      <span>Question Palette</span>
+                    </h3>
+                    <p className="text-[11px] text-surface-400 mt-0.5">
+                      {answeredCount} of {questions.length} answered ({unansweredCount} remaining)
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setMobilePaletteOpen(false)}
+                    className="p-1.5 rounded-lg text-surface-400 hover:text-white bg-surface-800 hover:bg-surface-700 cursor-pointer"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto py-4">
+                  <div className="grid grid-cols-5 gap-2">
+                    {questions.map((q, idx) => {
+                      const sub = submissions[q._id];
+                      const isAnswered = !!sub?.selectedOption;
+                      const isCurrent = activeQuestionIndex === idx;
+
+                      return (
+                        <button
+                          key={q._id}
+                          type="button"
+                          onClick={() => {
+                            setActiveQuestionIndex(idx);
+                            setMobilePaletteOpen(false);
+                          }}
+                          className={`h-11 rounded-xl text-xs font-bold transition flex flex-col items-center justify-center relative cursor-pointer ${
+                            isCurrent
+                              ? 'ring-2 ring-brand-500 ring-offset-2 ring-offset-surface-950 z-10'
+                              : ''
+                          } ${
+                            isAnswered
+                              ? 'bg-emerald-600 text-white shadow-sm'
+                              : isLight
+                              ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300'
+                              : 'bg-surface-800 hover:bg-surface-700 text-surface-300 border border-surface-700/60'
+                          }`}
+                        >
+                          <span>Q{q.questionNumber}</span>
+                          {isAnswered && (
+                            <span className="text-[9px] font-mono font-bold leading-none opacity-90">
+                              [{sub.selectedOption}]
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-surface-800 text-[11px] flex items-center justify-between text-surface-400">
+                  <span className="text-emerald-400 font-semibold font-mono">+1.0 Correct</span>
+                  <span className="text-rose-400 font-semibold font-mono">-0.25 Wrong</span>
+                  <span className="text-purple-400 font-bold">Pass: 24/40</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Right: Active Question & Interactive Options Card */}
-          <div className={`flex-1 overflow-y-auto p-6 lg:p-10 flex flex-col justify-between transition-colors ${
+          <div className={`flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 flex flex-col justify-between transition-colors ${
             isLight ? 'bg-slate-50 text-slate-900' : 'bg-surface-950 text-surface-100'
           }`}>
+            {/* Mobile Question Quick Bar */}
+            <div className={`lg:hidden mb-4 p-2.5 rounded-xl border flex items-center justify-between gap-2 ${
+              isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-surface-900 border-surface-800'
+            }`}>
+              <button
+                type="button"
+                onClick={() => setMobilePaletteOpen(true)}
+                className="px-2.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-[11px] font-bold flex items-center space-x-1.5 shadow-sm flex-shrink-0 cursor-pointer"
+              >
+                <ListFilter className="h-3.5 w-3.5" />
+                <span>Palette ({answeredCount}/{questions.length})</span>
+              </button>
+
+              <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar py-0.5">
+                {questions.map((q, idx) => {
+                  const sub = submissions[q._id];
+                  const isAnswered = !!sub?.selectedOption;
+                  const isCurrent = activeQuestionIndex === idx;
+
+                  return (
+                    <button
+                      key={q._id}
+                      type="button"
+                      onClick={() => setActiveQuestionIndex(idx)}
+                      className={`h-7 min-w-[28px] px-1.5 rounded-lg text-[10px] font-bold font-mono transition flex items-center justify-center flex-shrink-0 cursor-pointer ${
+                        isCurrent
+                          ? 'ring-2 ring-brand-500 bg-brand-600 text-white'
+                          : isAnswered
+                          ? 'bg-emerald-600 text-white'
+                          : isLight
+                          ? 'bg-slate-100 text-slate-700 border border-slate-300'
+                          : 'bg-surface-800 text-surface-300'
+                      }`}
+                    >
+                      {q.questionNumber}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="max-w-3xl w-full mx-auto space-y-6">
               {/* Question Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-surface-800">
@@ -951,7 +1073,54 @@ export const AssessmentWorkspace: React.FC = () => {
         </div>
       ) : (
         /* CODING SPLIT BODY: Monaco Editor */
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
+        <div className="flex-1 flex flex-col lg:grid lg:grid-cols-12 overflow-hidden">
+          {/* Mobile View Tab Switcher for Coding Workspace */}
+          <div className="lg:hidden flex items-center justify-around border-b border-surface-800 bg-surface-900/95 px-2 py-1.5 text-xs font-semibold flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => setMobileCodingTab('problem')}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                mobileCodingTab === 'problem'
+                  ? 'bg-brand-600 text-white shadow-sm'
+                  : 'text-surface-400 hover:text-white'
+              }`}
+            >
+              <FileText className="h-3.5 w-3.5" />
+              <span>Problem</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMobileCodingTab('code')}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                mobileCodingTab === 'code'
+                  ? 'bg-brand-600 text-white shadow-sm'
+                  : 'text-surface-400 hover:text-white'
+              }`}
+            >
+              <Code2 className="h-3.5 w-3.5" />
+              <span>Code Editor</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMobileCodingTab('console')}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                mobileCodingTab === 'console'
+                  ? 'bg-brand-600 text-white shadow-sm'
+                  : 'text-surface-400 hover:text-white'
+              }`}
+            >
+              <TerminalIcon className="h-3.5 w-3.5" />
+              <span>Console</span>
+              {currentSub && (currentSub.questionScore || 0) > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500 text-white font-bold">
+                  {currentSub.questionScore}/50
+                </span>
+              )}
+            </button>
+          </div>
+
           {/* Left Column: Problem Statement (5 cols) with Anti-Copy Lock */}
           <div 
             onContextMenu={(e) => e.preventDefault()}
@@ -959,7 +1128,9 @@ export const AssessmentWorkspace: React.FC = () => {
               e.preventDefault();
               alert('Safe Exam Alert: Copying problem statements and assessment materials to external sources is strictly prohibited.');
             }}
-            className={`lg:col-span-5 border-r overflow-y-auto p-6 space-y-6 select-none transition-colors duration-200 ${
+            className={`lg:col-span-5 border-r overflow-y-auto p-4 sm:p-6 space-y-6 select-none transition-colors duration-200 ${
+              mobileCodingTab === 'problem' ? 'flex flex-col flex-1' : 'hidden lg:block'
+            } ${
               isLight ? 'border-slate-200 bg-white text-slate-800' : 'border-surface-800 bg-surface-900/60 text-surface-200'
             }`}
           >
@@ -1022,9 +1193,13 @@ export const AssessmentWorkspace: React.FC = () => {
           </div>
 
           {/* Right Column: Code Editor & Execution Console (7 cols) */}
-          <div className="lg:col-span-7 flex flex-col overflow-hidden bg-surface-950">
+          <div className={`lg:col-span-7 flex flex-col overflow-hidden bg-surface-950 ${
+            mobileCodingTab !== 'problem' ? 'flex flex-1' : 'hidden lg:flex'
+          }`}>
             {/* Editor Area */}
-            <div className="flex-1 relative overflow-hidden">
+            <div className={`relative overflow-hidden transition-all ${
+              mobileCodingTab === 'console' ? 'hidden lg:block lg:flex-1' : 'flex-1'
+            }`}>
               <Editor
                 height="100%"
                 language={getMonacoLanguage(currentSub?.language || attempt?.language || 'c')}
@@ -1044,7 +1219,11 @@ export const AssessmentWorkspace: React.FC = () => {
             </div>
 
             {/* Bottom Execution Bar & Console */}
-            <div className={`h-60 border-t ${isLight ? 'border-slate-200 bg-white text-slate-800' : 'border-surface-800 bg-surface-900 text-surface-200'} flex flex-col flex-shrink-0 transition-colors`}>
+            <div className={`border-t transition-colors ${
+              mobileCodingTab === 'console' ? 'flex-1 flex flex-col' : 'h-60'
+            } ${
+              isLight ? 'border-slate-200 bg-white text-slate-800' : 'border-surface-800 bg-surface-900 text-surface-200'
+            } flex flex-col flex-shrink-0`}>
               {/* Controls bar */}
               <div className={`h-11 px-4 border-b ${isLight ? 'border-slate-200 bg-slate-50' : 'border-surface-800 bg-surface-950'} flex items-center justify-between`}>
                 <div className="flex items-center space-x-2 text-xs">
