@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { Response, NextFunction } from 'express';
+import * as XLSX from 'xlsx';
 import { User, Booking, Course, AssessmentAttempt, StudentProgress, AssessmentLevel, GlobalExitOtp, CodingQuestion } from '../models';
 import { AuthRequest } from '../middlewares/auth';
 import { AppError } from '../middlewares/errorHandler';
@@ -1021,6 +1022,250 @@ export const getAdminQuestions = async (
     next(error);
   }
 };
+
+/**
+ * Export complete student directory, assessment status, scores, and exam bookings to Excel (.xlsx)
+ * Accessible exclusively to Administrator
+ */
+export const exportStudentsExcel = async (
+  _req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const students = await User.find({ role: 'student' })
+      .select('-password')
+      .sort({ createdAt: -1 });
+
+    const studentIds = students.map((s) => s._id);
+
+    // Fetch progress, attempts, bookings, and courses in parallel
+    const [allProgress, allAttempts, allBookings] = await Promise.all([
+      StudentProgress.find({ studentId: { $in: studentIds } }).populate('courseId', 'name language totalLevels'),
+      AssessmentAttempt.find({ studentId: { $in: studentIds } })
+        .populate('courseId', 'name language')
+        .populate('levelId', 'levelNumber title')
+        .sort({ createdAt: -1 }),
+      Booking.find({ studentId: { $in: studentIds } })
+        .populate('courseId', 'name language')
+        .populate('levelId', 'levelNumber title')
+        .sort({ date: -1, startTime: -1 }),
+    ]);
+
+    // 1. Prepare Sheet 1: Students Overview
+    const studentsOverviewData = students.map((student, index) => {
+      const studentIdStr = student._id.toString();
+      const progressList = allProgress.filter((p) => p.studentId.toString() === studentIdStr);
+      const attempts = allAttempts.filter((a) => a.studentId.toString() === studentIdStr);
+      const bookings = allBookings.filter((b) => b.studentId.toString() === studentIdStr);
+
+      const enrolledCourseNames = progressList
+        .map((p) => (p.courseId as any)?.name || p.language?.toUpperCase())
+        .filter(Boolean)
+        .join(', ');
+
+      let totalClearedLevels = 0;
+      const courseProgressStrings: string[] = [];
+      let aptitudeClearedCount = 0;
+
+      progressList.forEach((p) => {
+        const cName = (p.courseId as any)?.name || p.language?.toUpperCase();
+        const cleared = p.completedLevels || [];
+        totalClearedLevels += cleared.length;
+        if (p.language === 'aptitude') {
+          aptitudeClearedCount = cleared.length;
+        }
+        if (cleared.length > 0) {
+          courseProgressStrings.push(`${cName}: L${cleared.join(', L')}`);
+        } else {
+          courseProgressStrings.push(`${cName}: L${p.currentUnlockedLevel || 1} in progress`);
+        }
+      });
+
+      const passedAttempts = attempts.filter((a) => a.passed);
+      const failedAttempts = attempts.filter((a) => !a.passed);
+      const passRate = attempts.length > 0
+        ? `${Math.round((passedAttempts.length / attempts.length) * 100)}%`
+        : '0%';
+
+      const maxScore = attempts.reduce((max, a) => Math.max(max, a.totalScore || 0), 0);
+      const avgScore = attempts.length > 0
+        ? (attempts.reduce((sum, a) => sum + (a.totalScore || 0), 0) / attempts.length).toFixed(1)
+        : '0';
+
+      const latestBooking = bookings[0] || null;
+
+      // Determine candidate status
+      let candidateStatus = 'REGISTERED';
+      if (latestBooking && latestBooking.attendanceStatus === 'ABSENT') {
+        candidateStatus = 'ABSENT_NEEDS_REBOOK';
+      } else if (latestBooking && latestBooking.status === 'BOOKED') {
+        candidateStatus = 'EXAM_SCHEDULED';
+      } else if (totalClearedLevels >= 10) {
+        candidateStatus = 'ADVANCED_CANDIDATE';
+      } else if (totalClearedLevels > 0) {
+        candidateStatus = 'ACTIVE_PROGRESSING';
+      } else if (attempts.length > 0) {
+        candidateStatus = 'EVALUATED_ATTEMPT';
+      }
+
+      return {
+        'S.No': index + 1,
+        'Student ID': studentIdStr,
+        'Full Name': student.name,
+        'Email Address': student.email,
+        'Registration Date': student.createdAt ? new Date(student.createdAt).toISOString().replace('T', ' ').substring(0, 19) : 'N/A',
+        'Overall Status': candidateStatus,
+        'Enrolled Courses Count': progressList.length,
+        'Enrolled Courses': enrolledCourseNames || 'None',
+        'Total Levels Cleared': totalClearedLevels,
+        'Aptitude Cleared': `${aptitudeClearedCount}/6 Levels`,
+        'Course-wise Level Detail': courseProgressStrings.join(' | ') || 'No activity yet',
+        'Total Assessment Attempts': attempts.length,
+        'Tests Passed': passedAttempts.length,
+        'Tests Failed / Incomplete': failedAttempts.length,
+        'Pass Rate': passRate,
+        'Best Score': maxScore,
+        'Average Score': avgScore,
+        'Latest Exam Date': latestBooking?.date || 'No Bookings',
+        'Latest Exam Timing': latestBooking ? `${latestBooking.startTime} - ${latestBooking.endTime}` : 'N/A',
+        'Latest Course & Level': latestBooking
+          ? `${(latestBooking.courseId as any)?.name || 'Course'} (${(latestBooking.levelId as any)?.title || `Level ${(latestBooking.levelId as any)?.levelNumber || ''}`})`
+          : 'N/A',
+        'Latest Booking Status': latestBooking?.status || 'N/A',
+        'Latest Attendance': latestBooking?.attendanceStatus || 'N/A',
+        'Latest Slot Reference': latestBooking?.slotReference || 'N/A',
+      };
+    });
+
+    // 2. Prepare Sheet 2: Assessment Attempts History
+    const attemptsHistoryData = allAttempts.map((attempt, index) => {
+      const student = students.find((s) => s._id.toString() === attempt.studentId?.toString());
+      return {
+        'S.No': index + 1,
+        'Attempt ID': attempt._id.toString(),
+        'Student Name': student?.name || 'Unknown',
+        'Student Email': student?.email || 'N/A',
+        'Course Name': (attempt.courseId as any)?.name || 'N/A',
+        'Level': attempt.levelNumber,
+        'Assessment Type': attempt.assessmentType?.toUpperCase() || 'CODING',
+        'Score Earned': attempt.totalScore,
+        'Max Marks': attempt.maxScore,
+        'Passing Marks': attempt.passingScore,
+        'Result': attempt.passed ? 'PASSED' : 'NOT CLEARED',
+        'Evaluation Status': attempt.status,
+        'MCQ Correct': attempt.correctCount ?? 'N/A',
+        'MCQ Wrong': attempt.wrongCount ?? 'N/A',
+        'Negative Penalty': attempt.negativePenalty ? `-${attempt.negativePenalty}` : '0',
+        'Date & Time': attempt.createdAt ? new Date(attempt.createdAt).toISOString().replace('T', ' ').substring(0, 19) : 'N/A',
+      };
+    });
+
+    // 3. Prepare Sheet 3: Exam Bookings & Attendance
+    const bookingsHistoryData = allBookings.map((booking, index) => {
+      const student = students.find((s) => s._id.toString() === booking.studentId?.toString());
+      return {
+        'S.No': index + 1,
+        'Slot Reference': booking.slotReference,
+        'Student Name': student?.name || 'Unknown',
+        'Student Email': student?.email || 'N/A',
+        'Course Name': (booking.courseId as any)?.name || 'N/A',
+        'Level': (booking.levelId as any)?.title || `Level ${(booking.levelId as any)?.levelNumber || ''}`,
+        'Exam Date': booking.date,
+        'Slot Timing': `${booking.startTime} - ${booking.endTime}`,
+        'Booking Status': booking.status,
+        'Proctor Attendance': booking.attendanceStatus,
+        'Booked At': booking.createdAt ? new Date(booking.createdAt).toISOString().replace('T', ' ').substring(0, 19) : 'N/A',
+      };
+    });
+
+    // 4. Construct Multi-Sheet Excel Workbook
+    const wb = XLSX.utils.book_new();
+
+    // Sheet 1: Students Overview
+    const wsStudents = XLSX.utils.json_to_sheet(studentsOverviewData);
+    wsStudents['!cols'] = [
+      { wch: 6 },  // S.No
+      { wch: 26 }, // Student ID
+      { wch: 22 }, // Full Name
+      { wch: 28 }, // Email Address
+      { wch: 20 }, // Registration Date
+      { wch: 22 }, // Overall Status
+      { wch: 14 }, // Enrolled Courses Count
+      { wch: 30 }, // Enrolled Courses
+      { wch: 18 }, // Total Levels Cleared
+      { wch: 18 }, // Aptitude Cleared
+      { wch: 36 }, // Course-wise Level Detail
+      { wch: 16 }, // Total Attempts
+      { wch: 14 }, // Tests Passed
+      { wch: 16 }, // Tests Failed / Incomplete
+      { wch: 12 }, // Pass Rate
+      { wch: 12 }, // Best Score
+      { wch: 14 }, // Average Score
+      { wch: 16 }, // Latest Exam Date
+      { wch: 18 }, // Latest Exam Timing
+      { wch: 32 }, // Latest Course & Level
+      { wch: 16 }, // Latest Booking Status
+      { wch: 18 }, // Latest Attendance
+      { wch: 20 }, // Latest Slot Reference
+    ];
+    XLSX.utils.book_append_sheet(wb, wsStudents, 'Students Overview');
+
+    // Sheet 2: Assessment Attempts History
+    const wsAttempts = XLSX.utils.json_to_sheet(attemptsHistoryData);
+    wsAttempts['!cols'] = [
+      { wch: 6 },
+      { wch: 26 },
+      { wch: 22 },
+      { wch: 28 },
+      { wch: 24 },
+      { wch: 10 },
+      { wch: 16 },
+      { wch: 14 },
+      { wch: 12 },
+      { wch: 14 },
+      { wch: 16 },
+      { wch: 18 },
+      { wch: 14 },
+      { wch: 14 },
+      { wch: 16 },
+      { wch: 20 },
+    ];
+    XLSX.utils.book_append_sheet(wb, wsAttempts, 'Assessment History');
+
+    // Sheet 3: Exam Bookings & Attendance
+    const wsBookings = XLSX.utils.json_to_sheet(bookingsHistoryData);
+    wsBookings['!cols'] = [
+      { wch: 6 },
+      { wch: 20 },
+      { wch: 22 },
+      { wch: 28 },
+      { wch: 24 },
+      { wch: 20 },
+      { wch: 14 },
+      { wch: 18 },
+      { wch: 16 },
+      { wch: 18 },
+      { wch: 20 },
+    ];
+    XLSX.utils.book_append_sheet(wb, wsBookings, 'Exam Bookings & Attendance');
+
+    // 5. Generate Excel Buffer
+    const excelBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const fileName = `SkillForge_Students_Master_Report_${dateStr}.xlsx`;
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    res.setHeader('Content-Length', excelBuffer.length);
+
+    res.end(excelBuffer);
+  } catch (error: any) {
+    next(error);
+  }
+};
+
 
 
 

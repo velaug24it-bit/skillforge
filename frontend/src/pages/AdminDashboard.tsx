@@ -23,7 +23,8 @@ import {
   Code,
   FileCode,
   CalendarPlus,
-  Layers
+  Layers,
+  FileSpreadsheet
 } from 'lucide-react';
 
 interface AdminQuestionRecord {
@@ -280,6 +281,7 @@ export const AdminDashboard: React.FC = () => {
   const [students, setStudents] = useState<StudentRecord[]>([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [exportingExcel, setExportingExcel] = useState(false);
 
   // Student History Modal state
   const [selectedStudentHistory, setSelectedStudentHistory] = useState<StudentHistoryData | null>(null);
@@ -428,6 +430,41 @@ export const AdminDashboard: React.FC = () => {
       });
     } finally {
       setLoadingStudents(false);
+    }
+  };
+
+  // Export Student Details, History & Bookings to Excel (.xlsx)
+  const handleExportExcel = async () => {
+    setExportingExcel(true);
+    try {
+      const response = await api.get('/admin/students/export-excel', {
+        responseType: 'blob',
+      });
+
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const dateStr = new Date().toISOString().slice(0, 10);
+      link.setAttribute('download', `SkillForge_Students_Master_Report_${dateStr}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      setNotification({
+        type: 'success',
+        message: 'Student details extracted successfully! Excel file (.xlsx) downloaded.',
+      });
+    } catch (err: any) {
+      setNotification({
+        type: 'error',
+        message: err?.response?.data?.message || 'Failed to export students Excel sheet',
+      });
+    } finally {
+      setExportingExcel(false);
     }
   };
 
@@ -920,7 +957,27 @@ export const AdminDashboard: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={handleExportExcel}
+            disabled={exportingExcel}
+            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/30 transition flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
+            title="Extract complete student details, progression status, scores, and exam bookings into Excel"
+          >
+            {exportingExcel ? (
+              <>
+                <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                <span>Exporting Excel...</span>
+              </>
+            ) : (
+              <>
+                <FileSpreadsheet className="h-3.5 w-3.5" />
+                <span>Export Students Excel</span>
+              </>
+            )}
+          </button>
+
           <button
             onClick={() => {
               fetchOverview();
@@ -1259,16 +1316,38 @@ export const AdminDashboard: React.FC = () => {
       {/* Tab 2: Student Directory & Progress History */}
       {activeTab === 'students' && (
         <div className="space-y-6">
-          {/* Search bar */}
-          <div className="bg-surface-900 border border-surface-800 rounded-2xl p-4 shadow-xl flex items-center space-x-3">
-            <Search className="h-4 w-4 text-surface-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search students by name or email address..."
-              className="w-full bg-transparent text-sm text-white placeholder-surface-500 focus:outline-none"
-            />
+          {/* Search bar & Excel Export Action Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="bg-surface-900 border border-surface-800 rounded-2xl p-4 shadow-xl flex items-center space-x-3 flex-1">
+              <Search className="h-4 w-4 text-surface-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search students by name or email address..."
+                className="w-full bg-transparent text-sm text-white placeholder-surface-500 focus:outline-none"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleExportExcel}
+              disabled={exportingExcel}
+              className="px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-600/30 transition flex items-center justify-center space-x-2 flex-shrink-0 cursor-pointer disabled:opacity-50"
+              title="Download full 3-sheet Excel workbook (Overview, Assessment History, Exam Bookings)"
+            >
+              {exportingExcel ? (
+                <>
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  <span>Extracting Excel...</span>
+                </>
+              ) : (
+                <>
+                  <FileSpreadsheet className="h-4 w-4" />
+                  <span>Export Students Excel (.xlsx)</span>
+                </>
+              )}
+            </button>
           </div>
 
           {loadingStudents ? (

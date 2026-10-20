@@ -15,6 +15,7 @@ import {
   adminBookSlot,
   createAdminQuestion,
   getAdminQuestions,
+  exportStudentsExcel,
 } from '../controllers/admin.controller';
 import { protect, authorize } from '../middlewares/auth';
 
@@ -25,6 +26,7 @@ router.use(protect);
 router.use(authorize('admin'));
 
 router.get('/overview', getAdminOverview);
+router.get('/students/export-excel', exportStudentsExcel);
 router.get('/students', getAdminStudents);
 router.get('/students/:studentId/history', getAdminStudentHistory);
 router.get('/slots', getDailyHourwiseBookings);
